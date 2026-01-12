@@ -69,7 +69,7 @@ export default function KoperasiHubPage() {
       >
         <div className="absolute inset-0 bg-linear-to-br from-black/70 via-black/60 to-green-900/50"></div>
         
-        <div className="max-w-7xl mx-auto w-full relative z-10">
+        <div className="max-w-6xl mx-auto w-full relative z-10">
           <div className="gap-8 lg:gap-12 items-center">
             {/* Left Content */}
             <div className="lg:col-span-3 text-white space-y-6">

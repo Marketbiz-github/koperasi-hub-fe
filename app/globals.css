@@ -24,3 +24,23 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes logo-slide {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-logo-slide {
+  animation: logo-slide 22s linear infinite;
+}
+
+/* Mobile lebih pelan */
+@media (max-width: 640px) {
+  .animate-logo-slide {
+    animation-duration: 30s;
+  }
+}

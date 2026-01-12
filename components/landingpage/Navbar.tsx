@@ -4,10 +4,12 @@ import { useState } from 'react';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDaftarOpen, setIsDaftarOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   return (
-    <nav className="bg-white shadow-lg fixed w-full top-0 z-50 border-b-2 border-green-500">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="fixed top-4 left-0 right-0 z-50 px-4">
+      <div className="max-w-7xl mx-auto bg-white backdrop-blur-lg shadow-xl border border-green-500 rounded-2xl px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-20">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 md:w-12 md:h-12 gradient-green rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition">
@@ -20,33 +22,73 @@ export default function Navbar() {
 
           <div className="hidden md:flex items-center space-x-3">
             <a
-              href="/marketplace"
+              href="/marketplace-vendor"
               className="flex items-center space-x-2 text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition"
             >
               <i className="fas fa-store"></i>
-              <span>Marketplace Hub</span>
+              <span>Marketplace Vendor</span>
             </a>
+
             <a
-                href="/login"
-                className="flex items-center space-x-2 text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition"
+              href="/marketplace-koperasi"
+              className="flex items-center space-x-2 text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition"
+            >
+              <i className="fas fa-store"></i>
+              <span>Marketplace Koperasi</span>
+            </a>
+
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setIsDaftarOpen(!isDaftarOpen);
+                  setIsLoginOpen(false);
+                }}
+                className="px-4 lg:px-5 py-2.5 rounded-xl gradient-green text-white text-sm font-semibold shadow-lg hover:shadow-xl transition transform hover:scale-105 flex items-center space-x-2"
               >
-                <i className="fas fa-sign-in-alt"></i>
+                <span>Daftar</span>
+                <i className="fas fa-chevron-down text-sm"></i>
+              </button>
+
+              {isDaftarOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border overflow-hidden z-50">
+                  <a
+                    href="/register-vendor"
+                    className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50"
+                  >
+                    Daftar Vendor
+                  </a>
+                  <a
+                    href="https://my.kooperasi.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50"
+                  >
+                    Daftar Koperasi
+                  </a>
+                </div>
+              )}
+            </div>
+
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setIsLoginOpen(!isLoginOpen);
+                  setIsDaftarOpen(false);
+                }}
+                className="px-4 lg:px-5 py-2.5 rounded-xl border-2 border-green-600 text-green-600 text-sm font-semibold hover:bg-green-50 transition flex items-center space-x-2"
+              >
                 <span>Login</span>
-              </a>
-            <a
-              href="/register-vendor"
-              className="px-4 lg:px-5 py-2.5 rounded-xl gradient-green text-white text-sm font-semibold shadow-lg hover:shadow-xl transition transform hover:scale-105"
-            >
-              Daftar Vendor
-            </a>
-            <a
-              href="https://my.kooperasi.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 lg:px-5 py-2.5 rounded-xl border-2 border-green-600 text-green-600 text-sm font-semibold hover:bg-green-50 transition"
-            >
-              Daftar Koperasi
-            </a>
+                <i className="fas fa-chevron-down text-sm"></i>
+              </button>
+
+              {isLoginOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border overflow-hidden z-50">
+                  <a href="/login/vendor" className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50">Login Vendor</a>
+                  <a href="/login/koperasi" className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50">Login Koperasi</a>
+                  <a href="/login/affiliator" className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50">Login Affiliator</a>
+                </div>
+              )}
+            </div>
           </div>
 
           <button
@@ -63,36 +105,62 @@ export default function Navbar() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 shadow-lg fade-in">
+        <div className="md:hidden bg-white border-t border-gray-100 shadow-lg fade-in rounded-2xl mt-2">
           <div className="px-4 pt-2 pb-4 space-y-3">
             <a
-              href="/marketplace"
+              href="/marketplace-vendor"
               className="flex items-center space-x-2 text-gray-700 hover:text-green-600 px-3 py-3 text-sm font-medium rounded-lg hover:bg-green-50 transition"
             >
               <i className="fas fa-store"></i>
-              <span>Marketplace Hub</span>
+              <span>Marketplace Vendor</span>
             </a>
+
             <a
-                href="/login"
-                className="flex items-center space-x-2 text-gray-700 hover:text-green-600 px-3 py-3 text-sm font-medium rounded-lg hover:bg-green-50 transition"
+              href="/marketplace-koperasi"
+              className="flex items-center space-x-2 text-gray-700 hover:text-green-600 px-3 py-3 text-sm font-medium rounded-lg hover:bg-green-50 transition"
+            >
+              <i className="fas fa-store"></i>
+              <span>Marketplace Koperasi</span>
+            </a>
+
+            <div>
+              <button
+                onClick={() => {
+                  setIsDaftarOpen(!isDaftarOpen);
+                }}
+                className="flex items-center justify-between w-full px-3 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-green-50"
               >
-                <i className="fas fa-sign-in-alt"></i>
+                <span>Daftar</span>
+                <i className={`fas ${isDaftarOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
+              </button>
+
+              {isDaftarOpen && (
+                <div className="mt-2 space-y-2">
+                  <a href="/register-vendor" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Daftar Vendor</a>
+                  <a href="https://my.kooperasi.com/" target="_blank" rel="noopener noreferrer" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Daftar Koperasi</a>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <button
+                onClick={() => {
+                  setIsLoginOpen(!isLoginOpen);
+                }}
+                className="flex items-center justify-between w-full px-3 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-green-50"
+              >
                 <span>Login</span>
-              </a>
-            <a
-              href="/register-vendor"
-              className="block w-full text-center px-4 py-3 rounded-xl gradient-green text-white text-sm font-semibold shadow-lg"
-            >
-              Daftar Vendor
-            </a>
-            <a
-              href="https://my.kooperasi.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full text-center px-4 py-3 rounded-xl border-2 border-green-600 text-green-600 text-sm font-semibold"
-            >
-              Daftar Koperasi
-            </a>
+                <i className={`fas ${isLoginOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
+              </button>
+
+              {isLoginOpen && (
+                <div className="mt-2 space-y-2">
+                  <a href="/login/vendor" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Login Vendor</a>
+                  <a href="/login/koperasi" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Login Koperasi</a>
+                  <a href="/login/affiliator" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Login Affiliator</a>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const token = req.cookies.get('access_token')?.value;
   const role = req.cookies.get('role')?.value;
   const path = req.nextUrl.pathname;
@@ -14,7 +14,7 @@ export function middleware(req: NextRequest) {
   if (path.startsWith('/dashboard/admin') && role !== 'admin') {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
-  
+
   if (path.startsWith('/dashboard/vendor') && role !== 'vendor') {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
