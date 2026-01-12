@@ -19,10 +19,10 @@ const users: UserWithPassword[] = [
   },
   {
     id: 2,
-    name: 'Reseller Andi',
-    email: 'reseller@test.com',
+    name: 'koperasi Andi',
+    email: 'koperasi@test.com',
     password: '123456',
-    role: 'reseller',
+    role: 'koperasi',
   },
   {
     id: 3,

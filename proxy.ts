@@ -19,7 +19,7 @@ export function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
-  if (path.startsWith('/dashboard/reseller') && role !== 'reseller') {
+  if (path.startsWith('/dashboard/koperasi') && role !== 'koperasi') {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 

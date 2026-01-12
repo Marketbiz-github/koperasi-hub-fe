@@ -38,8 +38,8 @@ export default function LoginPage() {
         router.push('/dashboard/admin');
       } else if (data.user.role === 'vendor') {
         router.push('/dashboard/vendor');
-      } else if (data.user.role === 'reseller') {
-        router.push('/dashboard/reseller');
+      } else if (data.user.role === 'koperasi') {
+        router.push('/dashboard/koperasi');
       } else {
         router.push('/dashboard/affiliator');
       }
