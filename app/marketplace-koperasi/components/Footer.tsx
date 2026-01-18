@@ -9,7 +9,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <div className="bg-[#10b981] w-8 h-8 rounded flex items-center justify-center font-bold">K</div>
+              <div className="w-10 h-10 md:w-12 md:h-12 gradient-green rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition">
+                <span className="text-white font-bold text-xl md:text-2xl">K</span>
+              </div>
               <span className="text-xl font-bold">KoperasiHub</span>
             </div>
             <p className="text-gray-300 text-sm">Platform marketplace yang menghubungkan vendor koperasi dengan konsumen di seluruh Indonesia.</p>

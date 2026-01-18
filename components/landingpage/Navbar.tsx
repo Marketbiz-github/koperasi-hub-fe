@@ -21,13 +21,13 @@ export default function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center space-x-3">
-            <a
+            {/* <a
               href="/marketplace-vendor"
               className="flex items-center space-x-2 text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition"
             >
               <i className="fas fa-store"></i>
               <span>Marketplace Vendor</span>
-            </a>
+            </a> */}
 
             <a
               href="/marketplace-koperasi"
@@ -107,13 +107,13 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 shadow-lg fade-in rounded-2xl mt-2">
           <div className="px-4 pt-2 pb-4 space-y-3">
-            <a
+            {/* <a
               href="/marketplace-vendor"
               className="flex items-center space-x-2 text-gray-700 hover:text-green-600 px-3 py-3 text-sm font-medium rounded-lg hover:bg-green-50 transition"
             >
               <i className="fas fa-store"></i>
               <span>Marketplace Vendor</span>
-            </a>
+            </a> */}
 
             <a
               href="/marketplace-koperasi"

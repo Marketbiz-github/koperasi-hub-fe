@@ -41,7 +41,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="/marketplace" className="hover:text-green-400 transition">
+                <a href="/marketplace-koperasi" className="hover:text-green-400 transition">
                   Marketplace
                 </a>
               </li>

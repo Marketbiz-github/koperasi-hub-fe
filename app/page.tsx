@@ -76,7 +76,7 @@ export default function KoperasiHubPage() {
               <div className="inline-block">
                 <span className="px-4 py-2 bg-green-500/20 backdrop-blur-sm rounded-full text-sm font-semibold border border-green-400/30">
                   <i className="fas fa-rocket mr-2"></i>
-                  Platform Terpercaya Indonesia
+                  Platform Distribusi Terpercaya Indonesia
                 </span>
               </div>
               
@@ -84,24 +84,6 @@ export default function KoperasiHubPage() {
                 Bisnis Anda Berkembang
                 <span className="block text-yellow-400">bersama Koperasi Indonesia</span>
               </h1>
-
-              {/* Stats */}
-              <div className="flex flex-wrap gap-6 md:gap-8 pt-2">
-                <div className="space-y-1">
-                  <div className="flex items-baseline space-x-2">
-                    <span className="text-4xl md:text-5xl font-bold">80</span>
-                    <span className="text-green-200 text-lg">++</span>
-                  </div>
-                  <p className="text-green-100 text-sm">Ribuan Produk Tersedia</p>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-baseline space-x-2">
-                    <span className="text-4xl md:text-5xl font-bold">1.7</span>
-                    <span className="text-green-200 text-lg">Jt</span>
-                  </div>
-                  <p className="text-green-100 text-sm">Juta Seller Aktif</p>
-                </div>
-              </div>
 
               {/* Features List */}
               <div className="space-y-3 pt-2">
@@ -117,6 +99,38 @@ export default function KoperasiHubPage() {
                     <span className="text-base md:text-lg text-green-50">{feature}</span>
                   </div>
                 ))}
+              </div>
+
+              {/* Stats Card (Glass Effect - Bottom Right) */}
+              <div className="mt-8 flex lg:justify-end">
+                <div className="flex items-center space-x-6 bg-white/20 backdrop-blur-md rounded-3xl px-8 py-4 shadow-lg border border-white/30">
+                  
+                  {/* Stat 1 */}
+                  <div className="space-y-1 text-white">
+                    <div className="flex items-baseline space-x-1">
+                      <span className="text-3xl md:text-4xl font-bold">80</span>
+                      <span className="text-green-300 text-lg">++</span>
+                    </div>
+                    <p className="text-xs md:text-sm text-green-100">
+                      Ribuan Produk
+                    </p>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="w-px bg-white/30"></div>
+
+                  {/* Stat 2 */}
+                  <div className="space-y-1 text-white">
+                    <div className="flex items-baseline space-x-1">
+                      <span className="text-3xl md:text-4xl font-bold">1.7</span>
+                      <span className="text-green-300 text-lg">Jt</span>
+                    </div>
+                    <p className="text-xs md:text-sm text-green-100">
+                      Seller Aktif
+                    </p>
+                  </div>
+
+                </div>
               </div>
             </div>
 

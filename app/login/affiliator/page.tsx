@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import LoginForm from '@/components/auth/loginAdmin';
+import LoginForm from '@/components/auth/loginAffiliator';
 
 export default function LoginPage() {
   const router = useRouter();

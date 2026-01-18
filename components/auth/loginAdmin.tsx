@@ -41,7 +41,7 @@ export default function LoginForm({
         <div className="w-full max-w-md">
           <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
-              Login Vendor
+              Login Admin
             </h1>
 
             <form onSubmit={onSubmit} className="space-y-6">
