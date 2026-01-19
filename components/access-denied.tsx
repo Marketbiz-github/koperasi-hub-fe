@@ -7,7 +7,7 @@ export function AccessDenied() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-700 to-slate-900 p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-lg">
         <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
           {/* Icon */}
           <div className="mb-6">
@@ -35,12 +35,9 @@ export function AccessDenied() {
           <p className="text-gray-600 mb-2">
             Anda tidak memiliki izin untuk mengakses halaman ini.
           </p>
-          <p className="text-sm text-gray-500 mb-8">
-            Role Anda: <span className="font-semibold capitalize text-gray-700">{user?.role}</span>
-          </p>
 
           {/* Buttons */}
-          <div className="space-y-3">
+          <div className="space-y-3 mt-12">
             <button
               onClick={() => router.back()}
               className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors duration-200"

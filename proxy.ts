@@ -26,12 +26,18 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
+  console.log('Middleware - Pathname:', pathname);
+  console.log('Middleware - Access Token:', accessToken ? 'Exists' : 'Not Found');
+  console.log('Middleware - User Role:', userRole || 'Not Found');
+
   // Redirect /dashboard ke role-specific dashboard (hanya jika sudah login)
   if (pathname === '/dashboard') {
     if (accessToken && userRole && roleRouteMap[userRole]) {
+      console.log('Middleware - Redirecting to role-specific dashboard for role:', userRole);
       // Sudah login dan role valid, redirect ke dashboard role-nya
       return NextResponse.redirect(new URL(roleRouteMap[userRole], request.url));
     } else if (!accessToken) {
+      console.log('Middleware - No access token, redirecting to /login1');
       // Belum login, redirect ke login
       return NextResponse.redirect(new URL('/login', request.url));
     }
@@ -44,8 +50,10 @@ export function proxy(request: NextRequest) {
   );
 
   if (isProtectedRoute) {
+    console.log('Middleware - Accessing protected route:', pathname);
     // Jika tidak ada token, redirect ke login
     if (!accessToken) {
+      console.log('Middleware - No access token, redirecting to /login2');
       return NextResponse.redirect(new URL('/login', request.url));
     }
     

@@ -1,37 +1,53 @@
-import { create } from 'zustand';
-import { User } from '@/types/user';
+import { create } from 'zustand'
+import { User } from '@/types/user'
 
 interface AuthState {
-  user: User | null;
-  setUser: (user: User) => void;
-  logout: () => Promise<void>;
-  isAuthenticated: () => boolean;
+  user: User | null
+  isHydrated: boolean
+  setUser: (user: User | null) => void
+  hydrate: () => Promise<void>
+  logout: () => Promise<void>
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
+  isHydrated: false,
 
   setUser: (user) => set({ user }),
 
-  logout: async () => {
+  hydrate: async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      const res = await fetch('/api/auth/me', {
+        credentials: 'include',
+      })
+
+      if (!res.ok) {
+        set({ user: null, isHydrated: true })
+        return
+      }
+
+      const data = await res.json()
+
+      set({
+        user: data.user ?? null,
+        isHydrated: true,
+      })
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Auth hydrate error:', error)
+      set({ user: null, isHydrated: true })
     }
-    
-    // Clear user from store
-    set({ user: null });
-    
-    // Clear cookies by redirecting through logout API or clearing manually
-    document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    document.cookie = 'role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    
-    // Redirect ke login page
-    window.location.href = '/login';
   },
 
-  isAuthenticated: () => {
-    return get().user !== null;
+  logout: async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+    } catch {}
+
+    set({ user: null })
+
+    document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;'
+    document.cookie = 'role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;'
+
+    window.location.href = '/login'
   },
-}));
+}))
