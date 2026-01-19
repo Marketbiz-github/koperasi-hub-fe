@@ -1,14 +1,23 @@
 "use client"
 
-import { IconCirclePlusFilled, IconMail, type Icon } from "@tabler/icons-react"
+import { IconChevronRight, type Icon } from "@tabler/icons-react"
+import { usePathname, useRouter } from "next/navigation"
+import * as React from "react"
 
-import { Button } from "@/components/ui/button"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 
 export function NavMain({
@@ -18,38 +27,83 @@ export function NavMain({
     title: string
     url: string
     icon?: Icon
+    items?: {
+      title: string
+      url: string
+    }[]
   }[]
 }) {
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const isActive = (url: string) => {
+    if (url === "#") return false
+    return pathname === url || pathname.startsWith(url + "/")
+  }
+
+  const hasActiveChild = (subItems?: { url: string }[]) => {
+    if (!subItems) return false
+    return subItems.some((item) => isActive(item.url))
+  }
+
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          <SidebarMenuItem className="flex items-center gap-2">
-            <SidebarMenuButton
-              tooltip="Quick Create"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-            >
-              <IconCirclePlusFilled />
-              <span>Quick Create</span>
-            </SidebarMenuButton>
-            <Button
-              size="icon"
-              className="size-8 group-data-[collapsible=icon]:opacity-0"
-              variant="outline"
-            >
-              <IconMail />
-              <span className="sr-only">Inbox</span>
-            </Button>
-          </SidebarMenuItem>
-        </SidebarMenu>
-        <SidebarMenu>
           {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton tooltip={item.title}>
-                {item.icon && <item.icon />}
-                <span>{item.title}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            <React.Fragment key={item.title}>
+              {item.items && item.items.length > 0 ? (
+                <Collapsible
+                  asChild
+                  defaultOpen={hasActiveChild(item.items)}
+                  className="group/collapsible"
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton
+                        tooltip={item.title}
+                        isActive={hasActiveChild(item.items)}
+                      >
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                        <IconChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {item.items.map((subItem) => (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton
+                              asChild
+                              isActive={isActive(subItem.url)}
+                              onClick={() => router.push(subItem.url)}
+                            >
+                              <a href={subItem.url}>
+                                <span>{subItem.title}</span>
+                              </a>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              ) : (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    isActive={isActive(item.url)}
+                    onClick={() => router.push(item.url)}
+                    asChild
+                  >
+                    <a href={item.url}>
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+            </React.Fragment>
           ))}
         </SidebarMenu>
       </SidebarGroupContent>

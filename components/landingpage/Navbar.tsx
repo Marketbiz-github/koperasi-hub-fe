@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isDaftarOpen, setIsDaftarOpen] = useState(false);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   return (
     <nav className="fixed top-4 left-0 right-0 z-50 px-4">
@@ -29,19 +29,18 @@ export default function Navbar() {
               <span>Marketplace Vendor</span>
             </a> */}
 
-            <a
+            <Link
               href="/marketplace-koperasi"
               className="flex items-center space-x-2 text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition"
             >
               <i className="fas fa-store"></i>
               <span>Marketplace Koperasi</span>
-            </a>
+            </Link>
 
             <div className="relative">
               <button
                 onClick={() => {
                   setIsDaftarOpen(!isDaftarOpen);
-                  setIsLoginOpen(false);
                 }}
                 className="px-4 lg:px-5 py-2.5 rounded-xl gradient-green text-white text-sm font-semibold shadow-lg hover:shadow-xl transition transform hover:scale-105 flex items-center space-x-2"
               >
@@ -65,29 +64,22 @@ export default function Navbar() {
                   >
                     Daftar Koperasi
                   </a>
+                  <a
+                    href="/register-affiliator"
+                    className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50"
+                  >
+                    Daftar Affiliator
+                  </a>
                 </div>
               )}
             </div>
 
             <div className="relative">
-              <button
-                onClick={() => {
-                  setIsLoginOpen(!isLoginOpen);
-                  setIsDaftarOpen(false);
-                }}
-                className="px-4 lg:px-5 py-2.5 rounded-xl border-2 border-green-600 text-green-600 text-sm font-semibold hover:bg-green-50 transition flex items-center space-x-2"
-              >
-                <span>Login</span>
-                <i className="fas fa-chevron-down text-sm"></i>
-              </button>
-
-              {isLoginOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border overflow-hidden z-50">
-                  <a href="/login/vendor" className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50">Login Vendor</a>
-                  <a href="/login/koperasi" className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50">Login Koperasi</a>
-                  <a href="/login/affiliator" className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50">Login Affiliator</a>
-                </div>
-              )}
+              <a href="/login" >
+                <button className="px-4 lg:px-5 py-2.5 rounded-xl border-2 border-green-600 text-green-600 text-sm font-semibold hover:bg-green-50 transition flex items-center space-x-2">
+                  <span>Login</span>
+                </button>
+              </a>
             </div>
           </div>
 
@@ -115,13 +107,13 @@ export default function Navbar() {
               <span>Marketplace Vendor</span>
             </a> */}
 
-            <a
+            <Link
               href="/marketplace-koperasi"
               className="flex items-center space-x-2 text-gray-700 hover:text-green-600 px-3 py-3 text-sm font-medium rounded-lg hover:bg-green-50 transition"
             >
               <i className="fas fa-store"></i>
               <span>Marketplace Koperasi</span>
-            </a>
+            </Link>
 
             <div>
               <button
@@ -138,28 +130,17 @@ export default function Navbar() {
                 <div className="mt-2 space-y-2">
                   <a href="/register-vendor" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Daftar Vendor</a>
                   <a href="https://my.kooperasi.com/" target="_blank" rel="noopener noreferrer" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Daftar Koperasi</a>
+                  <a href="/register-affiliator" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Daftar Affiliator</a>
                 </div>
               )}
             </div>
 
             <div>
-              <button
-                onClick={() => {
-                  setIsLoginOpen(!isLoginOpen);
-                }}
-                className="flex items-center justify-between w-full px-3 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-green-50"
-              >
-                <span>Login</span>
-                <i className={`fas ${isLoginOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
-              </button>
-
-              {isLoginOpen && (
-                <div className="mt-2 space-y-2">
-                  <a href="/login/vendor" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Login Vendor</a>
-                  <a href="/login/koperasi" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Login Koperasi</a>
-                  <a href="/login/affiliator" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Login Affiliator</a>
-                </div>
-              )}
+              <a href="/login" >
+                <button className="flex items-center justify-between w-full px-3 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-green-50">
+                  <span>Login</span>
+                </button>
+              </a>
             </div>
           </div>
         </div>
