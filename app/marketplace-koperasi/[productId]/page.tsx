@@ -3,19 +3,19 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Heart, Share2, ShoppingCart, MessageCircle, MapPin, Phone, ArrowLeft } from 'lucide-react';
+import { Star, Heart, Share2, ShoppingCart, ArrowLeft, StoreIcon } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     productId: string;
-  };
+  }>;
 };
 
 export default function ProductDetailPage({ params }: PageProps) {
-  const { productId } = params;
+  const { productId } = React.use(params);
   const addItem = useCartStore((s) => s.addItem);
   const [quantity, setQuantity] = React.useState(1);
   const [isWishlisted, setIsWishlisted] = React.useState(false);
@@ -98,7 +98,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                 </div>
 
                 {/* Wishlist & Share */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 mt-6">
                   <button
                     onClick={() => setIsWishlisted(!isWishlisted)}
                     className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg border transition font-medium ${
@@ -114,6 +114,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                     <Share2 size={20} />
                     Bagikan
                   </button>
+                  
                 </div>
               </div>
 
@@ -177,79 +178,28 @@ export default function ProductDetailPage({ params }: PageProps) {
                 {/* Add to Cart Button */}
                 <button
                   onClick={handleAddToCart}
-                  className="w-full gradient-green text-white py-4 rounded-lg font-bold flex items-center justify-center gap-2 hover:opacity-90 transition text-lg"
+                  className="w-fit gradient-green text-white py-3 px-6 rounded-lg font-bold flex items-center justify-center gap-2 hover:opacity-90 transition"
                 >
                   <ShoppingCart size={24} />
                   Tambah ke Keranjang
                 </button>
 
-                {/* Divider */}
-                <div className="border-t pt-6">
-                  {/* Store Info */}
-                  <h3 className="font-bold text-xl mb-4">Penjual</h3>
-                  <div className="flex items-start gap-4">
-                    <Image
-                      src={product.owner.image}
-                      alt={product.owner.name}
-                      width={80}
-                      height={80}
-                      className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
-                    />
-
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <p className="font-bold text-lg text-gray-900">{product.owner.name}</p>
-                        {product.owner.verified && (
-                          <span className="bg-blue-100 text-blue-600 text-xs px-2.5 py-1 rounded font-medium">
-                            ✓ Terverifikasi
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-                        <div className="flex items-center gap-1">
-                          <Star size={16} className="fill-yellow-400 text-yellow-400" />
-                          <span className="font-medium">{product.owner.rating}</span>
-                        </div>
-                        <span>({product.owner.reviews} ulasan)</span>
-                      </div>
-
-                      {product.owner.address && (
-                        <div className="flex items-start gap-2 text-sm text-gray-600 mb-2">
-                          <MapPin size={16} className="mt-0.5 shrink-0" />
-                          <span>{product.owner.address}</span>
-                        </div>
-                      )}
-
-                      {product.owner.phone && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-                          <Phone size={16} />
-                          <span>{product.owner.phone}</span>
-                        </div>
-                      )}
-
-                      <div className="flex gap-2 pt-2">
-                        <Link
-                          href={`/store/${product.owner.id}`}
-                          className="flex-1 bg-[#2F5755] hover:bg-[#244746] text-white py-2.5 rounded-lg text-center font-medium transition"
-                        >
-                          Kunjungi Toko
-                        </Link>
-                        <button className="flex-1 border border-[#2F5755] text-[#2F5755] hover:bg-[#2F5755] hover:text-white py-2.5 rounded-lg flex items-center justify-center gap-2 transition font-medium">
-                          <MessageCircle size={18} />
-                          Chat
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
 
           {/* Related Products */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-6">Produk Serupa dari Penjual Ini</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Produk Serupa dari Penjual Ini</h2>
+              <Link
+                href={`/store/${product.owner.id}`}
+                className="w-fit bg-[#2F5755] hover:bg-[#244746] text-white py-3 px-6 rounded-lg text-center font-medium transition flex items-center gap-2"
+              >
+                <StoreIcon size={16} />
+                Kunjungi Toko
+              </Link>      
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {relatedProducts.map((product, index) => (
                 <Link

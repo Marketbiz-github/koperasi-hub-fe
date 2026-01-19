@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { Star, MapPin, Phone, Mail, Globe, Facebook, Instagram, Twitter, Share2, ShoppingBag } from 'lucide-react';
-import CarouselBanner from '../../components/CarouselBanner';
+import CarouselBanner from '@/components/carousel-banner';
 import Header from '../../marketplace-koperasi/components/Header';
 import Footer from '../../marketplace-koperasi/components/Footer';
 import ProductCard from '../../marketplace-koperasi/components/ProductCard';
