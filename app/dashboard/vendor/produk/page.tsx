@@ -26,7 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 // import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Plus, Upload, Pencil, Trash2 } from "lucide-react"
+import { Plus, Upload, Pencil, Trash2, DollarSign } from "lucide-react"
 
 export default function ProductsPage() {
   return (
@@ -147,6 +147,15 @@ export default function ProductsPage() {
                   <Badge>Aktif</Badge>
                 </TableCell>
                 <TableCell className="text-right space-x-2">
+                  <a href="/dashboard/vendor/produk/1/atur-harga">
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      title="Atur harga koperasi"
+                    >
+                      <DollarSign className="h-4 w-4" />
+                    </Button>
+                  </a>
                   <Button size="icon" variant="outline">
                     <Pencil className="h-4 w-4" />
                   </Button>
@@ -169,6 +178,15 @@ export default function ProductsPage() {
                   <Badge>Aktif</Badge>
                 </TableCell>
                 <TableCell className="text-right space-x-2">
+                  <a href="/dashboard/vendor/produk/2/atur-harga">
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      title="Atur harga koperasi"
+                    >
+                      <DollarSign className="h-4 w-4" />
+                    </Button>
+                  </a>
                   <Button size="icon" variant="outline">
                     <Pencil className="h-4 w-4" />
                   </Button>
