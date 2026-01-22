@@ -1,47 +1,184 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import * as React from "react"
+import {
+  IconDashboard,
+  IconInnerShadowTop,
+  IconSettings,
+  IconShoppingCart,
+  IconGift,
+  IconBox,
+  IconMessageHeart,
+  IconDeviceLaptop,
+  IconCashRegister,
+} from "@tabler/icons-react"
 
-const menus = [
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Produk", href: "/dashboard/products" },
-  { label: "Order", href: "/dashboard/orders" },
-];
+import { NavMain } from "@/components/nav-main"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar"
 
-export function Sidebar() {
+const data = {
+  user: {
+    name: "shadcn",
+    email: "m@example.com",
+    avatar: "/avatars/shadcn.jpg",
+  },
+  navMain: [
+    {
+      title: "Dashboard",
+      url: "/dashboard/koperasi",
+      icon: IconDashboard,
+    },
+    {
+      title: "Kelola Microsite",
+      url: "#",
+      icon: IconDeviceLaptop,
+      items: [
+        {
+          title: "Profil",
+          url: "/dashboard/koperasi/microsite/profil",
+        },
+        {
+          title: "Laporan",
+          url: "/dashboard/koperasi/microsite/laporan",
+        },
+        {
+          title: "Kegiatan",
+          url: "/dashboard/koperasi/microsite/kegiatan",
+        }
+      ],
+    },
+    {
+      title: "Marketplace",
+      url: "/dashboard/koperasi/marketplace",
+      icon: IconShoppingCart,
+    },
+    {
+      title: "Produk",
+      url: "#",
+      icon: IconBox,
+      items: [
+        {
+          title: "Kategori Produk",
+          url: "/dashboard/koperasi/produk/kategori",
+        },
+        {
+          title: "Produk",
+          url: "/dashboard/koperasi/produk",
+        },
+      ],
+    },
+    {
+      title: "Word-of-mouth",
+      url: "#",
+      icon: IconMessageHeart,
+      items: [
+        {
+          title: "Campaign",
+          url: "/dashboard/koperasi/wom/campaign",
+        },
+        {
+          title: "Data Transaksi",
+          url: "/dashboard/koperasi/wom/data-transaksi",
+        },
+      ],
+    },
+    {
+      title: "Penjualan",
+      url: "/dashboard/koperasi/penjualan",
+      icon: IconCashRegister,
+    },
+    {
+      title: "Fitur",
+      url: "#",
+      icon: IconGift,
+      items: [
+        {
+          title: "Produk Unggulan",
+          url: "/dashboard/koperasi/fitur/produk-unggulan",
+        },
+        {
+          title: "Produk Diminati",
+          url: "/dashboard/koperasi/fitur/produk-diminati",
+        },
+        {
+          title: "Voucher",
+          url: "/dashboard/koperasi/fitur/voucher",
+        },
+        {
+          title: "Manajemen Stok",
+          url: "/dashboard/koperasi/fitur/manajemen-stok",
+        },
+        {
+          title: "Flash Sale",
+          url: "/dashboard/koperasi/fitur/flash-sale",
+        },
+      ],
+    },
+    {
+      title: "Pengaturan Toko",
+      url: "#",
+      icon: IconSettings,
+      items: [
+        {
+          title: "Detail Toko",
+          url: "/dashboard/koperasi/pengaturan-toko/detail",
+        },
+        {
+          title: "Shipping",
+          url: "/dashboard/koperasi/pengaturan-toko/shipping",
+        },
+        {
+          title: "Gudang",
+          url: "/dashboard/koperasi/pengaturan-toko/gudang",
+        },
+        {
+          title: "Pembayaran",
+          url: "/dashboard/koperasi/pengaturan-toko/pembayaran",
+        },
+        {
+          title: "WMS",
+          url: "/dashboard/koperasi/pengaturan-toko/wms",
+        },
+        {
+          title: "Pengaturan Lainnya",
+          url: "/dashboard/koperasi/pengaturan-toko/lainnya",
+        },
+      ],
+    },
+  ],
+}
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <>
-      {/* Desktop */}
-      <aside className="hidden md:flex w-64 border-r bg-white p-4">
-        <nav className="space-y-2">
-          {menus.map((m) => (
-            <Link key={m.href} href={m.href} className="block rounded px-3 py-2 hover:bg-slate-100">
-              {m.label}
-            </Link>
-          ))}
-        </nav>
-      </aside>
-
-      {/* Mobile */}
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button variant="ghost" className="md:hidden fixed top-4 left-4 z-50">
-            <Menu />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="p-4">
-          <nav className="space-y-2">
-            {menus.map((m) => (
-              <Link key={m.href} href={m.href} className="block rounded px-3 py-2 hover:bg-slate-100">
-                {m.label}
-              </Link>
-            ))}
-          </nav>
-        </SheetContent>
-      </Sheet>
-    </>
-  );
+    <Sidebar collapsible="offcanvas" {...props}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className="data-[slot=sidebar-menu-button]:p-1.5!"
+            >
+              <a href="#">
+                <IconInnerShadowTop className="size-5!" />
+                <span className="text-base font-semibold">Acme Inc.</span>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent>
+        <NavMain items={data.navMain} />
+      </SidebarContent>
+      <SidebarFooter>
+      </SidebarFooter>
+    </Sidebar>
+  )
 }

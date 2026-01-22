@@ -45,7 +45,7 @@ interface Koperasi {
 }
 
 export default function KoperasiPage() {
-  const [koperasiList, setKoperasiList] = useState<Koperasi[]>([
+  const [koperasiList] = useState<Koperasi[]>([
     {
       id: "1",
       nama: "Koperasi Sejahtera",

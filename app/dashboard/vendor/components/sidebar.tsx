@@ -5,10 +5,10 @@ import {
   IconDashboard,
   IconInnerShadowTop,
   IconSettings,
-  IconShoppingCart,
   IconBuildingCommunity,
   IconGift,
   IconBox,
+  IconCashRegister,
 } from "@tabler/icons-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -67,7 +67,7 @@ const data = {
     {
       title: "Penjualan",
       url: "/dashboard/vendor/penjualan",
-      icon: IconShoppingCart,
+      icon: IconCashRegister,
     },
     {
       title: "Fitur",
