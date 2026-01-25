@@ -50,7 +50,7 @@ export default function ProductCard({ product }: { product: Product }) {
   };
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow overflow-hidden group flex flex-col h-full">
-      <Link href={`/marketplace-koperasi/${product.id || product.name}`} className="flex-1">
+      <Link href={`/marketplace/${product.id || product.name}`} className="flex-1">
         <div className="relative cursor-pointer">
           {product.badge && (
             <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">

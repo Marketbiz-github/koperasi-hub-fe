@@ -55,7 +55,7 @@ export default function Header() {
               </div>
 
               {/* Cart icon */}
-              <Link href="/marketplace-koperasi/cart" className="relative text-white hover:text-[#10b981] transition">
+              <Link href="/marketplace/cart" className="relative text-white hover:text-[#10b981] transition">
                 <ShoppingCart className="w-6 h-6" />
                 {mounted && itemCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">

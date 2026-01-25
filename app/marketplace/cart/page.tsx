@@ -109,13 +109,13 @@ export default function CartPage() {
       <div className="max-w-5xl mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Keranjang Belanja</h1>
-          <Link href="/marketplace-koperasi" className="text-[#2F5755] hover:text-[#10b981]">Lanjut Belanja</Link>
+          <Link href="/marketplace" className="text-[#2F5755] hover:text-[#10b981]">Lanjut Belanja</Link>
         </div>
 
         {items.length === 0 ? (
           <div className="bg-white p-8 rounded-lg text-center">
             <div className="text-gray-600">Keranjangmu masih kosong.</div>
-            <Link href="/marketplace-koperasi" className="inline-block mt-4 bg-[#10b981] text-white px-5 py-2 rounded-lg">Kembali ke toko</Link>
+            <Link href="/marketplace" className="inline-block mt-4 bg-[#10b981] text-white px-5 py-2 rounded-lg">Kembali ke toko</Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

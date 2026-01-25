@@ -4,9 +4,9 @@ import React from 'react';
 import Image from 'next/image';
 import { Star, MapPin, Phone, Mail, Globe, Facebook, Instagram, Twitter, Share2, ShoppingBag } from 'lucide-react';
 import CarouselBanner from '@/components/carousel-banner';
-import Header from '../../marketplace-koperasi/components/Header';
-import Footer from '../../marketplace-koperasi/components/Footer';
-import ProductCard from '../../marketplace-koperasi/components/ProductCard';
+import Header from '../../marketplace/components/Header';
+import Footer from '../../marketplace/components/Footer';
+import ProductCard from '../../marketplace/components/ProductCard';
 import Link from 'next/link';
 
 export default function StorePage({

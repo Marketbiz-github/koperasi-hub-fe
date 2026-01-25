@@ -72,7 +72,7 @@ export default function ProductDetailPage({ params }: PageProps) {
       <main className="flex-1">
         <div className="max-w-7xl mx-auto w-full px-4 py-8">
           {/* Back Button */}
-          <Link href="/marketplace-koperasi" className="inline-flex items-center gap-2 text-[#2F5755] hover:text-[#10b981] mb-6">
+          <Link href="/marketplace" className="inline-flex items-center gap-2 text-[#2F5755] hover:text-[#10b981] mb-6">
             <ArrowLeft size={20} />
             Kembali ke Marketplace
           </Link>
@@ -204,7 +204,7 @@ export default function ProductDetailPage({ params }: PageProps) {
               {relatedProducts.map((product, index) => (
                 <Link
                   key={index}
-                  href={`/marketplace-koperasi/${product.id}`}
+                  href={`/marketplace/${product.id}`}
                   className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition"
                 >
                   <div className="relative">

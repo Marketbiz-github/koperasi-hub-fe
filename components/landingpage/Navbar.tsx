@@ -30,7 +30,7 @@ export default function Navbar() {
             </a> */}
 
             <Link
-              href="/marketplace-koperasi"
+              href="/marketplace"
               className="flex items-center space-x-2 text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition"
             >
               <i className="fas fa-store"></i>
@@ -51,7 +51,7 @@ export default function Navbar() {
               {isDaftarOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border overflow-hidden z-50">
                   <a
-                    href="/register-vendor"
+                    href="/register/vendor"
                     className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50"
                   >
                     Daftar Vendor
@@ -63,12 +63,6 @@ export default function Navbar() {
                     className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50"
                   >
                     Daftar Koperasi
-                  </a>
-                  <a
-                    href="/register-affiliator"
-                    className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50"
-                  >
-                    Daftar Affiliator
                   </a>
                 </div>
               )}
@@ -108,7 +102,7 @@ export default function Navbar() {
             </a> */}
 
             <Link
-              href="/marketplace-koperasi"
+              href="/marketplace"
               className="flex items-center space-x-2 text-gray-700 hover:text-green-600 px-3 py-3 text-sm font-medium rounded-lg hover:bg-green-50 transition"
             >
               <i className="fas fa-store"></i>
@@ -128,9 +122,8 @@ export default function Navbar() {
 
               {isDaftarOpen && (
                 <div className="mt-2 space-y-2">
-                  <a href="/register-vendor" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Daftar Vendor</a>
+                  <a href="/register/vendor" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Daftar Vendor</a>
                   <a href="https://my.kooperasi.com/" target="_blank" rel="noopener noreferrer" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Daftar Koperasi</a>
-                  <a href="/register-affiliator" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Daftar Affiliator</a>
                 </div>
               )}
             </div>
