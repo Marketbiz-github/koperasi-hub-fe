@@ -164,7 +164,7 @@ export default function LoginPage() {
 
             <div className="flex justify-center gap-4 text-sm">
               <a
-                href="/register-vendor"
+                href="/register/vendor"
                 className="text-green-600 font-medium hover:underline"
               >
                 Daftar Vendor
@@ -175,13 +175,6 @@ export default function LoginPage() {
                 className="text-green-600 font-medium hover:underline"
               >
                 Daftar Koperasi
-              </a>
-
-              <a
-                href="/register-affiliator"
-                className="text-green-600 font-medium hover:underline"
-              >
-                Daftar Affiliator
               </a>
             </div>
           </div>
