@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Card,
@@ -6,17 +6,17 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -24,22 +24,35 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-// import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Plus, Upload, Pencil, Trash2, DollarSign } from "lucide-react"
+} from "@/components/ui/table";
+import { Plus, Upload, Pencil, Trash2 } from "lucide-react";
+
+/**
+ * Dummy data
+ * nanti tinggal ganti dari API
+ */
+const products = [
+  {
+    id: 1,
+    name: "Jeruk Orange 1KG",
+    category: "Food",
+    stock: 30,
+    price: "Rp50.000",
+    status: "active",
+  },
+  {
+    id: 2,
+    name: "Mangga Manis 1KG",
+    category: "Food",
+    stock: 29,
+    price: "Rp40.000",
+    status: "active",
+  },
+];
 
 export default function ProductsPage() {
   return (
     <div className="space-y-6">
-      {/* INFO */}
-      {/* <Alert>
-        <Info className="h-4 w-4" />
-        <AlertDescription>
-          Untuk melakukan promosi, anda harus mengatur pembagian fee
-          Social Dropshipper pada setiap produk.
-        </AlertDescription>
-      </Alert> */}
-
       {/* ACTIONS */}
       <div className="flex flex-wrap gap-2">
         <a href="/dashboard/vendor/produk/tambah">
@@ -137,87 +150,56 @@ export default function ProductsPage() {
             </TableHeader>
 
             <TableBody>
-              <TableRow>
-                <TableCell>1</TableCell>
-                <TableCell>Jeruk Orange 1KG</TableCell>
-                <TableCell>Food</TableCell>
-                <TableCell>30</TableCell>
-                <TableCell>Rp50.000</TableCell>
-                <TableCell>
-                  <Badge>Aktif</Badge>
-                </TableCell>
-                <TableCell className="text-right space-x-2">
-                  <a href="/dashboard/vendor/produk/1/atur-harga">
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      title="Atur harga koperasi"
-                    >
-                      <DollarSign className="h-4 w-4" />
-                    </Button>
-                  </a>
-                  <Button size="icon" variant="outline">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="destructive"
+              {products.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
+                    className="py-8 text-center text-sm text-muted-foreground"
                   >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
+                    Tidak ada produk
+                  </TableCell>
+                </TableRow>
+              ) : (
+                products.map((product, index) => (
+                  <TableRow key={product.id}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{product.name}</TableCell>
+                    <TableCell>{product.category}</TableCell>
+                    <TableCell>{product.stock}</TableCell>
+                    <TableCell>{product.price}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          product.status === "active"
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
+                        {product.status === "active"
+                          ? "Aktif"
+                          : "Nonaktif"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right space-x-2">
 
-              <TableRow>
-                <TableCell>2</TableCell>
-                <TableCell>Mangga Manis 1KG</TableCell>
-                <TableCell>Food</TableCell>
-                <TableCell>29</TableCell>
-                <TableCell>Rp40.000</TableCell>
-                <TableCell>
-                  <Badge>Aktif</Badge>
-                </TableCell>
-                <TableCell className="text-right space-x-2">
-                  <a href="/dashboard/vendor/produk/2/atur-harga">
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      title="Atur harga koperasi"
-                    >
-                      <DollarSign className="h-4 w-4" />
-                    </Button>
-                  </a>
-                  <Button size="icon" variant="outline">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
+                      <Button size="icon" variant="outline">
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-
-      {/* PRODUK DIPROMOSIKAN */}
-      {/* <Card>
-        <CardHeader>
-          <CardTitle>Produk yang dipromosikan</CardTitle>
-          <CardDescription>
-            Produk yang sedang aktif dipromosikan
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent>
-          <div className="py-8 text-center text-sm text-muted-foreground">
-            Tidak ada data ditampilkan
-          </div>
-        </CardContent>
-      </Card> */}
     </div>
-  )
+  );
 }

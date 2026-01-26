@@ -1,0 +1,59 @@
+/**
+ * ORDER FLOW RULES
+ *
+ * 1. Koperasi menginisiasi pembelian
+ * 2. Koperasi memilih vendor
+ * 3. Sistem membuat order
+ * 4. Vendor menerima order
+ *
+ * 5. Metode pembayaran:
+ *
+ *    A. CASH
+ *      - Koperasi membayar ke vendor
+ *      - Koperasi melakukan konfirmasi pembayaran di sistem
+ *      - Sistem generate invoice
+ *      - Order lanjut ke proses pengiriman
+ *
+ *    B. CREDIT
+ *      - Koperasi mengajukan kredit ke vendor
+ *      - Vendor menyetujui atau menolak kredit
+ *      - Jika ditolak → order berhenti
+ *      - Jika disetujui:
+ *          - Sistem generate invoice
+ *          - Sistem membuat data piutang + termin
+ *          - Order lanjut ke proses pengiriman
+ *
+ * 6. Proses pengiriman:
+ *      - Jika qty besar → gunakan ekspedisi vendor
+ *      - Jika qty kecil/menengah → gunakan 3PL (JNE/J&T/dll)
+ *      - Vendor wajib mengisi nomor resi
+ *
+ * 7. Order selesai saat barang diterima koperasi
+ */
+
+
+
+/**
+ * RECEIVABLE / PIUTANG FLOW RULES
+ *
+ * 1. Sistem mengirim notifikasi ke koperasi pada:
+ *    - H-3 sebelum jatuh tempo
+ *    - H-0 pada hari jatuh tempo
+ *
+ * 2. Jika koperasi melakukan pembayaran:
+ *    - Koperasi memilih no.kontrak di sistem
+ *    - Melakukan pembayaran sesuai termin & jumlah
+ *    - Status termin berubah menjadi PAID
+ *
+ * 3. Jika pembayaran terlambat:
+ *    - Vendor melakukan follow-up via WA / Email
+ *    - Sistem hanya menyediakan data kontak & histori
+ *
+ * 4. Response koperasi:
+ *    - Jika bayar → status termin PAID
+ *    - Jika tidak ada respon / gagal bayar:
+ *        - Vendor mengubah status kontrak menjadi MACET
+ *
+ * 5. Jika seluruh termin dalam kontrak telah dibayar:
+ *    - Status piutang kontrak berubah menjadi LUNAS
+ */

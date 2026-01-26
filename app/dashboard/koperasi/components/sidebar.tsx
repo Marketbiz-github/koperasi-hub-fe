@@ -5,12 +5,12 @@ import {
   IconDashboard,
   IconInnerShadowTop,
   IconSettings,
-  IconShoppingCart,
   IconGift,
   IconBox,
   IconMessageHeart,
   IconDeviceLaptop,
   IconCashRegister,
+  IconBuildingStore,
 } from "@tabler/icons-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -57,8 +57,34 @@ const data = {
     },
     {
       title: "Marketplace",
-      url: "/dashboard/koperasi/marketplace",
-      icon: IconShoppingCart,
+      url: "#",
+      icon: IconBuildingStore,
+      items: [
+        {
+          title: "Marketplace",
+          url: "/dashboard/koperasi/marketplace",
+        },
+        {
+          title: "Pembelian",
+          url: "/dashboard/koperasi/marketplace/pembelian",
+        },
+        {
+          title: "Vendor",
+          url: "/dashboard/koperasi/marketplace/vendor",
+        },
+        {
+          title: "Pembayaran",
+          url: "/dashboard/koperasi/marketplace/pembayaran",
+        },
+        {
+          title: "Piutang",
+          url: "/dashboard/koperasi/marketplace/piutang",
+        },
+        {
+          title: "Pengiriman",
+          url: "/dashboard/koperasi/marketplace/pengiriman",
+        },
+      ],
     },
     {
       title: "Produk",
