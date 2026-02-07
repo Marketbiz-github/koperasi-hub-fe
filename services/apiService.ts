@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers'
+// services/apiService.ts
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://koperasihub.koyeb.app'
 
@@ -76,5 +76,19 @@ export const authService = {
         // Tapi karena ini stateless JWT biasanya decode saja cukup di client/server
         // Namun kita coba tes validasi token jika ada endpointnya
         return { success: true } // Placeholder, usually handled by middleware or decoding
+    }
+}
+
+export const userService = {
+    async getUsers(token: string) {
+        return apiRequest('/users', {
+            token,
+        })
+    },
+
+    async getUserDetail(token: string, id: string | number) {
+        return apiRequest(`/users/${id}`, {
+            token,
+        })
     }
 }

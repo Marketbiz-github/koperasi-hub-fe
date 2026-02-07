@@ -3,11 +3,14 @@ import { User } from '@/types/user'
 
 interface AuthState {
   user: User | null
+  userDetail: User | null
   isHydrated: boolean
   isLoading: boolean
   error: string | null
   setUser: (user: User | null) => void
+  setUserDetail: (detail: User | null) => void
   hydrate: () => Promise<void>
+  fetchUserDetail: () => Promise<void>
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string; user?: User }>
   register: (data: any) => Promise<{ success: boolean; message?: string }>
   logout: () => Promise<void>
@@ -16,11 +19,13 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
+  userDetail: null,
   isHydrated: false,
   isLoading: false,
   error: null,
 
   setUser: (user) => set({ user }),
+  setUserDetail: (userDetail) => set({ userDetail }),
 
   clearError: () => set({ error: null }),
 
@@ -31,7 +36,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       })
 
       if (!res.ok) {
-        set({ user: null, isHydrated: true })
+        set({ user: null, userDetail: null, isHydrated: true })
         return
       }
 
@@ -39,11 +44,28 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       set({
         user: data.user ?? null,
+        userDetail: data.user ?? null, // Sync initially from /api/auth/me
         isHydrated: true,
       })
     } catch (error) {
       console.error('Auth hydrate error:', error)
-      set({ user: null, isHydrated: true })
+      set({ user: null, userDetail: null, isHydrated: true })
+    }
+  },
+
+  fetchUserDetail: async () => {
+    const { user } = get();
+    if (!user?.id) return;
+
+    try {
+      const response = await fetch(`/api/users/${user.id}`);
+      const data = await response.json();
+
+      if (response.ok && data.data) {
+        set({ userDetail: data.data });
+      }
+    } catch (err) {
+      console.error('Failed to fetch user detail:', err);
     }
   },
 

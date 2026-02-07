@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { userService } from '@/services/apiService'
 
 export async function GET() {
   const cookieStore = await cookies()
@@ -14,15 +15,24 @@ export async function GET() {
     )
   }
 
-  // Optional: Validasi ke API eksternal jika endpoint tersedia
-  // const userProfile = await authService.getMe(token);
+  try {
+    const result = await userService.getUserDetail(token, userId);
 
-  return NextResponse.json({
-    user: {
-      id: userId,
-      name: 'User',
-      email: '', // Not stored in cookies yet
-      role: role || 'vendor',
-    },
-  })
+    return NextResponse.json({
+      user: {
+        ...result.data,
+        role: role || result.data.role || 'vendor', // Fallback to cookie role if needed
+      },
+    })
+  } catch (error) {
+    // If external API fails, fallback to basic cookie info so the UI doesn't break
+    return NextResponse.json({
+      user: {
+        id: userId,
+        name: 'User',
+        email: '',
+        role: role || 'vendor',
+      },
+    })
+  }
 }

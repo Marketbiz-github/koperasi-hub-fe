@@ -16,7 +16,7 @@ import { IconUser } from "@tabler/icons-react"
 import { useAuthStore } from "@/store/authStore"
 
 export function SiteHeader() {
-  const { user, logout } = useAuthStore()
+  const { user, userDetail, logout } = useAuthStore()
 
   const handleLogout = async () => {
     await logout()
@@ -45,10 +45,10 @@ export function SiteHeader() {
 
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="font-semibold">
-                {user?.name || 'My Account'}
+                {userDetail?.name || user?.name || 'My Account'}
               </DropdownMenuLabel>
               <div className="px-2 py-1.5 text-xs text-gray-600">
-                {user?.email}
+                {userDetail?.email || user?.email}
               </div>
               <DropdownMenuSeparator />
 
