@@ -1,4 +1,4 @@
-export type Role = 'admin' | 'vendor' | 'koperasi' | 'affiliator';
+export type Role = 'super_admin' | 'vendor' | 'koperasi' | 'affiliator' | 'reseller';
 
 export interface User {
   id: number;

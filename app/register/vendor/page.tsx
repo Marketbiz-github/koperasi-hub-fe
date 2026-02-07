@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Check } from 'lucide-react';
 import Image from 'next/image'
+import { useAuthStore } from '@/store/authStore';
 
 interface FormErrors {
   [key: string]: string;
@@ -17,10 +18,7 @@ export default function RegisterVendorPage() {
     name: '',
     email: '',
     phone: '',
-    storeType: '',
     minishop_name: '',
-    url_group_telegram: '',
-    url_group_wa: '',
     area: '',
     alamat_lengkap: '',
     address: '',
@@ -67,9 +65,6 @@ export default function RegisterVendorPage() {
     if (!formData.phone.trim()) {
       newErrors.phone = 'Nomor telepon harus diisi';
     }
-    if (!formData.storeType) {
-      newErrors.storeType = 'Jenis toko harus dipilih';
-    }
     if (!formData.minishop_name.trim()) {
       newErrors.minishop_name = 'Nama toko harus diisi';
     }
@@ -100,9 +95,12 @@ export default function RegisterVendorPage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const { register: registerAction, isLoading: isAuthLoading, error: authError, clearError } = useAuthStore();
+
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setSuccessMessage('');
+    clearError();
 
     if (!validateForm()) {
       return;
@@ -111,30 +109,23 @@ export default function RegisterVendorPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          role: 'vendor',
-        }),
+      const result = await registerAction({
+        ...formData,
+        role: 'vendor',
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setErrors({ submit: data.message || 'Terjadi kesalahan saat registrasi' });
-        setIsLoading(false);
-        return;
+      if (result.success) {
+        setSuccessMessage('Registrasi berhasil! Silakan cek email Anda untuk verifikasi.');
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
+      } else {
+        setErrors({ submit: result.message || 'Terjadi kesalahan saat registrasi' });
       }
-
-      setSuccessMessage('Registrasi berhasil! Silakan cek email Anda untuk verifikasi.');
-      setTimeout(() => {
-        router.push('/login');
-      }, 2000);
     } catch (error) {
       console.error(error);
       setErrors({ submit: 'Terjadi kesalahan saat registrasi' });
+    } finally {
       setIsLoading(false);
     }
   }
@@ -145,7 +136,7 @@ export default function RegisterVendorPage() {
       {/* Background Image */}
       <div className="absolute inset-0">
         <Image
-          src="/images/vendor.jpg" 
+          src="/images/vendor.jpg"
           alt="Auth Background"
           fill
           priority
@@ -189,35 +180,10 @@ export default function RegisterVendorPage() {
 
           {/* Registration Form */}
           <form onSubmit={handleRegister} className="space-y-6 mb-8">
-            
+
             {/* Section 1: Data Pribadi */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-green-200">Data Pribadi</h3>
-              
-              {/* Subdomain */}
-              <div className="mb-4">
-                <label htmlFor="subdomain" className="block text-sm font-medium text-gray-700 mb-2">
-                  Subdomain Toko Anda <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="subdomain"
-                  name="subdomain"
-                  type="text"
-                  value={formData.subdomain}
-                  onChange={handleInputChange}
-                  className={`w-full px-4 py-3 rounded-lg border ${errors.subdomain ? 'border-red-500' : 'border-gray-300'} bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none`}
-                  placeholder="subdomain-toko-anda"
-                  required
-                />
-                {formData.subdomain && (
-                  <p className="mt-2 text-sm text-gray-600">
-                    Link toko Anda: https://<span className="font-semibold text-green-600">{formData.subdomain}</span>.koperasi.hub
-                  </p>
-                )}
-                {errors.subdomain && (
-                  <p className="mt-1 text-sm text-red-600">{errors.subdomain}</p>
-                )}
-              </div>
 
               {/* Nama Lengkap dan Email */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -286,27 +252,6 @@ export default function RegisterVendorPage() {
                   )}
                 </div>
 
-                <div>
-                  <label htmlFor="storeType" className="block text-sm font-medium text-gray-700 mb-2">
-                    Jenis Toko <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    id="storeType"
-                    name="storeType"
-                    value={formData.storeType}
-                    onChange={handleInputChange}
-                    className={`w-full px-4 py-3 rounded-lg border ${errors.storeType ? 'border-red-500' : 'border-gray-300'} bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none`}
-                    required
-                  >
-                    <option value="">Pilih Jenis Toko</option>
-                    <option value="1">Toko Produk Non Digital</option>
-                    <option value="2">Toko Produk Digital</option>
-                    <option value="3">Toko Tour Travel</option>
-                  </select>
-                  {errors.storeType && (
-                    <p className="mt-1 text-sm text-red-600">{errors.storeType}</p>
-                  )}
-                </div>
               </div>
             </div>
 
@@ -337,37 +282,29 @@ export default function RegisterVendorPage() {
                 )}
               </div>
 
-              {/* Grup Telegram dan WhatsApp */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label htmlFor="url_group_telegram" className="block text-sm font-medium text-gray-700 mb-2">
-                    URL Grup Telegram
-                  </label>
-                  <input
-                    id="url_group_telegram"
-                    name="url_group_telegram"
-                    type="text"
-                    value={formData.url_group_telegram}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none"
-                    placeholder="https://t.me/..."
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="url_group_wa" className="block text-sm font-medium text-gray-700 mb-2">
-                    URL Grup WhatsApp
-                  </label>
-                  <input
-                    id="url_group_wa"
-                    name="url_group_wa"
-                    type="text"
-                    value={formData.url_group_wa}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none"
-                    placeholder="https://chat.whatsapp.com/..."
-                  />
-                </div>
+              {/* Subdomain */}
+              <div className="mb-4">
+                <label htmlFor="subdomain" className="block text-sm font-medium text-gray-700 mb-2">
+                  Subdomain Toko Anda <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="subdomain"
+                  name="subdomain"
+                  type="text"
+                  value={formData.subdomain}
+                  onChange={handleInputChange}
+                  className={`w-full px-4 py-3 rounded-lg border ${errors.subdomain ? 'border-red-500' : 'border-gray-300'} bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none`}
+                  placeholder="subdomain-toko-anda"
+                  required
+                />
+                {formData.subdomain && (
+                  <p className="mt-2 text-sm text-gray-600">
+                    Link toko Anda: https://<span className="font-semibold text-green-600">{formData.subdomain}</span>.koperasi.hub
+                  </p>
+                )}
+                {errors.subdomain && (
+                  <p className="mt-1 text-sm text-red-600">{errors.subdomain}</p>
+                )}
               </div>
 
               {/* Area dan Alamat */}

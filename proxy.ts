@@ -2,63 +2,50 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const protectedRoutes = [
   '/dashboard/vendor',
-  '/dashboard/admin',
+  '/dashboard/super_admin',
   '/dashboard/koperasi',
   '/dashboard/affiliator',
+  '/dashboard/reseller',
 ];
 
 const roleRouteMap: Record<string, string> = {
   vendor: '/dashboard/vendor',
-  admin: '/dashboard/admin',
+  super_admin: '/dashboard/super_admin',
   koperasi: '/dashboard/koperasi',
   affiliator: '/dashboard/affiliator',
+  reseller: '/dashboard/reseller',
 };
 
-const oldLoginRoutes = ['/login/vendor', '/login/admin', '/login/koperasi', '/login/affiliator'];
+const oldLoginRoutes = ['/login/vendor', '/login/super_admin', '/login/koperasi', '/login/affiliator'];
 
 export function proxy(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
+  const { pathname } = request.nextUrl;
   const accessToken = request.cookies.get('access_token')?.value;
   const userRole = request.cookies.get('role')?.value;
 
-  // Redirect old login routes ke /login
+  // 1. Redirect old login routes to /login
   if (oldLoginRoutes.includes(pathname)) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  console.log('Middleware - Pathname:', pathname);
-  console.log('Middleware - Access Token:', accessToken ? 'Exists' : 'Not Found');
-  console.log('Middleware - User Role:', userRole || 'Not Found');
-
-  // Redirect /dashboard ke role-specific dashboard (hanya jika sudah login)
+  // 2. Handle /dashboard landing page redirect
   if (pathname === '/dashboard') {
     if (accessToken && userRole && roleRouteMap[userRole]) {
-      console.log('Middleware - Redirecting to role-specific dashboard for role:', userRole);
-      // Sudah login dan role valid, redirect ke dashboard role-nya
       return NextResponse.redirect(new URL(roleRouteMap[userRole], request.url));
-    } else if (!accessToken) {
-      console.log('Middleware - No access token, redirecting to /login1');
-      // Belum login, redirect ke login
-      return NextResponse.redirect(new URL('/login', request.url));
     }
-    // Jika ada akses token tapi role tidak valid, biarkan page handle
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Cek apakah route yang diakses adalah protected route
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
+  // 3. Protect dashboard routes
+  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 
-  if (isProtectedRoute) {
-    console.log('Middleware - Accessing protected route:', pathname);
-    // Jika tidak ada token, redirect ke login
-    if (!accessToken) {
-      console.log('Middleware - No access token, redirecting to /login2');
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
-    
-    // Jika ada token, biarkan page load (layoutnya akan handle permission check dan show access denied jika role tidak sesuai)
+  if (isProtectedRoute && !accessToken) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
+
+  // 4. Role-based access within protected routes
+  // (Optional: can be added here if we want strictly strict middleware checks)
+  // For now, layouts handle specific permission checks for better UI/UX (Access Denied page).
 
   return NextResponse.next();
 }

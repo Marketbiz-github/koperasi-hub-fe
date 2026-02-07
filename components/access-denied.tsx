@@ -1,7 +1,11 @@
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 
-export function AccessDenied() {
+interface AccessDeniedProps {
+  allowedRole?: string;
+}
+
+export function AccessDenied({ allowedRole }: AccessDeniedProps) {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
 
@@ -33,7 +37,9 @@ export function AccessDenied() {
             Akses Ditolak
           </h1>
           <p className="text-gray-600 mb-2">
-            Anda tidak memiliki izin untuk mengakses halaman ini.
+            {allowedRole
+              ? `Anda tidak memiliki izin untuk mengakses halaman ini. Halaman ini hanya untuk ${allowedRole}.`
+              : 'Anda tidak memiliki izin untuk mengakses halaman ini.'}
           </p>
 
           {/* Buttons */}
@@ -48,9 +54,10 @@ export function AccessDenied() {
               onClick={() => {
                 const roleRouteMap: Record<string, string> = {
                   vendor: '/dashboard/vendor',
-                  admin: '/dashboard/admin',
+                  super_admin: '/dashboard/super_admin',
                   koperasi: '/dashboard/koperasi',
                   affiliator: '/dashboard/affiliator',
+                  reseller: '/dashboard/reseller',
                 };
                 const route = user?.role ? roleRouteMap[user.role] : '/dashboard';
                 router.push(route);

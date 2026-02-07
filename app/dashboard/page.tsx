@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore'
 
 const roleRouteMap: Record<string, string> = {
   vendor: '/dashboard/vendor',
-  admin: '/dashboard/admin',
+  super_admin: '/dashboard/super_admin',
   koperasi: '/dashboard/koperasi',
   affiliator: '/dashboard/affiliator',
 }

@@ -8,49 +8,31 @@ import Image from 'next/image'
 
 export default function LoginPage() {
   const router = useRouter();
-  const setUser = useAuthStore(state => state.setUser);
+  const { login, isLoading, error, clearError } = useAuthStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    setError('');
-    setIsLoading(true);
+    clearError();
 
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+    const result = await login(email, password);
 
-      if (!res.ok) {
-        setError('Email atau password salah');
-        setIsLoading(false);
-        return;
-      }
-
-      const data = await res.json();
-      setUser(data.user);
-
-      // redirect by role
-      if (data.user.role === 'admin') {
-        router.push('/dashboard/admin');
-      } else if (data.user.role === 'vendor') {
+    if (result.success && result.user) {
+      const role = result.user.role;
+      if (role === 'super_admin') {
+        router.push('/dashboard/super_admin');
+      } else if (role === 'vendor') {
         router.push('/dashboard/vendor');
-      } else if (data.user.role === 'koperasi') {
+      } else if (role === 'koperasi') {
         router.push('/dashboard/koperasi');
+      } else if (role === 'reseller') {
+        router.push('/dashboard/reseller');
       } else {
         router.push('/dashboard/affiliator');
       }
-    } catch (error) {
-      console.error(error);
-      setError('Terjadi kesalahan saat login');
-      setIsLoading(false);
     }
   }
 
@@ -60,7 +42,7 @@ export default function LoginPage() {
       {/* Background Image */}
       <div className="absolute inset-0">
         <Image
-          src="/images/vendor.jpg" 
+          src="/images/vendor.jpg"
           alt="Auth Background"
           fill
           priority
@@ -101,7 +83,9 @@ export default function LoginPage() {
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
+                autoComplete="username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none"
@@ -118,7 +102,9 @@ export default function LoginPage() {
               <div className="relative">
                 <input
                   id="password"
+                  name="password"
                   type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none pr-12"

@@ -4,23 +4,26 @@ import { ReactNode, useEffect } from "react";
 import { AppSidebar } from "./components/sidebar";
 import { SiteHeader } from "./components/topbar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { AccessDenied } from "@/components/access-denied";
 
 export function VendorLayoutClient({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const { user, hydrate, isHydrated } = useAuthStore();
 
   useEffect(() => {
     hydrate();
   }, [hydrate]);
 
-  // ⏳ Tunggu auth selesai dicek
-  if (!isHydrated) return null;
+  useEffect(() => {
+    if (isHydrated && !user) {
+      router.push('/login');
+    }
+  }, [isHydrated, user, router]);
 
-  // Jika tidak ada user, redirect dilakukan via useLayoutEffect
-  if (!user) {
-    return null;
-  }
+  // ⏳ Tunggu auth selesai dicek
+  if (!isHydrated || !user) return null;
 
   // Jika user ada tapi role tidak sesuai, show access denied
   if (user.role !== 'vendor') {

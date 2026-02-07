@@ -5,30 +5,33 @@ import { SiteHeader } from "../vendor/components/topbar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useAuthStore } from "@/store/authStore";
 import { AccessDenied } from "@/components/access-denied";
-import { useEffect } from "react";
+import { useEffect, ReactNode } from "react";
+import { useRouter } from "next/navigation";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const router = useRouter();
   const { user, hydrate, isHydrated } = useAuthStore()
 
   useEffect(() => {
     hydrate()
   }, [hydrate])
 
-  // ⏳ Tunggu auth selesai dicek
-  if (!isHydrated) return null
+  useEffect(() => {
+    if (isHydrated && !user) {
+      router.push('/login');
+    }
+  }, [isHydrated, user, router]);
 
-  // Jika tidak ada user, redirect dilakukan via useLayoutEffect
-  if (!user) {
-    return null;
-  }
+  // ⏳ Tunggu auth selesai dicek
+  if (!isHydrated || !user) return null
 
   // Jika user ada tapi role tidak sesuai, show access denied
-  if (user.role !== 'admin') {
-    return <AccessDenied />;
+  if (user.role !== 'super_admin') {
+    return <AccessDenied allowedRole="super_admin" />
   }
 
   // Role sesuai, render dashboard

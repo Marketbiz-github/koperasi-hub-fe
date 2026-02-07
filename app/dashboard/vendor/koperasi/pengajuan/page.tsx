@@ -165,7 +165,7 @@ export default function PengajuanPage() {
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Link
-                          href={`/dashboard/admin/pengajuan/${item.id}`}
+                          href={`/dashboard/super_admin/pengajuan/${item.id}`}
                         >
                           <Button
                             size="icon"

@@ -1,32 +1,28 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { decodeFakeToken } from '@/lib/fakeJwt'
 
 export async function GET() {
-  const token = (await cookies()).get('access_token')?.value
+  const cookieStore = await cookies()
+  const token = cookieStore.get('access_token')?.value
+  const role = cookieStore.get('role')?.value
+  const userId = cookieStore.get('user_id')?.value
 
-  if (!token) {
+  if (!token || !userId) {
     return NextResponse.json(
       { message: 'Unauthorized' },
       { status: 401 }
     )
   }
 
-  const user = decodeFakeToken(token)
-
-  if (!user) {
-    return NextResponse.json(
-      { message: 'Invalid token' },
-      { status: 401 }
-    )
-  }
+  // Optional: Validasi ke API eksternal jika endpoint tersedia
+  // const userProfile = await authService.getMe(token);
 
   return NextResponse.json({
     user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
+      id: userId,
+      name: 'User',
+      email: '', // Not stored in cookies yet
+      role: role || 'vendor',
     },
   })
 }
