@@ -19,13 +19,12 @@ export default function RegisterVendorPage() {
     email: '',
     phone: '',
     minishop_name: '',
-    area: '',
-    alamat_lengkap: '',
-    address: '',
     password: '',
     confirmPassword: '',
+    flag_id: '',
   });
 
+  const [flags, setFlags] = useState<any[]>([]);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -33,12 +32,54 @@ export default function RegisterVendorPage() {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
+  // Fetch flags on mount
+  useState(() => {
+    async function fetchFlags() {
+      try {
+        const response = await fetch('/api/flags');
+        if (response.ok) {
+          const result = await response.json();
+          if (result.data) {
+            setFlags(result.data);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching flags:', error);
+      }
+    }
+    fetchFlags();
+  });
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+
+    setFormData(prev => {
+      const newData = { ...prev, [name]: value };
+
+      // Auto-generate subdomain from minishop_name if subdomain hasn't been manually edited
+      // or if it's currently empty
+      if (name === 'minishop_name') {
+        const slug = value
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+
+        // Only auto-fill if subdomain is empty or was previously auto-generated from minishop_name
+        const prevSlug = prev.minishop_name
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+
+        if (!prev.subdomain || prev.subdomain === prevSlug) {
+          newData.subdomain = slug;
+        }
+      }
+
+      return newData;
+    });
+
     // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -68,15 +109,6 @@ export default function RegisterVendorPage() {
     if (!formData.minishop_name.trim()) {
       newErrors.minishop_name = 'Nama toko harus diisi';
     }
-    if (!formData.area.trim()) {
-      newErrors.area = 'Area toko harus diisi';
-    }
-    if (!formData.alamat_lengkap.trim()) {
-      newErrors.alamat_lengkap = 'Alamat lengkap harus dipilih';
-    }
-    if (!formData.address.trim()) {
-      newErrors.address = 'Detail alamat harus diisi';
-    }
     if (!formData.password) {
       newErrors.password = 'Password harus diisi';
     } else if (formData.password.length < 6) {
@@ -95,12 +127,10 @@ export default function RegisterVendorPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const { register: registerAction, isLoading: isAuthLoading, error: authError, clearError } = useAuthStore();
-
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setSuccessMessage('');
-    clearError();
+    setErrors({});
 
     if (!validateForm()) {
       return;
@@ -109,22 +139,35 @@ export default function RegisterVendorPage() {
     setIsLoading(true);
 
     try {
-      const result = await registerAction({
-        ...formData,
-        role: 'vendor',
+      const response = await fetch('/api/register/vendor', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone,
+          subdomain: formData.subdomain,
+          store_name: formData.minishop_name,
+          flag_id: formData.flag_id || null,
+        }),
       });
 
-      if (result.success) {
-        setSuccessMessage('Registrasi berhasil! Silakan cek email Anda untuk verifikasi.');
+      const result = await response.json();
+
+      if (response.ok) {
+        setSuccessMessage('Registrasi berhasil! Silakan cek email Anda untuk aktivasi akun.');
         setTimeout(() => {
           router.push('/login');
-        }, 2000);
+        }, 3000);
       } else {
         setErrors({ submit: result.message || 'Terjadi kesalahan saat registrasi' });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setErrors({ submit: 'Terjadi kesalahan saat registrasi' });
+      setErrors({ submit: 'Terjadi kesalahan sistem saat registrasi' });
     } finally {
       setIsLoading(false);
     }
@@ -226,7 +269,7 @@ export default function RegisterVendorPage() {
                 </div>
               </div>
 
-              {/* Phone dan Store Type */}
+              {/* Phone dan Flag selection */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
@@ -252,6 +295,25 @@ export default function RegisterVendorPage() {
                   )}
                 </div>
 
+                <div>
+                  <label htmlFor="flag_id" className="block text-sm font-medium text-gray-700 mb-2">
+                    Grup / Flag (Opsional)
+                  </label>
+                  <select
+                    id="flag_id"
+                    name="flag_id"
+                    value={formData.flag_id}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none"
+                  >
+                    <option value="">Pilih Flag (Jika Ada)</option>
+                    {flags.map((flag) => (
+                      <option key={flag.id} value={flag.id}>
+                        {flag.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -304,77 +366,6 @@ export default function RegisterVendorPage() {
                 )}
                 {errors.subdomain && (
                   <p className="mt-1 text-sm text-red-600">{errors.subdomain}</p>
-                )}
-              </div>
-
-              {/* Area dan Alamat */}
-              <div className="mb-4">
-                <label htmlFor="area" className="block text-sm font-medium text-gray-700 mb-2">
-                  Area Toko <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="area"
-                  name="area"
-                  type="text"
-                  value={formData.area}
-                  onChange={handleInputChange}
-                  className={`w-full px-4 py-3 rounded-lg border ${errors.area ? 'border-red-500' : 'border-gray-300'} bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none`}
-                  placeholder="Kota/Kabupaten"
-                  required
-                />
-                {errors.area && (
-                  <p className="mt-1 text-sm text-red-600">{errors.area}</p>
-                )}
-              </div>
-
-              {/* Alamat Lengkap */}
-              <div className="mb-4">
-                <label htmlFor="alamat_lengkap" className="block text-sm font-medium text-gray-700 mb-2">
-                  Alamat Lengkap <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="alamat_lengkap"
-                  name="alamat_lengkap"
-                  type="text"
-                  value={formData.alamat_lengkap}
-                  onChange={handleInputChange}
-                  className={`w-full px-4 py-3 rounded-lg border ${errors.alamat_lengkap ? 'border-red-500' : 'border-gray-300'} bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none`}
-                  placeholder="Provinsi, Kota, Distrik"
-                  required
-                />
-                {errors.alamat_lengkap && (
-                  <p className="mt-1 text-sm text-red-600">{errors.alamat_lengkap}</p>
-                )}
-              </div>
-
-              {/* Detail Alamat */}
-              <div className="mb-4">
-                <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
-                  Detail Alamat <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  id="address"
-                  name="address"
-                  value={formData.address}
-                  onChange={(e) => {
-                    setFormData(prev => ({
-                      ...prev,
-                      address: e.target.value
-                    }));
-                    if (errors.address) {
-                      setErrors(prev => ({
-                        ...prev,
-                        address: ''
-                      }));
-                    }
-                  }}
-                  className={`w-full px-4 py-3 rounded-lg border ${errors.address ? 'border-red-500' : 'border-gray-300'} bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none`}
-                  placeholder="Jln. Contoh No. 123 Blok A"
-                  rows={3}
-                  required
-                />
-                {errors.address && (
-                  <p className="mt-1 text-sm text-red-600">{errors.address}</p>
                 )}
               </div>
             </div>

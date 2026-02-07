@@ -31,10 +31,34 @@ export async function apiRequest(endpoint: string, options: ApiOptions = {}) {
     }
 
     const response = await fetch(`${BASE_URL}${endpoint}`, config)
-    const responseData = await response.json()
+
+    let responseData: any = {}
+    const contentType = response.headers.get('content-type')
+
+    try {
+        if (contentType && contentType.includes('application/json')) {
+            responseData = await response.json()
+        } else {
+            const rawText = await response.text()
+            responseData = { message: rawText }
+        }
+    } catch (parseError) {
+        console.error('Failed to parse API response:', parseError)
+        responseData = { message: 'Gagal memproses respon dari server' }
+    }
 
     if (!response.ok) {
-        throw new Error(responseData.meta?.message || responseData.message || 'Something went wrong')
+        // Log error response to console for server-side debugging
+        console.error(`API Error [${method} ${endpoint}]:`, {
+            status: response.status,
+            data: responseData
+        });
+
+        const errorMessage = responseData.data?.error || responseData.meta?.message || responseData.message || 'Something went wrong';
+        const error: any = new Error(errorMessage);
+        error.data = responseData;
+        error.status = response.status;
+        throw error;
     }
 
     return responseData
@@ -88,6 +112,30 @@ export const userService = {
 
     async getUserDetail(token: string, id: string | number) {
         return apiRequest(`/users/${id}`, {
+            token,
+        })
+    }
+}
+
+export const adminService = {
+    async getFlags(token: string) {
+        return apiRequest('/flags', {
+            token,
+        })
+    },
+
+    async assignFlagToUser(token: string, data: { user_id: string | number, flag_id: string | number }) {
+        return apiRequest('/users/flags', {
+            method: 'POST',
+            body: data,
+            token,
+        })
+    },
+
+    async registerIpaymu(token: string, storeId: string | number, body?: any) {
+        return apiRequest(`/stores/${storeId}/register-ipaymu`, {
+            method: 'POST',
+            body,
             token,
         })
     }
