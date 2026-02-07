@@ -4,7 +4,7 @@ import { userService } from '@/services/apiService'
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     const cookieStore = await cookies()
     const token = cookieStore.get('access_token')?.value

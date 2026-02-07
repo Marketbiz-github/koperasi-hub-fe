@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Check } from 'lucide-react';
 import Image from 'next/image'
@@ -35,7 +35,7 @@ export default function RegisterVendorPage() {
   const [successMessage, setSuccessMessage] = useState('');
 
   // Fetch flags on mount
-  useState(() => {
+  useEffect(() => {
     async function fetchFlags() {
       try {
         const response = await fetch('/api/flags');
@@ -50,7 +50,7 @@ export default function RegisterVendorPage() {
       }
     }
     fetchFlags();
-  });
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
