@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Check } from 'lucide-react';
 import Image from 'next/image'
 import { useAuthStore } from '@/store/authStore';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 interface FormErrors {
   [key: string]: string;
@@ -12,6 +13,7 @@ interface FormErrors {
 
 export default function RegisterVendorPage() {
   const router = useRouter();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const [formData, setFormData] = useState({
     subdomain: '',
@@ -136,6 +138,18 @@ export default function RegisterVendorPage() {
       return;
     }
 
+    if (!executeRecaptcha) {
+      setErrors({ submit: 'CAPTCHA belum siap, silakan tunggu sebentar' });
+      return;
+    }
+
+    const token = await executeRecaptcha('register');
+
+    if (!token) {
+      setErrors({ submit: 'Gagal mendapatkan token CAPTCHA' });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -152,6 +166,7 @@ export default function RegisterVendorPage() {
           subdomain: formData.subdomain,
           store_name: formData.minishop_name,
           flag_id: formData.flag_id || null,
+          captchaToken: token,
         }),
       });
 

@@ -11,8 +11,8 @@ interface AuthState {
   setUserDetail: (detail: User | null) => void
   hydrate: () => Promise<void>
   fetchUserDetail: () => Promise<void>
-  login: (email: string, password: string) => Promise<{ success: boolean; message?: string; user?: User }>
-  register: (data: any) => Promise<{ success: boolean; message?: string }>
+  login: (email: string, password: string, captchaToken?: string) => Promise<{ success: boolean; message?: string; user?: User }>
+  register: (data: any, captchaToken?: string) => Promise<{ success: boolean; message?: string }>
   logout: () => Promise<void>
   clearError: () => void
 }
@@ -69,13 +69,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  login: async (email, password) => {
+  login: async (email, password, captchaToken) => {
     set({ isLoading: true, error: null })
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, captchaToken }),
       })
 
       const data = await res.json()
@@ -95,13 +95,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  register: async (data) => {
+  register: async (data, captchaToken) => {
     set({ isLoading: true, error: null })
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, captchaToken }),
       })
 
       const responseData = await res.json()

@@ -6,15 +6,29 @@ export async function POST(req: Request) {
     try {
         // 1. Parse Input dari frontend (page.tsx)
         const body = await req.json();
-        console.log("Register payload received:", body);
-
         const {
             name, email, password, phone,
             minishop_name, subdomain, address, area,
             flag_name,
             affiliate_code,
-            role // Ambil role dari frontend (default 'vendor' di page.tsx)
+            role,
+            captchaToken
         } = body;
+
+        // 1. Verify CAPTCHA
+        if (!captchaToken) {
+            return NextResponse.json({ message: 'CAPTCHA token is required' }, { status: 400 });
+        }
+
+        const secretKey = process.env.GOOGLE_CAPTCHA_SECRET_KEY || process.env.GOOGLE_CAPTHA_SECRET_KEY;
+        const verifyResponse = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${captchaToken}`, {
+            method: 'POST',
+        });
+        const verifyData = await verifyResponse.json();
+
+        if (!verifyData.success) {
+            return NextResponse.json({ message: 'Invalid CAPTCHA' }, { status: 400 });
+        }
 
         // 2. Register User (External API)
         console.log("Stepping into: Register User...");

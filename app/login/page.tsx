@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Eye, EyeOff } from 'lucide-react';
 import Image from 'next/image'
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 export default function LoginPage() {
   const router = useRouter();
   const { login, isLoading, error, clearError } = useAuthStore();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,7 +20,19 @@ export default function LoginPage() {
     e.preventDefault();
     clearError();
 
-    const result = await login(email, password);
+    if (!executeRecaptcha) {
+      useAuthStore.setState({ error: 'CAPTCHA belum siap, silakan tunggu sebentar' });
+      return;
+    }
+
+    const token = await executeRecaptcha('login');
+
+    if (!token) {
+      useAuthStore.setState({ error: 'Gagal mendapatkan token CAPTCHA' });
+      return;
+    }
+
+    const result = await login(email, password, token);
 
     if (result.success && result.user) {
       const role = result.user.role;

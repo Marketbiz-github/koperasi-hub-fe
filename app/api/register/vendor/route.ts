@@ -4,7 +4,22 @@ import { authService, adminService } from '@/services/apiService'
 export async function POST(req: Request) {
     try {
         const body = await req.json()
-        const { name, email, password, phone, subdomain, store_name, flag_id } = body
+        const { name, email, password, phone, subdomain, store_name, flag_id, captchaToken } = body
+
+        // 0. Verify CAPTCHA
+        if (!captchaToken) {
+            return NextResponse.json({ message: 'CAPTCHA token is required' }, { status: 400 });
+        }
+
+        const secretKey = process.env.GOOGLE_CAPTCHA_SECRET_KEY || process.env.GOOGLE_CAPTHA_SECRET_KEY;
+        const verifyResponse = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${captchaToken}`, {
+            method: 'POST',
+        });
+        const verifyData = await verifyResponse.json();
+
+        if (!verifyData.success) {
+            return NextResponse.json({ message: 'Invalid CAPTCHA' }, { status: 400 });
+        }
 
         // 1. Login as Super Admin to get token
         const adminEmail = process.env.SUPER_ADMIN_EMAIL

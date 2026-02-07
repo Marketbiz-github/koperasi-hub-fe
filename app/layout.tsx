@@ -64,6 +64,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { CaptchaProvider } from "@/components/providers/CaptchaProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -82,7 +84,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <CaptchaProvider>
+          {children}
+        </CaptchaProvider>
       </body>
     </html>
   );
