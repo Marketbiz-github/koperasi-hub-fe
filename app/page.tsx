@@ -15,7 +15,7 @@ export default function KoperasiHubPage() {
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
       />
-      
+
 
       <style jsx global>{`
         body {
@@ -68,7 +68,7 @@ export default function KoperasiHubPage() {
         }}
       >
         <div className="absolute inset-0 bg-linear-to-br from-black/70 via-black/60 to-green-900/50"></div>
-        
+
         <div className="max-w-6xl mx-auto w-full relative z-10">
           <div className="gap-8 lg:gap-12 items-center">
             {/* Left Content */}
@@ -79,7 +79,7 @@ export default function KoperasiHubPage() {
                   Platform Distribusi Terpercaya Indonesia
                 </span>
               </div>
-              
+
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                 Bisnis Anda Berkembang
                 <span className="block text-yellow-400">bersama Koperasi Indonesia</span>
@@ -104,7 +104,7 @@ export default function KoperasiHubPage() {
               {/* Stats Card (Glass Effect - Bottom Right) */}
               <div className="mt-8 flex lg:justify-end">
                 <div className="flex items-center space-x-6 bg-white/20 backdrop-blur-md rounded-3xl px-8 py-4 shadow-lg border border-white/30">
-                  
+
                   {/* Stat 1 */}
                   <div className="space-y-1 text-white">
                     <div className="flex items-baseline space-x-1">
@@ -202,11 +202,10 @@ export default function KoperasiHubPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-6 py-3 font-semibold rounded-xl transition ${
-                  activeTab === tab
+                className={`px-6 py-3 font-semibold rounded-xl transition ${activeTab === tab
                     ? 'gradient-green text-white shadow-lg'
                     : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 {tab === 'vendor' ? 'Vendor' : 'Koperasi'}
               </button>
@@ -226,9 +225,7 @@ export default function KoperasiHubPage() {
                   : 'Koperasi bisa memilih vendor yang sesuai kebutuhan anggotanya, menjual produk ke anggota, dan mendapatkan komisi dari setiap transaksi.'}
               </p>
               <a
-                href={activeTab === 'vendor' ? '/register-vendor' : 'https://my.kooperasi.com/'}
-                target={activeTab === 'koperasi' ? '_blank' : undefined}
-                rel={activeTab === 'koperasi' ? 'noopener noreferrer' : undefined}
+                href={activeTab === 'vendor' ? '/register/vendor' : '/register/koperasi'}
                 className="inline-block gradient-green text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition transform hover:scale-105"
               >
                 Daftar {activeTab === 'vendor' ? 'Vendor' : 'Koperasi'}
@@ -239,67 +236,67 @@ export default function KoperasiHubPage() {
             <div className="space-y-6">
               {activeTab === 'vendor'
                 ? [
-                    {
-                      title: 'Terdaftar sebagai Merchant & Punya Produk',
-                      description: 'Pastikan usaha Anda sudah memiliki produk yang siap dijual.',
-                    },
-                    {
-                      title: 'Daftar sebagai Vendor',
-                      description: 'Registrasi di platform dan lengkapi data usaha Anda.',
-                    },
-                    {
-                      title: 'Pilih Paket',
-                      description: 'Ada paket standard dan premium',
-                    },
-                    {
-                      title: 'Pantau Penjualan',
-                      description: 'Lacak transaksi, pesanan, dan perkembangan bisnis Anda.',
-                    },
-                  ].map((step, index) => (
-                    <div
-                      key={index}
-                      className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition flex items-start space-x-4"
-                    >
-                      <div className="w-10 h-10 shrink-0 gradient-green text-white rounded-full flex items-center justify-center font-bold shadow-lg">
-                        {index + 1}
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-1">{step.title}</h4>
-                        <p className="text-gray-600 text-sm">{step.description}</p>
-                      </div>
+                  {
+                    title: 'Terdaftar sebagai Merchant & Punya Produk',
+                    description: 'Pastikan usaha Anda sudah memiliki produk yang siap dijual.',
+                  },
+                  {
+                    title: 'Daftar sebagai Vendor',
+                    description: 'Registrasi di platform dan lengkapi data usaha Anda.',
+                  },
+                  {
+                    title: 'Pilih Paket',
+                    description: 'Ada paket standard dan premium',
+                  },
+                  {
+                    title: 'Pantau Penjualan',
+                    description: 'Lacak transaksi, pesanan, dan perkembangan bisnis Anda.',
+                  },
+                ].map((step, index) => (
+                  <div
+                    key={index}
+                    className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition flex items-start space-x-4"
+                  >
+                    <div className="w-10 h-10 shrink-0 gradient-green text-white rounded-full flex items-center justify-center font-bold shadow-lg">
+                      {index + 1}
                     </div>
-                  ))
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-1">{step.title}</h4>
+                      <p className="text-gray-600 text-sm">{step.description}</p>
+                    </div>
+                  </div>
+                ))
                 : [
-                    {
-                      title: 'Daftar sebagai Koperasi di Kooperasi.com',
-                      description: 'Registrasi dengan data & legalitas koperasi Anda.',
-                    },
-                    {
-                      title: 'Pilih Produk Vendor',
-                      description: 'Jelajahi Marketplace Hub dan pilih produk yang sesuai.',
-                    },
-                    {
-                      title: 'Lakukan Pembelian',
-                      description: 'Pesan produk dari vendor dan kelola stok koperasi.',
-                    },
-                    {
-                      title: 'Jual Produk Anda',
-                      description: 'Distribusikan produk kepada anggota atau masyarakat.',
-                    },
-                  ].map((step, index) => (
-                    <div
-                      key={index}
-                      className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition flex items-start space-x-4"
-                    >
-                      <div className="w-10 h-10 shrink-0 gradient-green text-white rounded-full flex items-center justify-center font-bold shadow-lg">
-                        {index + 1}
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-1">{step.title}</h4>
-                        <p className="text-gray-600 text-sm">{step.description}</p>
-                      </div>
+                  {
+                    title: 'Daftar sebagai Koperasi di Kooperasi.com',
+                    description: 'Registrasi dengan data & legalitas koperasi Anda.',
+                  },
+                  {
+                    title: 'Pilih Produk Vendor',
+                    description: 'Jelajahi Marketplace Hub dan pilih produk yang sesuai.',
+                  },
+                  {
+                    title: 'Lakukan Pembelian',
+                    description: 'Pesan produk dari vendor dan kelola stok koperasi.',
+                  },
+                  {
+                    title: 'Jual Produk Anda',
+                    description: 'Distribusikan produk kepada anggota atau masyarakat.',
+                  },
+                ].map((step, index) => (
+                  <div
+                    key={index}
+                    className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition flex items-start space-x-4"
+                  >
+                    <div className="w-10 h-10 shrink-0 gradient-green text-white rounded-full flex items-center justify-center font-bold shadow-lg">
+                      {index + 1}
                     </div>
-                  ))}
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-1">{step.title}</h4>
+                      <p className="text-gray-600 text-sm">{step.description}</p>
+                    </div>
+                  </div>
+                ))}
             </div>
           </div>
         </div>
@@ -371,9 +368,8 @@ export default function KoperasiHubPage() {
                 >
                   <span className="font-medium text-gray-900 pr-4">{faq.question}</span>
                   <i
-                    className={`fas fa-chevron-down text-green-600 transition-transform duration-300 ${
-                      openFaq === index ? 'rotate-180' : ''
-                    }`}
+                    className={`fas fa-chevron-down text-green-600 transition-transform duration-300 ${openFaq === index ? 'rotate-180' : ''
+                      }`}
                   ></i>
                 </button>
                 {openFaq === index && (

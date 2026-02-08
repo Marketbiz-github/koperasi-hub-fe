@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Check } from 'lucide-react';
+import { Eye, EyeOff, Check, Loader2 } from 'lucide-react';
 import Image from 'next/image'
 import { useAuthStore } from '@/store/authStore';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
@@ -10,6 +10,8 @@ import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 interface FormErrors {
   [key: string]: string;
 }
+
+import Link from 'next/link';
 
 export default function RegisterVendorPage() {
   const router = useRouter();
@@ -58,8 +60,6 @@ export default function RegisterVendorPage() {
     setFormData(prev => {
       const newData = { ...prev, [name]: value };
 
-      // Auto-generate subdomain from minishop_name if subdomain hasn't been manually edited
-      // or if it's currently empty
       if (name === 'minishop_name') {
         const slug = value
           .toLowerCase()
@@ -67,7 +67,6 @@ export default function RegisterVendorPage() {
           .replace(/-+/g, '-')
           .replace(/^-|-$/g, '');
 
-        // Only auto-fill if subdomain is empty or was previously auto-generated from minishop_name
         const prevSlug = prev.minishop_name
           .toLowerCase()
           .replace(/[^a-z0-9]/g, '-')
@@ -82,7 +81,6 @@ export default function RegisterVendorPage() {
       return newData;
     });
 
-    // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -167,6 +165,7 @@ export default function RegisterVendorPage() {
           store_name: formData.minishop_name,
           flag_id: formData.flag_id || null,
           captchaToken: token,
+          role: 'vendor'
         }),
       });
 
@@ -189,64 +188,58 @@ export default function RegisterVendorPage() {
   }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-black/70 p-4 overflow-hidden py-8">
-
-      {/* Background Image */}
-      <div className="absolute inset-0">
-        <Image
-          src="/images/vendor.jpg"
-          alt="Auth Background"
-          fill
-          priority
-          className="object-cover opacity-20"
-        />
-      </div>
-
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/40 -z-10" />
-
-      {/* content */}
-      <div className="w-full max-w-2xl z-10">
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="flex items-center space-x-3 justify-center mb-4">
-              <div className="w-10 h-10 md:w-12 md:h-12 gradient-green rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition">
-                <span className="text-white font-bold text-xl md:text-2xl">K</span>
-              </div>
-              <div className="text-3xl font-bold text-gray-900">KoperasiHub</div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4 font-sans py-12">
+      <div className="w-full max-w-2xl">
+        {/* Logo Section */}
+        <div className="flex flex-col items-center mb-10">
+          <Link href="/" className="transition-transform hover:scale-105">
+            <div className="relative w-48 h-16">
+              <Image
+                src="/images/koperasihub.png"
+                alt="KoperasiHub Logo"
+                fill
+                className="object-contain"
+                priority
+              />
             </div>
-            <p className="text-gray-600">Daftar Sebagai Vendor</p>
+          </Link>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 md:p-10">
+          <div className="mb-10">
+            <h2 className="text-2xl font-bold text-slate-900">Daftar Sebagai Vendor</h2>
+            <p className="text-slate-500 mt-1">Mulai kelola produk dan jangkau pasar lebih luas.</p>
           </div>
 
           {/* Error Message */}
           {errors.submit && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 text-sm">{errors.submit}</p>
+            <div className="mb-8 p-4 bg-red-50 border border-red-100 rounded-xl">
+              <p className="text-red-600 text-sm font-medium">{errors.submit}</p>
             </div>
           )}
 
           {/* Success Message */}
           {successMessage && (
-            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-green-600 text-sm flex items-center gap-2">
-                <Check className="w-4 h-4" />
+            <div className="mb-8 p-4 bg-emerald-50 border border-emerald-100 rounded-xl">
+              <p className="text-emerald-600 text-sm font-medium flex items-center gap-2">
+                <Check className="w-5 h-5" />
                 {successMessage}
               </p>
             </div>
           )}
 
           {/* Registration Form */}
-          <form onSubmit={handleRegister} className="space-y-6 mb-8">
-
+          <form onSubmit={handleRegister} className="space-y-8">
             {/* Section 1: Data Pribadi */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-green-200">Data Pribadi</h3>
+            <div className="space-y-5">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">1</div>
+                <h3 className="text-lg font-bold text-slate-800">Informasi Pribadi</h3>
+              </div>
 
-              {/* Nama Lengkap dan Email */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
                     Nama Lengkap <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -255,18 +248,16 @@ export default function RegisterVendorPage() {
                     type="text"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 rounded-lg border ${errors.name ? 'border-red-500' : 'border-gray-300'} bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none`}
-                    placeholder="Nama Lengkap Anda"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                    placeholder="Nama Lengkap"
                     required
                   />
-                  {errors.name && (
-                    <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-                  )}
+                  {errors.name && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.name}</p>}
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Email <span className="text-red-500">*</span>
+                  <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Email Aktif <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="email"
@@ -274,248 +265,210 @@ export default function RegisterVendorPage() {
                     type="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 rounded-lg border ${errors.email ? 'border-red-500' : 'border-gray-300'} bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none`}
-                    placeholder="email@example.com"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                    placeholder="email@anda.com"
                     required
                   />
-                  {errors.email && (
-                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                  )}
+                  {errors.email && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.email}</p>}
                 </div>
-              </div>
 
-              {/* Phone dan Flag selection */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="phone" className="block text-sm font-semibold text-slate-700 mb-2">
                     Nomor Telepon <span className="text-red-500">*</span>
                   </label>
-                  <div className="flex gap-2">
-                    <div className="flex items-center px-3 py-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-600 font-medium">
+                  <div className="flex">
+                    <span className="inline-flex items-center px-4 rounded-l-xl border border-r-0 border-slate-300 bg-slate-50 text-slate-500 font-medium">
                       +62
-                    </div>
+                    </span>
                     <input
                       id="phone"
                       name="phone"
                       type="number"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className={`flex-1 px-4 py-3 rounded-lg border ${errors.phone ? 'border-red-500' : 'border-gray-300'} bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none`}
-                      placeholder="8123456789"
+                      className="w-full px-4 py-3 rounded-r-xl border border-slate-300 bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                      placeholder="81234xxx"
                       required
                     />
                   </div>
-                  {errors.phone && (
-                    <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
-                  )}
+                  {errors.phone && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.phone}</p>}
                 </div>
 
                 <div>
-                  <label htmlFor="flag_id" className="block text-sm font-medium text-gray-700 mb-2">
-                    Grup / Flag (Opsional)
+                  <label htmlFor="flag_id" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Referal / Flag Group
                   </label>
                   <select
                     id="flag_id"
                     name="flag_id"
                     value={formData.flag_id}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
                   >
-                    <option value="">Pilih Flag (Jika Ada)</option>
+                    <option value="">Pilih Jika Ada</option>
                     {flags.map((flag) => (
-                      <option key={flag.id} value={flag.id}>
-                        {flag.name}
-                      </option>
+                      <option key={flag.id} value={flag.id}>{flag.name}</option>
                     ))}
                   </select>
                 </div>
               </div>
             </div>
 
-            {/* Divider */}
-            <div className="border-t border-gray-200"></div>
-
             {/* Section 2: Data Toko */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-green-200">Data Toko</h3>
-
-              {/* Nama Toko */}
-              <div className="mb-4">
-                <label htmlFor="minishop_name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Nama Toko <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="minishop_name"
-                  name="minishop_name"
-                  type="text"
-                  value={formData.minishop_name}
-                  onChange={handleInputChange}
-                  className={`w-full px-4 py-3 rounded-lg border ${errors.minishop_name ? 'border-red-500' : 'border-gray-300'} bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none`}
-                  placeholder="Nama Toko Anda"
-                  required
-                />
-                {errors.minishop_name && (
-                  <p className="mt-1 text-sm text-red-600">{errors.minishop_name}</p>
-                )}
+            <div className="space-y-5 pt-4">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">2</div>
+                <h3 className="text-lg font-bold text-slate-800">Detail Toko</h3>
               </div>
 
-              {/* Subdomain */}
-              <div className="mb-4">
-                <label htmlFor="subdomain" className="block text-sm font-medium text-gray-700 mb-2">
-                  Subdomain Toko Anda <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="subdomain"
-                  name="subdomain"
-                  type="text"
-                  value={formData.subdomain}
-                  onChange={handleInputChange}
-                  className={`w-full px-4 py-3 rounded-lg border ${errors.subdomain ? 'border-red-500' : 'border-gray-300'} bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none`}
-                  placeholder="subdomain-toko-anda"
-                  required
-                />
-                {formData.subdomain && (
-                  <p className="mt-2 text-sm text-gray-600">
-                    Link toko Anda: https://<span className="font-semibold text-green-600">{formData.subdomain}</span>.koperasi.hub
-                  </p>
-                )}
-                {errors.subdomain && (
-                  <p className="mt-1 text-sm text-red-600">{errors.subdomain}</p>
-                )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="md:col-span-2">
+                  <label htmlFor="minishop_name" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Nama Toko / Bisnis <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="minishop_name"
+                    name="minishop_name"
+                    type="text"
+                    value={formData.minishop_name}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                    placeholder="Nama Toko Anda"
+                    required
+                  />
+                  {errors.minishop_name && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.minishop_name}</p>}
+                </div>
+
+                <div className="md:col-span-2">
+                  <label htmlFor="subdomain" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Subdomain <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="subdomain"
+                      name="subdomain"
+                      type="text"
+                      value={formData.subdomain}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none pr-32"
+                      placeholder="subdomain"
+                      required
+                    />
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">
+                      .koperasihub.com
+                    </div>
+                  </div>
+                  {errors.subdomain && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.subdomain}</p>}
+                </div>
               </div>
             </div>
-
-            {/* Divider */}
-            <div className="border-t border-gray-200"></div>
 
             {/* Section 3: Keamanan */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-green-200">Keamanan</h3>
-
-              {/* Password */}
-              <div className="mb-4">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  Password <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className={`w-full px-4 py-3 rounded-lg border ${errors.password ? 'border-red-500' : 'border-gray-300'} bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none pr-12`}
-                    placeholder="Minimal 6 karakter"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-                )}
+            <div className="space-y-5 pt-4">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">3</div>
+                <h3 className="text-lg font-bold text-slate-800">Keamanan Akun</h3>
               </div>
 
-              {/* Confirm Password */}
-              <div className="mb-4">
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                  Konfirmasi Password <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    className={`w-full px-4 py-3 rounded-lg border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none pr-12`}
-                    placeholder="Ulang password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
-                  </button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Password <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none pr-12"
+                      placeholder="Minimal 6 karakter"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-600"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                  {errors.password && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.password}</p>}
                 </div>
-                {errors.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
-                )}
+
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Konfirmasi Password <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none pr-12"
+                      placeholder="Masukkan ulang"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-600"
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                  {errors.confirmPassword && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.confirmPassword}</p>}
+                </div>
               </div>
             </div>
 
-            {/* Divider */}
-            <div className="border-t border-gray-200"></div>
-
-            {/* Terms & Conditions */}
-            <div className="flex items-start gap-3">
-              <input
-                id="agreeTerms"
-                type="checkbox"
-                checked={agreeTerms}
-                onChange={(e) => {
-                  setAgreeTerms(e.target.checked);
-                  if (errors.agreeTerms) {
-                    setErrors(prev => ({
-                      ...prev,
-                      agreeTerms: ''
-                    }));
-                  }
-                }}
-                className="mt-1 w-5 h-5 rounded border-gray-300 text-green-600 cursor-pointer"
-              />
-              <label htmlFor="agreeTerms" className="text-sm text-gray-700">
-                Saya menyetujui <a href="#" className="text-green-600 font-medium hover:underline">Syarat & Ketentuan</a> dan <a href="#" className="text-green-600 font-medium hover:underline">Kebijakan Privasi</a>
-              </label>
+            {/* Terms */}
+            <div className="pt-6 border-t border-slate-100">
+              <div className="flex items-start gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <input
+                  id="agreeTerms"
+                  type="checkbox"
+                  checked={agreeTerms}
+                  onChange={(e) => setAgreeTerms(e.target.checked)}
+                  className="mt-1 w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                />
+                <label htmlFor="agreeTerms" className="text-sm text-slate-600">
+                  Saya menyetujui <Link href="#" className="font-bold text-emerald-600 hover:underline">Syarat & Ketentuan</Link> serta <Link href="#" className="font-bold text-emerald-600 hover:underline">Kebijakan Privasi</Link> KoperasiHub.
+                </label>
+              </div>
+              {errors.agreeTerms && <p className="mt-2 text-xs font-medium text-red-500">{errors.agreeTerms}</p>}
             </div>
-            {errors.agreeTerms && (
-              <p className="text-sm text-red-600">{errors.agreeTerms}</p>
-            )}
 
-            {/* Register Button */}
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 gradient-green disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors duration-200 hover:brightness-110 focus:outline-none focus:ring-4 focus:ring-green-200"
+              className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-bold rounded-xl transition-all shadow-lg shadow-emerald-600/20 active:scale-[0.98] text-lg flex items-center justify-center gap-2"
             >
+              {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
               {isLoading ? 'Memproses Registrasi...' : 'Daftar Sebagai Vendor'}
             </button>
           </form>
 
           {/* Login Link */}
-          <div className="text-center pt-6 border-t border-gray-200">
-            <p className="text-gray-600 mb-3">
-              Sudah memiliki akun?
+          <div className="text-center pt-8 mt-10 border-t border-slate-100">
+            <p className="text-slate-500 font-medium">
+              Sudah memiliki akun?{' '}
+              <Link href="/login" className="text-emerald-600 hover:text-emerald-700 font-bold underline-offset-4 hover:underline transition-all">
+                Login di sini
+              </Link>
             </p>
-            <a
-              href="/login"
-              className="text-green-600 font-medium hover:underline"
-            >
-              Login di sini
-            </a>
           </div>
+        </div>
 
-          {/* Footer */}
-          <div className="text-center mt-6">
-            <p className="text-xs text-gray-500">
-              © 2025 KoperasiHub. All rights reserved.
-            </p>
-          </div>
+        {/* Footer info */}
+        <div className="text-center mt-10">
+          <p className="text-sm text-slate-400">
+            &copy; {new Date().getFullYear()} KoperasiHub Platform. Seluruh Hak Cipta Dilindungi.
+          </p>
         </div>
       </div>
     </div>

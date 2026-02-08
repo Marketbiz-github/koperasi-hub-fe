@@ -4,7 +4,7 @@ import { authService, adminService } from '@/services/apiService'
 export async function POST(req: Request) {
     try {
         const body = await req.json()
-        const { name, email, password, phone, subdomain, store_name, flag_id, captchaToken } = body
+        const { name, email, password, phone, subdomain, store_name, flag_id, captchaToken, role } = body
 
         // 0. Verify CAPTCHA
         if (!captchaToken) {
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
                 email,
                 password,
                 phone,
-                role: 'vendor'
+                role: role || 'vendor'
             })
         } catch (error: any) {
             return NextResponse.json(

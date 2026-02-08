@@ -114,6 +114,13 @@ export const userService = {
         return apiRequest(`/users/${id}`, {
             token,
         })
+    },
+
+    async addAffiliation(data: { parent_id: number, child_id: number, type: string }) {
+        return apiRequest('/users/affiliate', {
+            method: 'POST',
+            body: data,
+        })
     }
 }
 

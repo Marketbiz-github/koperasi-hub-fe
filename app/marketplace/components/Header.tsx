@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Menu, Search, ShoppingCart } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useMounted } from '@/hooks/useMounted';
+import Image from 'next/image';
 
 export default function Header() {
   const mounted = useMounted();
@@ -37,10 +38,17 @@ export default function Header() {
         <div className="border-t border-gray-700">
           <div className="container mx-auto p-4 flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 md:w-12 md:h-12 gradient-green rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition">
-                <span className="text-white font-bold text-xl md:text-2xl">K</span>
-              </div>
-              <span className="text-xl font-bold">KoperasiHub</span>
+              <Link href="/" className="">
+                <div className="relative w-36 md:w-48 h-12 md:h-14">
+                  <Image
+                    src="/images/koperasihub-dark.png"
+                    alt="KoperasiHub Logo"
+                    fill
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+              </Link>
             </div>
 
             {/* Desktop search + cart + login */}

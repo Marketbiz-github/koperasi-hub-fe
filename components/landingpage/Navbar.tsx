@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -11,13 +12,20 @@ export default function Navbar() {
     <nav className="fixed top-4 left-0 right-0 z-50 px-4">
       <div className="max-w-7xl mx-auto bg-white backdrop-blur-lg shadow-xl border border-green-500 rounded-2xl px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-20">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 md:w-12 md:h-12 gradient-green rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition">
-              <span className="text-white font-bold text-xl md:text-2xl">K</span>
-            </div>
-            <span className="text-xl md:text-2xl font-bold text-gray-900">
-              Koperasi<span className="text-green-600">Hub</span>
-            </span>
+
+          {/* Logo Section */}
+          <div className="flex flex-col items-center">
+            <Link href="/" className="">
+              <div className="relative w-36 md:w-48 h-12 md:h-16">
+                <Image
+                  src="/images/koperasihub.png"
+                  alt="KoperasiHub Logo"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+            </Link>
           </div>
 
           <div className="hidden md:flex items-center space-x-3">
@@ -57,12 +65,16 @@ export default function Navbar() {
                     Daftar Vendor
                   </a>
                   <a
-                    href="https://my.kooperasi.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="/register/koperasi"
                     className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50"
                   >
                     Daftar Koperasi
+                  </a>
+                  <a
+                    href="/register/reseller"
+                    className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50"
+                  >
+                    Daftar Reseller
                   </a>
                 </div>
               )}
@@ -123,7 +135,8 @@ export default function Navbar() {
               {isDaftarOpen && (
                 <div className="mt-2 space-y-2">
                   <a href="/register/vendor" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Daftar Vendor</a>
-                  <a href="https://my.kooperasi.com/" target="_blank" rel="noopener noreferrer" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Daftar Koperasi</a>
+                  <a href="/register/koperasi" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Daftar Koperasi</a>
+                  <a href="/register/reseller" className="block px-4 py-3 text-sm text-gray-700 rounded-lg hover:bg-green-50">Daftar Reseller</a>
                 </div>
               )}
             </div>
