@@ -57,12 +57,19 @@ export async function POST(req: Request) {
         }
 
         // The external API returns ID directly in data as verified by user: data.id
-        const userId = userResult.data?.id || userResult.data?.user?.id
+        // We add fallbacks for data.user_id or data.user.id just in case the structure varies.
+        const newVendorId = userResult.data?.id || userResult.data?.user_id || userResult.data?.user?.id;
 
-        if (!userId) {
+        console.log(`[DEBUG] Register Success. Extracted New User ID: ${newVendorId} (${typeof newVendorId})`);
+        console.log(`[DEBUG] Full Register Result Data:`, JSON.stringify(userResult.data));
+
+        if (!newVendorId) {
             console.error('Registration response missing ID:', userResult)
             return NextResponse.json(
-                { message: 'Registrasi berhasil tapi ID user tidak ditemukan' },
+                {
+                    message: 'Registrasi berhasil tapi ID user tidak ditemukan',
+                    debug: userResult.data
+                },
                 { status: 400 }
             )
         }
@@ -73,11 +80,11 @@ export async function POST(req: Request) {
                 // Ensure IDs are sent as numbers if possible, 
                 // some APIs are strict about type validation
                 await adminService.assignFlagToUser(adminToken, {
-                    user_id: Number(userId),
+                    user_id: Number(newVendorId),
                     flag_id: Number(flag_id)
                 })
             } catch (error: any) {
-                console.error('Assign flag fail for User:', userId, 'Flag:', flag_id, 'Error:', error.message)
+                console.error('Assign flag fail for User:', newVendorId, 'Flag:', flag_id, 'Error:', error.message)
                 return NextResponse.json(
                     {
                         message: `Gagal memberikan label flag: ${error.message}`,
@@ -91,11 +98,14 @@ export async function POST(req: Request) {
         // 4. Create Store
         let storeResult;
         try {
-            storeResult = await authService.createStore(adminToken, {
-                user_id: userId,
+            const storePayload = {
+                user_id: Number(newVendorId),
                 name: store_name,
                 subdomain: subdomain
-            })
+            };
+            console.log(`[DEBUG] Store Payload for createStore:`, JSON.stringify(storePayload));
+
+            storeResult = await authService.createStore(adminToken, storePayload)
         } catch (error: any) {
             console.error('Create store fail:', error)
             return NextResponse.json(
@@ -134,7 +144,7 @@ export async function POST(req: Request) {
                 message: 'Vendor registration completed successfully'
             },
             data: {
-                user_id: userId,
+                user_id: newVendorId,
                 store_id: storeId
             }
         })

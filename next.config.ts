@@ -7,6 +7,18 @@ const nextConfig: NextConfig = {
     'koperasi-hub-fe.test',
     '*.koperasi-hub-fe.test',
   ],
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'koperasi-hub-fe.test',
+      },
+      {
+        protocol: 'https',
+        hostname: 'koperasihub.koyeb.app',
+      },
+    ],
+  },
 };
 
 

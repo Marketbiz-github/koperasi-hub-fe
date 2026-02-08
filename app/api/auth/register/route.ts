@@ -72,13 +72,17 @@ export async function POST(req: Request) {
         console.log("Stepping into: Create Store...");
         if (minishop_name) {
             try {
-                await authService.createStore(token, {
+                const storePayload = {
+                    user_id: Number(user_id),
                     name: minishop_name,
                     description: address || `Toko milik ${name}`,
                     phone: phone,
                     domain: subdomain,
                     status: '1'
-                });
+                };
+                console.log(`[DEBUG] Auth Register: Store Payload:`, JSON.stringify(storePayload));
+
+                await authService.createStore(token, storePayload);
                 console.log("Create Store Success");
             } catch (err: any) {
                 console.error("Gagal buat store:", err.message);
