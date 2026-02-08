@@ -12,7 +12,7 @@ interface FormErrors {
     [key: string]: string;
 }
 
-export default function RegisterResellerPage() {
+function RegisterResellerContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { executeRecaptcha } = useGoogleReCaptcha();
@@ -490,5 +490,13 @@ export default function RegisterResellerPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function RegisterResellerPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50"><Loader2 className="w-10 h-10 animate-spin text-emerald-600" /></div>}>
+            <RegisterResellerContent />
+        </Suspense>
     );
 }

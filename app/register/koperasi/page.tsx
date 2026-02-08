@@ -12,7 +12,7 @@ interface FormErrors {
     [key: string]: string;
 }
 
-export default function RegisterKoperasiPage() {
+function RegisterKoperasiContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { executeRecaptcha } = useGoogleReCaptcha();
@@ -490,5 +490,13 @@ export default function RegisterKoperasiPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function RegisterKoperasiPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50"><Loader2 className="w-10 h-10 animate-spin text-emerald-600" /></div>}>
+            <RegisterKoperasiContent />
+        </Suspense>
     );
 }
