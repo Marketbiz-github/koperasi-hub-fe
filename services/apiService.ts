@@ -313,5 +313,42 @@ export const biteshipService = {
     }
 }
 
+export const generalCategoryService = {
+    async getList(token?: string) {
+        return apiRequest('/general-categories', {
+            token,
+        })
+    },
+
+    async getDetail(token: string, id: string | number) {
+        return apiRequest(`/general-categories/${id}`, {
+            token,
+        })
+    },
+
+    async create(token: string, data: any) {
+        return apiRequest('/general-categories', {
+            method: 'POST',
+            body: data,
+            token,
+        })
+    },
+
+    async update(token: string, id: string | number, data: any) {
+        return apiRequest(`/general-categories/${id}`, {
+            method: 'PUT',
+            body: data,
+            token,
+        })
+    },
+
+    async delete(token: string, id: string | number) {
+        return apiRequest(`/general-categories/${id}`, {
+            method: 'DELETE',
+            token,
+        })
+    }
+}
+
 // Keep old name for backward compatibility
 export const shipperService = biteshipService;

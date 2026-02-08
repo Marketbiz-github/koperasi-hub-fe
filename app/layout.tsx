@@ -65,6 +65,7 @@ export const metadata: Metadata = {
 };
 
 import { CaptchaProvider } from "@/components/providers/CaptchaProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({
   children,
@@ -86,6 +87,7 @@ export default function RootLayout({
       >
         <CaptchaProvider>
           {children}
+          <Toaster />
         </CaptchaProvider>
       </body>
     </html>

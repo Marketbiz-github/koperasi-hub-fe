@@ -9,21 +9,27 @@ export async function POST(req: NextRequest) {
         const role = formData.get('role') as string;
         const userId = formData.get('userId') as string;
         const storeId = formData.get('storeId') as string;
-        const type = formData.get('type') as string; // 'logo' or 'cover'
+        const type = formData.get('type') as string;
 
-        if (!file || !role || !userId || !storeId || !type) {
-            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        if (!file) {
+            return NextResponse.json({ error: 'Missing file' }, { status: 400 });
         }
 
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const filename = file.name;
+        let relativeDir = '';
+        if (role === 'categories') {
+            relativeDir = path.join('images', 'categories');
+        } else {
+            if (!role || !userId || !storeId || !type) {
+                return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+            }
+            relativeDir = path.join('images', role, userId, storeId, type);
+        }
 
-        // Target directory: public/images/{role}/{userId}/{storeId}/{type}/
-        const relativeDir = path.join('images', role, userId, storeId, type);
         const uploadDir = path.join(process.cwd(), 'public', relativeDir);
-
-        // Create directory recursively
         await mkdir(uploadDir, { recursive: true });
+
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const filename = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
 
         const filePath = path.join(uploadDir, filename);
         await writeFile(filePath, buffer);
