@@ -41,7 +41,10 @@ export default function StoreValidationPopup() {
         }
 
         const checkStoreData = async () => {
-            if (!isHydrated || !user) return;
+            if (!isHydrated || !user || user.role === 'super_admin') {
+                setLoading(false);
+                return;
+            }
 
             try {
                 setLoading(true);

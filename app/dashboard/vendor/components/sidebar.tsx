@@ -93,34 +93,8 @@ const vendorNav = [
   },
   {
     title: "Pengaturan Toko",
-    url: "#",
+    url: "/dashboard/vendor/store-settings",
     icon: IconSettings,
-    items: [
-      {
-        title: "Detail Toko",
-        url: "/dashboard/vendor/pengaturan-toko/detail",
-      },
-      {
-        title: "Shipping",
-        url: "/dashboard/vendor/pengaturan-toko/shipping",
-      },
-      {
-        title: "Gudang",
-        url: "/dashboard/vendor/pengaturan-toko/gudang",
-      },
-      {
-        title: "Pembayaran",
-        url: "/dashboard/vendor/pengaturan-toko/pembayaran",
-      },
-      {
-        title: "WMS",
-        url: "/dashboard/vendor/pengaturan-toko/wms",
-      },
-      {
-        title: "Pengaturan Lainnya",
-        url: "/dashboard/vendor/pengaturan-toko/lainnya",
-      },
-    ],
   },
 ];
 

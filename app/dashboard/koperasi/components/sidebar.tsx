@@ -150,34 +150,8 @@ const data = {
     },
     {
       title: "Pengaturan Toko",
-      url: "#",
+      url: "/dashboard/koperasi/store-settings",
       icon: IconSettings,
-      items: [
-        {
-          title: "Detail Toko",
-          url: "/dashboard/koperasi/pengaturan-toko/detail",
-        },
-        {
-          title: "Shipping",
-          url: "/dashboard/koperasi/pengaturan-toko/shipping",
-        },
-        {
-          title: "Gudang",
-          url: "/dashboard/koperasi/pengaturan-toko/gudang",
-        },
-        {
-          title: "Pembayaran",
-          url: "/dashboard/koperasi/pengaturan-toko/pembayaran",
-        },
-        {
-          title: "WMS",
-          url: "/dashboard/koperasi/pengaturan-toko/wms",
-        },
-        {
-          title: "Pengaturan Lainnya",
-          url: "/dashboard/koperasi/pengaturan-toko/lainnya",
-        },
-      ],
     },
   ],
 }

@@ -342,7 +342,7 @@ export default function StoreSettingsForm() {
     }
 
     return (
-        <div className="max-w-4xl mx-auto py-8 px-4">
+        <div className="mx-auto py-8 px-4">
             <div className="flex items-center gap-3 mb-8">
                 <div className="p-3 bg-emerald-100 rounded-xl text-emerald-600">
                     <Store className="w-8 h-8" />
