@@ -389,3 +389,48 @@ export const productCategoryService = {
         })
     }
 }
+
+export const productService = {
+    async getProducts(params: { store_id?: string | number, page?: number, limit?: number, name?: string, status?: string, category_id?: string | number }, token?: string) {
+        let query = new URLSearchParams();
+        if (params.page) query.append('page', params.page.toString());
+        if (params.limit) query.append('limit', params.limit.toString());
+        if (params.store_id) query.append('store_id', params.store_id.toString());
+        if (params.name) query.append('name', params.name);
+        if (params.status) query.append('status', params.status);
+        if (params.category_id) query.append('product_category_id', params.category_id.toString());
+
+        const queryString = query.toString();
+        const endpoint = `/products${queryString ? `?${queryString}` : ''}`;
+
+        return apiRequest(endpoint, { token });
+    },
+
+    async getProductDetail(id: string | number, token?: string) {
+        return apiRequest(`/products/${id}`, { token });
+    },
+
+    async createProduct(data: any, token: string) {
+        return apiRequest('/products', {
+            method: 'POST',
+            body: data,
+            token,
+        });
+    },
+
+    async updateProduct(id: string | number, data: any, token: string) {
+        return apiRequest(`/products/${id}`, {
+            method: 'PUT',
+            body: data,
+            token,
+        });
+    },
+
+    async deleteProduct(id: string | number, token: string) {
+        return apiRequest(`/products/${id}`, {
+            method: 'DELETE',
+            token,
+        });
+    }
+}
+

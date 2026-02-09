@@ -1,10 +1,11 @@
 {
   "info": {
-    "_postman_id": "b458491f-13fe-4411-b49d-844f6d8ae471",
+    "_postman_id": "15f728af-e08e-4a7a-bcc2-d6349dc7f0c9",
     "name": "KOPERASIHUB API",
     "description": "Dokumentasi ini memberikan rincian teknis mengenai status, tipe data, dan kode respon untuk setiap fitur di KoperasiHub.\n\nEndpoint Prod : koperasihub.koyeb.app\n\n**Response Code**\n\n| **Code** | **Status** | **Keterangan** |\n| --- | --- | --- |\n| 200 | Success | Berhasil |\n| 201 | Created | Data baru dibuat |\n| 400 | Bad Request | Input tidak valid |\n| 401 | Unauthorized | Token salah atau kadaluarsa |\n| 403 | Forbidden | Tidak ada akses role |\n| 404 | Not Found | Resource tidak ditemukan |\n| 429 | Too Many Request | Terkena rate limit |\n| 500 | Server Error | Terjadi kesalahan internal pada server |",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "29649167"
+    "_exporter_id": "29649167",
+    "_collection_link": "https://go.postman.co/collection/35041713-15f728af-e08e-4a7a-bcc2-d6349dc7f0c9?source=collection_link"
   },
   "item": [
     {
@@ -307,6 +308,114 @@
               ],
               "cookie": [],
               "body": "{\n    \"meta\": {\n        \"message\": \"Account has been registered\",\n        \"code\": 201,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"email\": \"pisogow580@example.com\",\n        \"id\": 2,\n        \"name\": \"New User\",\n        \"phone\": \"08123456789\",\n        \"role\": \"vendor\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Onboarding Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"janestore1@gmail.com\",\n  \"password\": \"password123\",\n  \"phone\": \"08123456789\",\n  \"role\": \"vendor\",\n  \"store_name\": \"Toko Jane\",\n  \"store_subdomain\": \"janestore2\",\n  \"store_description\": \"Toko retail serba ada\",\n  \"store_phone\": \"08123456789\",\n  \"store_alamat\": \"Jl. Merdeka No. 10\",\n  \"ipaymu_password\": \"ipaymupassword123\",\n  \"flag_ids\": [1, 2],\n  \"plan_id\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/onboarding",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "onboarding"
+              ]
+            },
+            "description": "Digunakan untuk melakukan pendaftaran user baru dengan satu endpoint yang sudah menjalankan beberapa fungsi , Register > create store > SSO Ipaymu > flag > plan. jika gagal user data tidak akan di buat dan akan di rollback  \n  \nPada api ini, token tidak di perlukan"
+          },
+          "response": [
+            {
+              "name": "Onboarding Register",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"janestore1@gmail.com\",\n  \"password\": \"password123\",\n  \"phone\": \"08123456789\",\n  \"role\": \"vendor\",\n  \"store_name\": \"Toko Jane\",\n  \"store_subdomain\": \"janestore2\",\n  \"store_description\": \"Toko retail serba ada\",\n  \"store_phone\": \"08123456789\",\n  \"store_alamat\": \"Jl. Merdeka No. 10\",\n  \"ipaymu_password\": \"ipaymupassword123\",\n  \"flag_ids\": [1, 2],\n  \"plan_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/onboarding",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "onboarding"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 09 Feb 2026 01:35:55 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "1566"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Onboarding success\",\n        \"code\": 201,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"user\": {\n            \"id\": 11,\n            \"name\": \"Jane Doe\",\n            \"email\": \"janestore1@gmail.com\",\n            \"phone\": \"08123456789\",\n            \"role\": \"vendor\",\n            \"plan_id\": 1,\n            \"expired_at\": \"2026-03-11T01:35:55.467847461Z\",\n            \"plan\": {\n                \"id\": 1,\n                \"name\": \"Test Bussines Package\",\n                \"price\": \"100000\",\n                \"duration_days\": 30,\n                \"created_at\": \"2026-02-09T01:24:38.055922Z\",\n                \"updated_at\": \"2026-02-09T01:24:38.055922Z\",\n                \"deleted_at\": null\n            },\n            \"flags\": [\n                {\n                    \"id\": 1,\n                    \"name\": \"Test Indonesia\",\n                    \"created_at\": \"2026-02-09T01:24:00.24067Z\",\n                    \"updated_at\": \"2026-02-09T01:24:00.24067Z\"\n                },\n                {\n                    \"id\": 2,\n                    \"name\": \"Kode Indonesia\",\n                    \"created_at\": \"2026-02-09T01:24:08.676168Z\",\n                    \"updated_at\": \"2026-02-09T01:24:08.676168Z\"\n                }\n            ],\n            \"status\": 0,\n            \"created_at\": \"2026-02-09T01:35:54.310743585Z\",\n            \"updated_at\": \"2026-02-09T01:35:55.467986502Z\"\n        },\n        \"store\": {\n            \"id\": 12,\n            \"user_id\": 11,\n            \"uuid\": \"c9fae16b-1e94-4c32-9914-3f4c91606348\",\n            \"name\": \"Toko Jane\",\n            \"ipaymu_va\": \"1179028123456789\",\n            \"ipaymu_response\": null,\n            \"subdomain\": \"janestore2\",\n            \"domain\": null,\n            \"slogan\": null,\n            \"description\": \"Toko retail serba ada\",\n            \"alamat\": \"Jl. Merdeka No. 10\",\n            \"province_id\": null,\n            \"city_id\": null,\n            \"district_id\": null,\n            \"area_id\": null,\n            \"province\": null,\n            \"city\": null,\n            \"district\": null,\n            \"area\": null,\n            \"courier\": null,\n            \"phone\": \"08123456789\",\n            \"zipcode\": null,\n            \"logo\": null,\n            \"cover\": null,\n            \"color\": null,\n            \"status\": null,\n            \"type\": null,\n            \"payment_method\": null,\n            \"latitude\": null,\n            \"longitude\": null,\n            \"fee_setting\": null,\n            \"theme_id\": null,\n            \"is_gratis_ongkir\": null,\n            \"gratis_ongkir_unit\": null,\n            \"gratis_ongkir_value\": null,\n            \"created_at\": \"2026-02-09T01:35:54.322341877Z\",\n            \"updated_at\": \"2026-02-09T01:35:55.430436919Z\",\n            \"deleted_at\": null\n        }\n    }\n}"
             }
           ]
         }
@@ -626,7 +735,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzAxMTQ0MTEsInVzZXJfaWQiOjJ9.omeX10cIN-dmoAfbLF_iJuJwBDRl5T4QVwO4R-fuJg8",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA2ODUzNzQsInVzZXJfaWQiOjF9.kayy_kq8WcR8oUIs56Lp0VwXb6rz9sC6mvd4gn2rta4",
                   "type": "string"
                 }
               ]
@@ -2362,7 +2471,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzAxMTQ0MTEsInVzZXJfaWQiOjJ9.omeX10cIN-dmoAfbLF_iJuJwBDRl5T4QVwO4R-fuJg8",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA2ODUzNzQsInVzZXJfaWQiOjF9.kayy_kq8WcR8oUIs56Lp0VwXb6rz9sC6mvd4gn2rta4",
                   "type": "string"
                 }
               ]
@@ -2371,7 +2480,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Test Indonesia\"\n}",
+              "raw": "{\n    \"name\": \"Kode Indonesia\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2836,7 +2945,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzAyNzYwNjcsInVzZXJfaWQiOjF9.B3JAsOl44MYhzDMo4aw8JQWi59yXFNruXlM0dJMh9Mc",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA2ODUzNzQsInVzZXJfaWQiOjF9.kayy_kq8WcR8oUIs56Lp0VwXb6rz9sC6mvd4gn2rta4",
                   "type": "string"
                 }
               ]
@@ -2853,12 +2962,22 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/users",
+              "raw": "{{base_url}}/users?page=1&limit=1",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
               ]
             }
           },
@@ -2878,12 +2997,22 @@
                   }
                 },
                 "url": {
-                  "raw": "{{base_url}}/users",
+                  "raw": "{{base_url}}/users?page=1&limit=1",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
                     "users"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "1"
+                    }
                   ]
                 }
               },
@@ -2892,96 +3021,56 @@
               "_postman_previewlanguage": null,
               "header": [
                 {
-                  "key": "Date",
-                  "value": "Mon, 02 Feb 2026 10:38:12 GMT"
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
                 },
                 {
                   "key": "Content-Type",
                   "value": "application/json; charset=utf-8"
                 },
                 {
-                  "key": "Transfer-Encoding",
-                  "value": "chunked"
-                },
-                {
-                  "key": "Connection",
-                  "value": "keep-alive"
-                },
-                {
-                  "key": "access-control-allow-headers",
-                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
-                },
-                {
-                  "key": "access-control-allow-methods",
-                  "value": "POST, GET, OPTIONS, PUT, DELETE"
-                },
-                {
-                  "key": "access-control-allow-origin",
-                  "value": "*"
-                },
-                {
-                  "key": "content-security-policy",
-                  "value": "default-src 'self'"
-                },
-                {
-                  "key": "referrer-policy",
+                  "key": "Referrer-Policy",
                   "value": "strict-origin-when-cross-origin"
                 },
                 {
-                  "key": "strict-transport-security",
+                  "key": "Strict-Transport-Security",
                   "value": "max-age=31536000; includeSubDomains"
                 },
                 {
-                  "key": "x-content-type-options",
+                  "key": "X-Content-Type-Options",
                   "value": "nosniff"
                 },
                 {
-                  "key": "x-frame-options",
+                  "key": "X-Frame-Options",
                   "value": "DENY"
                 },
                 {
-                  "key": "x-xss-protection",
+                  "key": "X-Xss-Protection",
                   "value": "1; mode=block"
                 },
                 {
-                  "key": "x-envoy-upstream-service-time",
-                  "value": "2110"
+                  "key": "Date",
+                  "value": "Mon, 09 Feb 2026 01:12:33 GMT"
                 },
                 {
-                  "key": "x-koyeb-backend",
-                  "value": "was"
-                },
-                {
-                  "key": "server",
-                  "value": "cloudflare"
-                },
-                {
-                  "key": "x-koyeb-brand",
-                  "value": "koyeb_default"
-                },
-                {
-                  "key": "x-koyeb-glb",
-                  "value": "sin"
-                },
-                {
-                  "key": "cf-cache-status",
-                  "value": "DYNAMIC"
-                },
-                {
-                  "key": "Content-Encoding",
-                  "value": "br"
-                },
-                {
-                  "key": "CF-RAY",
-                  "value": "9c790eb4ccd27974-SIN"
-                },
-                {
-                  "key": "alt-svc",
-                  "value": "h3=\":443\"; ma=86400"
+                  "key": "Content-Length",
+                  "value": "350"
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"meta\": {\n        \"message\": \"List of users\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": [\n        {\n            \"id\": 1,\n            \"name\": \"New User\",\n            \"email\": \"pisogow580@gamening.com\",\n            \"phone\": \"08123456789\",\n            \"role\": \"vendor\",\n            \"plan_id\": null,\n            \"expired_at\": null,\n            \"status\": 1,\n            \"created_at\": \"2026-02-02T07:37:36.652019Z\",\n            \"updated_at\": \"2026-02-02T07:39:57.957469Z\"\n        },\n        {\n            \"id\": 2,\n            \"name\": \"New User\",\n            \"email\": \"pisogow580@example.com\",\n            \"phone\": \"08123456789\",\n            \"role\": \"vendor\",\n            \"plan_id\": 1,\n            \"expired_at\": \"2026-03-04T10:30:01.670295Z\",\n            \"plan\": {\n                \"id\": 1,\n                \"name\": \"PRO Package v2\",\n                \"price\": \"550000\",\n                \"duration_days\": 30,\n                \"created_at\": \"2026-02-02T10:27:33.701306Z\",\n                \"updated_at\": \"2026-02-02T10:35:25.722861Z\",\n                \"deleted_at\": null,\n                \"features\": [\n                    {\n                        \"id\": 1,\n                        \"code\": \"advance_multi_warehouse\",\n                        \"name\": \"Advanced Multi Warehouse\",\n                        \"description\": \"Advanced Multi Warehouse Management\",\n                        \"created_at\": \"2026-02-02T10:31:50.852249Z\",\n                        \"updated_at\": \"2026-02-02T10:34:16.640435Z\",\n                        \"deleted_at\": null\n                    }\n                ]\n            },\n            \"flags\": [\n                {\n                    \"id\": 1,\n                    \"name\": \"Koperasi\",\n                    \"created_at\": \"2026-02-02T10:36:01.89573Z\",\n                    \"updated_at\": \"2026-02-02T10:36:01.89573Z\"\n                },\n                {\n                    \"id\": 2,\n                    \"name\": \"Gantari\",\n                    \"created_at\": \"2026-02-02T10:36:19.361656Z\",\n                    \"updated_at\": \"2026-02-02T10:36:19.361656Z\"\n                }\n            ],\n            \"status\": 1,\n            \"created_at\": \"2026-02-02T10:23:23.293025Z\",\n            \"updated_at\": \"2026-02-02T10:30:01.876661Z\"\n        }\n    ]\n}"
+              "body": "{\n    \"meta\": {\n        \"message\": \"List of users\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"data\": [\n            {\n                \"id\": 1,\n                \"name\": \"New User\",\n                \"email\": \"pisogow580@example.com\",\n                \"phone\": \"08123456789\",\n                \"role\": \"vendor\",\n                \"plan_id\": null,\n                \"expired_at\": null,\n                \"status\": 1,\n                \"created_at\": \"2026-02-03T03:13:04.974998Z\",\n                \"updated_at\": \"2026-02-03T03:13:04.974998Z\"\n            }\n        ],\n        \"meta\": {\n            \"limit\": 1,\n            \"page\": 1,\n            \"total\": 1\n        }\n    }\n}"
             }
           ]
         },
@@ -3507,7 +3596,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzAxMTQ0MTEsInVzZXJfaWQiOjJ9.omeX10cIN-dmoAfbLF_iJuJwBDRl5T4QVwO4R-fuJg8",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA2ODUzNzQsInVzZXJfaWQiOjF9.kayy_kq8WcR8oUIs56Lp0VwXb6rz9sC6mvd4gn2rta4",
                   "type": "string"
                 }
               ]
@@ -3705,7 +3794,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzAxMTQ0MTEsInVzZXJfaWQiOjJ9.omeX10cIN-dmoAfbLF_iJuJwBDRl5T4QVwO4R-fuJg8",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA2ODUzNzQsInVzZXJfaWQiOjF9.kayy_kq8WcR8oUIs56Lp0VwXb6rz9sC6mvd4gn2rta4",
                   "type": "string"
                 }
               ]
@@ -3864,7 +3953,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzAxMTQ0MTEsInVzZXJfaWQiOjJ9.omeX10cIN-dmoAfbLF_iJuJwBDRl5T4QVwO4R-fuJg8",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA2ODUzNzQsInVzZXJfaWQiOjF9.kayy_kq8WcR8oUIs56Lp0VwXb6rz9sC6mvd4gn2rta4",
                   "type": "string"
                 }
               ]
@@ -3873,7 +3962,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"user_id\" : 1,\n    \"name\": \"Toko Sejahtera\",\n    \"description\": \"Menyediakan segala kebutuhan pokok\",\n    \"phone\": \"081234567890\",\n    \"alamat\": \"Jl. Sudirman No. 10, Jakarta\"\n}",
+              "raw": "{\n    \"user_id\" : 3,\n    \"name\": \"Toko Sejahtera\",\n    \"description\": \"Menyediakan segala kebutuhan pokok\",\n    \"phone\": \"081234567890\",\n    \"alamat\": \"Jl. Sudirman No. 10, Jakarta\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

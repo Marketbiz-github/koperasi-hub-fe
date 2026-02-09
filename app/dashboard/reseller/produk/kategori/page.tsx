@@ -3,7 +3,7 @@ import ProductCategoryPageShared from '@/components/ProductCategoryPage';
 export default function ResellerCategoryPage() {
     return (
         <ProductCategoryPageShared
-            title="Kategori Produk Reseller"
+            title="Kategori Produk"
             description="Kelola kategori produk khusus untuk inventori reseller Anda."
         />
     );

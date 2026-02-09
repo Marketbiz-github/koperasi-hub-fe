@@ -289,14 +289,16 @@ export default function ProductCategoryPageShared({ title, description }: Produc
 
             <Card>
                 <CardHeader className="pb-3">
-                    <CardTitle className="text-lg font-medium flex items-center gap-2">
-                        <Search className="h-4 w-4 text-muted-foreground" />
-                        <Input
-                            placeholder="Cari nama kategori..."
-                            className="max-w-sm"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+                    <CardTitle className="flex items-center gap-2">
+                        <div className="relative">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Cari nama kategori..."
+                                className="pl-9"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -309,7 +311,7 @@ export default function ProductCategoryPageShared({ title, description }: Produc
                             <Table>
                                 <TableHeader className="bg-muted/50">
                                     <TableRow>
-                                        <TableHead className="w-16">ID</TableHead>
+                                        <TableHead className="w-16">No</TableHead>
                                         <TableHead>Gambar</TableHead>
                                         <TableHead>Nama Kategori</TableHead>
                                         <TableHead>Parent</TableHead>
@@ -325,9 +327,9 @@ export default function ProductCategoryPageShared({ title, description }: Produc
                                             </TableCell>
                                         </TableRow>
                                     ) : (
-                                        filteredCategories.map((cat) => (
+                                        filteredCategories.map((cat, index) => (
                                             <TableRow key={cat.id} className="hover:bg-muted/30 transition-colors">
-                                                <TableCell className="font-mono text-xs text-muted-foreground">#{cat.id}</TableCell>
+                                                <TableCell className="font-mono text-xs text-muted-foreground">{index + 1}</TableCell>
                                                 <TableCell>
                                                     {cat.image ? (
                                                         <img
