@@ -1,9 +1,9 @@
 import { ReactNode } from "react";
 import type { Metadata } from "next";
-import { AffiliatorLayoutClient } from "./affiliatorLayoutClient";
+import { ResellerLayoutClient } from "./resellerLayoutClient";
 
 export const metadata: Metadata = {
-  title: "Dashboard Affiliator",
+  title: "Dashboard Reseller",
   robots: {
     index: false,
     follow: false,
@@ -15,5 +15,5 @@ export default function DashboardLayout({
 }: {
   children: ReactNode;
 }) {
-  return <AffiliatorLayoutClient>{children}</AffiliatorLayoutClient>;
+  return <ResellerLayoutClient>{children}</ResellerLayoutClient>;
 }

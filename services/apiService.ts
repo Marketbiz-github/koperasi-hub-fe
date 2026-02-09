@@ -352,3 +352,40 @@ export const generalCategoryService = {
 
 // Keep old name for backward compatibility
 export const shipperService = biteshipService;
+
+export const productCategoryService = {
+    async getList(token: string) {
+        return apiRequest('/product-categories', {
+            token,
+        })
+    },
+
+    async getDetail(token: string, id: string | number) {
+        return apiRequest(`/product-categories/${id}`, {
+            token,
+        })
+    },
+
+    async create(token: string, data: any) {
+        return apiRequest('/product-categories', {
+            method: 'POST',
+            body: data,
+            token,
+        })
+    },
+
+    async update(token: string, id: string | number, data: any) {
+        return apiRequest(`/product-categories/${id}`, {
+            method: 'PUT',
+            body: data,
+            token,
+        })
+    },
+
+    async delete(token: string, id: string | number) {
+        return apiRequest(`/product-categories/${id}`, {
+            method: 'DELETE',
+            token,
+        })
+    }
+}

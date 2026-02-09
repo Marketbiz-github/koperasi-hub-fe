@@ -16,13 +16,12 @@ export async function POST(req: NextRequest) {
         }
 
         let relativeDir = '';
-        if (role === 'categories') {
+        if (role && userId && storeId && type) {
+            relativeDir = path.join('images', role, String(userId), String(storeId), type);
+        } else if (role === 'categories') {
             relativeDir = path.join('images', 'categories');
         } else {
-            if (!role || !userId || !storeId || !type) {
-                return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-            }
-            relativeDir = path.join('images', role, userId, storeId, type);
+            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
         const uploadDir = path.join(process.cwd(), 'public', relativeDir);
