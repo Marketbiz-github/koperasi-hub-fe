@@ -4,13 +4,16 @@ import { User } from '@/types/user'
 interface AuthState {
   user: User | null
   userDetail: User | null
+  store: any | null
   isHydrated: boolean
   isLoading: boolean
   error: string | null
   setUser: (user: User | null) => void
   setUserDetail: (detail: User | null) => void
+  setStore: (store: any | null) => void
   hydrate: () => Promise<void>
   fetchUserDetail: () => Promise<void>
+  fetchStore: () => Promise<void>
   login: (email: string, password: string, captchaToken?: string) => Promise<{ success: boolean; message?: string; user?: User }>
   register: (data: any, captchaToken?: string) => Promise<{ success: boolean; message?: string }>
   logout: () => Promise<void>
@@ -20,12 +23,14 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   userDetail: null,
+  store: null,
   isHydrated: false,
   isLoading: false,
   error: null,
 
   setUser: (user) => set({ user }),
   setUserDetail: (userDetail) => set({ userDetail }),
+  setStore: (store) => set({ store }),
 
   clearError: () => set({ error: null }),
 
@@ -47,6 +52,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         userDetail: data.user ?? null, // Sync initially from /api/auth/me
         isHydrated: true,
       })
+
+      if (data.user) {
+        await get().fetchStore();
+      }
     } catch (error) {
       console.error('Auth hydrate error:', error)
       set({ user: null, userDetail: null, isHydrated: true })
@@ -66,6 +75,32 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
     } catch (err) {
       console.error('Failed to fetch user detail:', err);
+    }
+  },
+
+  fetchStore: async () => {
+    const { user } = get();
+    if (!user?.id) return;
+
+    try {
+      const response = await fetch(`/api/stores/user/${user.id}`);
+
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        console.error("Store API returned non-JSON response:", await response.text());
+        return;
+      }
+
+      const data = await response.json();
+
+      if (response.ok && data.data && data.data.length > 0) {
+        set({ store: data.data[0] });
+      } else {
+        console.warn('Store not found or empty for user:', user.id);
+      }
+    } catch (err) {
+      console.error('Failed to fetch store detail:', err);
     }
   },
 
