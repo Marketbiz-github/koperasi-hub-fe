@@ -3613,13 +3613,13 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/stores/1/register-ipaymu",
+              "raw": "{{base_url}}/stores/13/register-ipaymu",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "stores",
-                "1",
+                "13",
                 "register-ipaymu"
               ]
             }
@@ -4517,7 +4517,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzAxMTQ0MTEsInVzZXJfaWQiOjJ9.omeX10cIN-dmoAfbLF_iJuJwBDRl5T4QVwO4R-fuJg8",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA3MjUxMzQsInVzZXJfaWQiOjF9.4FXQ9Fd5iDGWRpnKZvqHP3BEZcyRf1Aw-eP_eKk77rQ",
                   "type": "string"
                 }
               ]
@@ -4534,14 +4534,37 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/gudang",
+              "raw": "{{base_url}}/gudang?page=1&limit=10&store_id=1&product_id=1&product_variant_id=2",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "gudang"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "store_id",
+                  "value": "1"
+                },
+                {
+                  "key": "product_id",
+                  "value": "1"
+                },
+                {
+                  "key": "product_variant_id",
+                  "value": "2"
+                }
               ]
-            }
+            },
+            "description": "Untuk filter bisa gunakan semua atau gunakan salah satu"
           },
           "response": [
             {
@@ -4559,12 +4582,34 @@
                   }
                 },
                 "url": {
-                  "raw": "{{base_url}}/gudang",
+                  "raw": "{{base_url}}/gudang?page=1&limit=10&store_id=1&product_id=1&product_variant_id=2",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
                     "gudang"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "store_id",
+                      "value": "1"
+                    },
+                    {
+                      "key": "product_id",
+                      "value": "1"
+                    },
+                    {
+                      "key": "product_variant_id",
+                      "value": "2"
+                    }
                   ]
                 }
               },
@@ -4573,96 +4618,56 @@
               "_postman_previewlanguage": null,
               "header": [
                 {
-                  "key": "Date",
-                  "value": "Mon, 02 Feb 2026 10:44:33 GMT"
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
                 },
                 {
                   "key": "Content-Type",
                   "value": "application/json; charset=utf-8"
                 },
                 {
-                  "key": "Transfer-Encoding",
-                  "value": "chunked"
-                },
-                {
-                  "key": "Connection",
-                  "value": "keep-alive"
-                },
-                {
-                  "key": "access-control-allow-headers",
-                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
-                },
-                {
-                  "key": "access-control-allow-methods",
-                  "value": "POST, GET, OPTIONS, PUT, DELETE"
-                },
-                {
-                  "key": "access-control-allow-origin",
-                  "value": "*"
-                },
-                {
-                  "key": "content-security-policy",
-                  "value": "default-src 'self'"
-                },
-                {
-                  "key": "referrer-policy",
+                  "key": "Referrer-Policy",
                   "value": "strict-origin-when-cross-origin"
                 },
                 {
-                  "key": "strict-transport-security",
+                  "key": "Strict-Transport-Security",
                   "value": "max-age=31536000; includeSubDomains"
                 },
                 {
-                  "key": "x-content-type-options",
+                  "key": "X-Content-Type-Options",
                   "value": "nosniff"
                 },
                 {
-                  "key": "x-frame-options",
+                  "key": "X-Frame-Options",
                   "value": "DENY"
                 },
                 {
-                  "key": "x-xss-protection",
+                  "key": "X-Xss-Protection",
                   "value": "1; mode=block"
                 },
                 {
-                  "key": "x-envoy-upstream-service-time",
-                  "value": "1528"
+                  "key": "Date",
+                  "value": "Mon, 09 Feb 2026 15:28:39 GMT"
                 },
                 {
-                  "key": "x-koyeb-backend",
-                  "value": "was"
-                },
-                {
-                  "key": "server",
-                  "value": "cloudflare"
-                },
-                {
-                  "key": "x-koyeb-brand",
-                  "value": "koyeb_default"
-                },
-                {
-                  "key": "x-koyeb-glb",
-                  "value": "sin"
-                },
-                {
-                  "key": "cf-cache-status",
-                  "value": "DYNAMIC"
-                },
-                {
-                  "key": "Content-Encoding",
-                  "value": "br"
-                },
-                {
-                  "key": "CF-RAY",
-                  "value": "9c791803c8a68331-SIN"
-                },
-                {
-                  "key": "alt-svc",
-                  "value": "h3=\":443\"; ma=86400"
+                  "key": "Content-Length",
+                  "value": "551"
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"meta\": {\n        \"message\": \"List of gudang\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": [\n        {\n            \"id\": 1,\n            \"id_store\": 1,\n            \"email\": \"gudang@koperasi.com\",\n            \"nama_gudang\": \"Gudang Pusat\",\n            \"alamat\": \"Jl. Raya Denpasar\",\n            \"area_id\": \"1\",\n            \"province_id\": \"51\",\n            \"province\": \"Bali\",\n            \"city_id\": \"5171\",\n            \"city\": \"Denpasar\",\n            \"district_id\": \"517101\",\n            \"district\": \"Denpasar Selatan\",\n            \"subdistrict_id\": \"51710101\",\n            \"subdistrict\": \"Sesetan\",\n            \"zipcode\": \"80223\",\n            \"latitude\": -8.670458,\n            \"longitude\": 115.212629,\n            \"id_wms\": \"WMS-001\",\n            \"status\": 1\n        }\n    ]\n}"
+              "body": "{\n    \"meta\": {\n        \"message\": \"List of gudang\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"limit\": 10,\n            \"total\": 1\n        },\n        \"warehouses\": [\n            {\n                \"id\": 1,\n                \"id_store\": 1,\n                \"email\": \"gudang@koperasi.com\",\n                \"nama_gudang\": \"Gudang Pusat\",\n                \"alamat\": \"Jl. Raya Denpasar\",\n                \"area_id\": \"1\",\n                \"province_id\": \"51\",\n                \"province\": \"Bali\",\n                \"city_id\": \"5171\",\n                \"city\": \"Denpasar\",\n                \"district_id\": \"517101\",\n                \"district\": \"Denpasar Selatan\",\n                \"subdistrict_id\": \"51710101\",\n                \"subdistrict\": \"Sesetan\",\n                \"zipcode\": \"80223\",\n                \"latitude\": -8.670458,\n                \"longitude\": 115.212629,\n                \"id_wms\": \"WMS-001\",\n                \"status\": 1\n            }\n        ]\n    }\n}"
             }
           ]
         },
@@ -10095,22 +10100,16 @@
               "body": "{\n    \"meta\": {\n        \"message\": \"Tracking info retrieved successfully\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"success\": true,\n        \"message\": \"\",\n        \"object\": \"tracking\",\n        \"id\": \"6982f718fe20681dd6b67b9e\",\n        \"waybill_id\": \"JX7103904465\",\n        \"courier\": {\n            \"company\": \"jnt\",\n            \"name\": \"\",\n            \"phone\": \"\",\n            \"type\": \"\"\n        },\n        \"status\": \"dropping_off\",\n        \"history\": [\n            {\n                \"note\": \"Manifes.\",\n                \"updated_at\": \"2026-02-03T12:16:57+07:00\",\n                \"status\": \"picking_up\"\n            },\n            {\n                \"note\": \"Item has been picked and ready to be shipped.\",\n                \"updated_at\": \"2026-02-03T18:55:07+07:00\",\n                \"status\": \"picked\"\n            },\n            {\n                \"note\": \"Paket akan dikirimkan ke JRT_GATEWAY.\",\n                \"updated_at\": \"2026-02-03T22:39:27+07:00\",\n                \"status\": \"dropping_off\"\n            },\n            {\n                \"note\": \"Paket telah sampai di JRT_GATEWAY. Mobil.\",\n                \"updated_at\": \"2026-02-04T00:32:35+07:00\",\n                \"status\": \"dropping_off\"\n            },\n            {\n                \"note\": \"Paket telah sampai di JRT_GATEWAY.\",\n                \"updated_at\": \"2026-02-04T00:40:44+07:00\",\n                \"status\": \"dropping_off\"\n            },\n            {\n                \"note\": \"Paket akan dikirimkan ke DPS_GATEWAY. Mobil.\",\n                \"updated_at\": \"2026-02-04T01:26:35+07:00\",\n                \"status\": \"dropping_off\"\n            },\n            {\n                \"note\": \"Paket akan dikirimkan ke DPS_GATEWAY. Mobil.\",\n                \"updated_at\": \"2026-02-04T06:54:01+07:00\",\n                \"status\": \"dropping_off\"\n            }\n        ]\n    }\n}"
             }
           ]
-        }
-      ],
-      "description": "Untuk mendapatkan courier rates dan courier list  \npada API ini sudah otomatis menggunakan sistem berdasarkan origin terdekat dari destinasi , menjadikan hasil kalkulasi akurat sesuai titik terdekat dari pembeli."
-    },
-    {
-      "name": "Order",
-      "item": [
+        },
         {
-          "name": "Create Order",
+          "name": "Search Area",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzAyNjEzMjksInVzZXJfaWQiOjF9.eO7mVUFjy3cYcQ4Lktd_SHBu9xFYQSjobNZXjscceuA",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA3MjUxMzQsInVzZXJfaWQiOjF9.4FXQ9Fd5iDGWRpnKZvqHP3BEZcyRf1Aw-eP_eKk77rQ",
                   "type": "string"
                 }
               ]
@@ -10119,7 +10118,133 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\"\n}",
+              "raw": "{\n  \"input\": \"Denpasar Utara\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/shipping/areas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "shipping",
+                "areas"
+              ]
+            },
+            "description": "Input minimal 3 karakter"
+          },
+          "response": [
+            {
+              "name": "Search Area",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"input\": \"Malang\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/shipping/areas",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "shipping",
+                    "areas"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 09 Feb 2026 15:10:18 GMT"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Areas retrieved\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"success\": true,\n        \"object\": \"\",\n        \"message\": \"\",\n        \"areas\": [\n            {\n                \"id\": \"IDNP11IDNC250IDND2615\",\n                \"name\": \"Klojen, Malang, Jawa Timur. 65111\",\n                \"country\": \"\",\n                \"administrative_division_level_1_name\": \"Jawa Timur\",\n                \"administrative_division_level_2_name\": \"Malang\",\n                \"administrative_division_level_3_name\": \"Klojen\",\n                \"administrative_division_level_4_name\": \"\",\n                \"postal_code\": 0\n            },\n            {\n                \"id\": \"IDNP11IDNC250IDND2615\",\n                \"name\": \"Klojen, Malang, Jawa Timur. 65112\",\n                \"country\": \"\",\n                \"administrative_division_level_1_name\": \"Jawa Timur\",\n                \"administrative_division_level_2_name\": \"Malang\",\n                \"administrative_division_level_3_name\": \"Klojen\",\n                \"administrative_division_level_4_name\": \"\",\n                \"postal_code\": 0\n            },\n            {\n                \"id\": \"IDNP11IDNC250IDND2615\",\n                \"name\": \"Klojen, Malang, Jawa Timur. 65113\",\n                \"country\": \"\",\n                \"administrative_division_level_1_name\": \"Jawa Timur\",\n                \"administrative_division_level_2_name\": \"Malang\",\n                \"administrative_division_level_3_name\": \"Klojen\",\n                \"administrative_division_level_4_name\": \"\",\n                \"postal_code\": 0\n            },\n            {\n                \"id\": \"IDNP11IDNC250IDND2615\",\n                \"name\": \"Klojen, Malang, Jawa Timur. 65115\",\n                \"country\": \"\",\n                \"administrative_division_level_1_name\": \"Jawa Timur\",\n                \"administrative_division_level_2_name\": \"Malang\",\n                \"administrative_division_level_3_name\": \"Klojen\",\n                \"administrative_division_level_4_name\": \"\",\n                \"postal_code\": 0\n            },\n            {\n                \"id\": \"IDNP11IDNC250IDND2615\",\n                \"name\": \"Klojen, Malang, Jawa Timur. 65116\",\n                \"country\": \"\",\n                \"administrative_division_level_1_name\": \"Jawa Timur\",\n                \"administrative_division_level_2_name\": \"Malang\",\n                \"administrative_division_level_3_name\": \"Klojen\",\n                \"administrative_division_level_4_name\": \"\",\n                \"postal_code\": 0\n            },\n            {\n                \"id\": \"IDNP11IDNC250IDND2615\",\n                \"name\": \"Klojen, Malang, Jawa Timur. 65117\",\n                \"country\": \"\",\n                \"administrative_division_level_1_name\": \"Jawa Timur\",\n                \"administrative_division_level_2_name\": \"Malang\",\n                \"administrative_division_level_3_name\": \"Klojen\",\n                \"administrative_division_level_4_name\": \"\",\n                \"postal_code\": 0\n            },\n            {\n                \"id\": \"IDNP11IDNC250IDND2615\",\n                \"name\": \"Klojen, Malang, Jawa Timur. 65118\",\n                \"country\": \"\",\n                \"administrative_division_level_1_name\": \"Jawa Timur\",\n                \"administrative_division_level_2_name\": \"Malang\",\n                \"administrative_division_level_3_name\": \"Klojen\",\n                \"administrative_division_level_4_name\": \"\",\n                \"postal_code\": 0\n            },\n            {\n                \"id\": \"IDNP11IDNC250IDND2615\",\n                \"name\": \"Klojen, Malang, Jawa Timur. 65119\",\n                \"country\": \"\",\n                \"administrative_division_level_1_name\": \"Jawa Timur\",\n                \"administrative_division_level_2_name\": \"Malang\",\n                \"administrative_division_level_3_name\": \"Klojen\",\n                \"administrative_division_level_4_name\": \"\",\n                \"postal_code\": 0\n            },\n            {\n                \"id\": \"IDNP11IDNC250IDND2602\",\n                \"name\": \"Blimbing, Malang, Jawa Timur. 65121\",\n                \"country\": \"\",\n                \"administrative_division_level_1_name\": \"Jawa Timur\",\n                \"administrative_division_level_2_name\": \"Malang\",\n                \"administrative_division_level_3_name\": \"Blimbing\",\n                \"administrative_division_level_4_name\": \"\",\n                \"postal_code\": 0\n            },\n            {\n                \"id\": \"IDNP11IDNC250IDND2602\",\n                \"name\": \"Blimbing, Malang, Jawa Timur. 65122\",\n                \"country\": \"\",\n                \"administrative_division_level_1_name\": \"Jawa Timur\",\n                \"administrative_division_level_2_name\": \"Malang\",\n                \"administrative_division_level_3_name\": \"Blimbing\",\n                \"administrative_division_level_4_name\": \"\",\n                \"postal_code\": 0\n            }\n        ]\n    }\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Untuk mendapatkan courier rates dan courier list  \npada API ini sudah otomatis menggunakan sistem berdasarkan origin terdekat dari destinasi , menjadikan hasil kalkulasi akurat sesuai titik terdekat dari pembeli."
+    },
+    {
+      "name": "Order",
+      "item": [
+        {
+          "name": "Create Order Instant Payment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA3MjUxMzQsInVzZXJfaWQiOjF9.4FXQ9Fd5iDGWRpnKZvqHP3BEZcyRf1Aw-eP_eKk77rQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"instant\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -11054,9 +11179,741 @@
               "body": "{\n    \"meta\": {\n        \"message\": \"Order cancelled\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": null\n}"
             }
           ]
+        },
+        {
+          "name": "Create Order Tenor Payment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA3MjUxMzQsInVzZXJfaWQiOjF9.4FXQ9Fd5iDGWRpnKZvqHP3BEZcyRf1Aw-eP_eKk77rQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"tenor\",\n    \"tenor_months\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Create Order Tenor Payment",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"tenor\",\n    \"tenor_months\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/orders",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 09 Feb 2026 12:09:12 GMT"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Order created successfully\",\n        \"code\": 201,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"order\": {\n            \"id\": 10,\n            \"order_number\": \"ORD-20260209-19668\",\n            \"user_id\": 1,\n            \"store_id\": 1,\n            \"gudang_id\": 1,\n            \"status\": \"waiting_approval\",\n            \"payment_category\": \"piutang\",\n            \"debt_status\": \"pending_approval\",\n            \"subtotal\": 200000,\n            \"shipping_cost\": 10000,\n            \"discount_amount\": 0,\n            \"total_amount\": 210000,\n            \"customer_name\": \"Budi\",\n            \"customer_email\": \"budi@example.com\",\n            \"customer_phone\": \"08123456789\",\n            \"customer_address\": \"Jl. Merdeka No. 1\",\n            \"customer_province\": \"DKI Jakarta\",\n            \"customer_city\": \"Jakarta Selatan\",\n            \"customer_district\": \"Tebet\",\n            \"customer_subdistrict\": \"Tebet Barat\",\n            \"customer_zipcode\": \"12810\",\n            \"warehouse_name\": \"Gudang Pusat\",\n            \"warehouse_address\": \"Jl. Raya Denpasar\",\n            \"warehouse_province\": \"Bali\",\n            \"warehouse_city\": \"Denpasar\",\n            \"warehouse_district\": \"Denpasar Selatan\",\n            \"warehouse_subdistrict\": \"Sesetan\",\n            \"warehouse_zipcode\": \"80223\",\n            \"courier_name\": \"JNE\",\n            \"courier_service\": \"Reguler\",\n            \"courier_code\": \"jne\",\n            \"tracking_number\": null,\n            \"payment_method\": \"ipaymu\",\n            \"payment_status\": \"unpaid\",\n            \"paid_at\": null,\n            \"payment_expired_at\": null,\n            \"ipaymu_session_id\": null,\n            \"ipaymu_transaction_id\": null,\n            \"ipaymu_payment_url\": null,\n            \"ipaymu_payment_name\": null,\n            \"ipaymu_payment_method\": null,\n            \"ipaymu_amount\": null,\n            \"ipaymu_fee\": null,\n            \"ipaymu_expired_at\": null,\n            \"ipaymu_paid_at\": null,\n            \"ipaymu_callback_url\": null,\n            \"ipaymu_response\": null,\n            \"stock_reserved\": true,\n            \"stock_reserved_at\": \"2026-02-09T12:09:12.383419668Z\",\n            \"stock_reserved_until\": null,\n            \"customer_notes\": \"Packing kayu\",\n            \"admin_notes\": null,\n            \"items\": [\n                {\n                    \"id\": 19,\n                    \"order_id\": 10,\n                    \"product_id\": 1,\n                    \"product_variant_id\": 2,\n                    \"gudang_id\": 1,\n                    \"product_name\": \"iPhone 13 Pro\",\n                    \"product_sku\": \"blue-256\",\n                    \"variant_name\": \"Ocean Blue, 256 Gb\",\n                    \"price\": 50000,\n                    \"quantity\": 2,\n                    \"subtotal\": 100000,\n                    \"discount_amount\": 0,\n                    \"total\": 100000,\n                    \"weight\": \"200\",\n                    \"stock_reserved\": 2,\n                    \"stock_deducted\": false,\n                    \"created_at\": \"2026-02-09T12:09:12.492335835Z\",\n                    \"updated_at\": \"2026-02-09T12:09:12.492335835Z\"\n                },\n                {\n                    \"id\": 20,\n                    \"order_id\": 10,\n                    \"product_id\": 1,\n                    \"product_variant_id\": 3,\n                    \"gudang_id\": 1,\n                    \"product_name\": \"iPhone 13 Pro\",\n                    \"product_sku\": \"grey-512\",\n                    \"variant_name\": \"Grey Metalic, 512 Gb\",\n                    \"price\": 50000,\n                    \"quantity\": 2,\n                    \"subtotal\": 100000,\n                    \"discount_amount\": 0,\n                    \"total\": 100000,\n                    \"weight\": \"200\",\n                    \"stock_reserved\": 2,\n                    \"stock_deducted\": false,\n                    \"created_at\": \"2026-02-09T12:09:12.492335835Z\",\n                    \"updated_at\": \"2026-02-09T12:09:12.492335835Z\"\n                }\n            ],\n            \"created_at\": \"2026-02-09T12:09:12.489916168Z\",\n            \"updated_at\": \"2026-02-09T12:09:12.489916168Z\",\n            \"deleted_at\": null\n        },\n        \"payment_url\": null\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Order PO payment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA3MjUxMzQsInVzZXJfaWQiOjF9.4FXQ9Fd5iDGWRpnKZvqHP3BEZcyRf1Aw-eP_eKk77rQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"po\" \n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Create Order PO payment",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"po\" \n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/orders",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 09 Feb 2026 12:10:22 GMT"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Order created successfully\",\n        \"code\": 201,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"order\": {\n            \"id\": 11,\n            \"order_number\": \"ORD-20260209-99422\",\n            \"user_id\": 1,\n            \"store_id\": 1,\n            \"gudang_id\": 1,\n            \"status\": \"waiting_approval\",\n            \"payment_category\": \"piutang\",\n            \"debt_status\": \"pending_approval\",\n            \"subtotal\": 200000,\n            \"shipping_cost\": 10000,\n            \"discount_amount\": 0,\n            \"total_amount\": 210000,\n            \"customer_name\": \"Budi\",\n            \"customer_email\": \"budi@example.com\",\n            \"customer_phone\": \"08123456789\",\n            \"customer_address\": \"Jl. Merdeka No. 1\",\n            \"customer_province\": \"DKI Jakarta\",\n            \"customer_city\": \"Jakarta Selatan\",\n            \"customer_district\": \"Tebet\",\n            \"customer_subdistrict\": \"Tebet Barat\",\n            \"customer_zipcode\": \"12810\",\n            \"warehouse_name\": \"Gudang Pusat\",\n            \"warehouse_address\": \"Jl. Raya Denpasar\",\n            \"warehouse_province\": \"Bali\",\n            \"warehouse_city\": \"Denpasar\",\n            \"warehouse_district\": \"Denpasar Selatan\",\n            \"warehouse_subdistrict\": \"Sesetan\",\n            \"warehouse_zipcode\": \"80223\",\n            \"courier_name\": \"JNE\",\n            \"courier_service\": \"Reguler\",\n            \"courier_code\": \"jne\",\n            \"tracking_number\": null,\n            \"payment_method\": \"ipaymu\",\n            \"payment_status\": \"unpaid\",\n            \"paid_at\": null,\n            \"payment_expired_at\": null,\n            \"ipaymu_session_id\": null,\n            \"ipaymu_transaction_id\": null,\n            \"ipaymu_payment_url\": null,\n            \"ipaymu_payment_name\": null,\n            \"ipaymu_payment_method\": null,\n            \"ipaymu_amount\": null,\n            \"ipaymu_fee\": null,\n            \"ipaymu_expired_at\": null,\n            \"ipaymu_paid_at\": null,\n            \"ipaymu_callback_url\": null,\n            \"ipaymu_response\": null,\n            \"stock_reserved\": true,\n            \"stock_reserved_at\": \"2026-02-09T12:10:21.300799422Z\",\n            \"stock_reserved_until\": null,\n            \"customer_notes\": \"Packing kayu\",\n            \"admin_notes\": null,\n            \"items\": [\n                {\n                    \"id\": 21,\n                    \"order_id\": 11,\n                    \"product_id\": 1,\n                    \"product_variant_id\": 2,\n                    \"gudang_id\": 1,\n                    \"product_name\": \"iPhone 13 Pro\",\n                    \"product_sku\": \"blue-256\",\n                    \"variant_name\": \"Ocean Blue, 256 Gb\",\n                    \"price\": 50000,\n                    \"quantity\": 2,\n                    \"subtotal\": 100000,\n                    \"discount_amount\": 0,\n                    \"total\": 100000,\n                    \"weight\": \"200\",\n                    \"stock_reserved\": 2,\n                    \"stock_deducted\": false,\n                    \"created_at\": \"2026-02-09T12:10:22.165088798Z\",\n                    \"updated_at\": \"2026-02-09T12:10:22.165088798Z\"\n                },\n                {\n                    \"id\": 22,\n                    \"order_id\": 11,\n                    \"product_id\": 1,\n                    \"product_variant_id\": 3,\n                    \"gudang_id\": 1,\n                    \"product_name\": \"iPhone 13 Pro\",\n                    \"product_sku\": \"grey-512\",\n                    \"variant_name\": \"Grey Metalic, 512 Gb\",\n                    \"price\": 50000,\n                    \"quantity\": 2,\n                    \"subtotal\": 100000,\n                    \"discount_amount\": 0,\n                    \"total\": 100000,\n                    \"weight\": \"200\",\n                    \"stock_reserved\": 2,\n                    \"stock_deducted\": false,\n                    \"created_at\": \"2026-02-09T12:10:22.165088798Z\",\n                    \"updated_at\": \"2026-02-09T12:10:22.165088798Z\"\n                }\n            ],\n            \"created_at\": \"2026-02-09T12:10:22.163296173Z\",\n            \"updated_at\": \"2026-02-09T12:10:22.163296173Z\",\n            \"deleted_at\": null\n        },\n        \"payment_url\": null\n    }\n}"
+            }
+          ]
         }
       ],
       "description": "Menejemen order\n\n**Order Status**\n\n| **Status** | **Deskripsi** |\n| --- | --- |\n| pending | Pesanan baru dibuat, menunggu pembayaran. Stok sudah di-reserve |\n| paid | Pembayaran berhasil dikonfirmasi (via iPaymu) |\n| processing | Pesanan sedang disiapkan/dipacking di gudang |\n| shipped | Barang telah diserahkan ke kurir dan nomor resi telah di-update |\n| delivered | Barang telah sampai di tujuan |\n| completed | Transaksi selesai (barang diterima dan dikonfirmasi pembeli) |\n| cancelled | Pesanan dibatalkan (oleh admin/pembeli). Reservasi stok dilepaskan |\n| refunded | Dana dikembalikan ke pembeli |\n| failed | Terjadi kesalahan pada proses pembayaran atau sistem |\n| expired | Waktu pembayaran habis. Reservasi stok dilepaskan otomatis |"
+    },
+    {
+      "name": "Piutang",
+      "item": [
+        {
+          "name": "Approve Piutang",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA3MjUxMzQsInVzZXJfaWQiOjF9.4FXQ9Fd5iDGWRpnKZvqHP3BEZcyRf1Aw-eP_eKk77rQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/10/approve-piutang",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "10",
+                "approve-piutang"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Approve Piutang",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/orders/10/approve-piutang",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders",
+                    "10",
+                    "approve-piutang"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 09 Feb 2026 12:12:18 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "81"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Piutang approved\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reject Piutang",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA3MjUxMzQsInVzZXJfaWQiOjF9.4FXQ9Fd5iDGWRpnKZvqHP3BEZcyRf1Aw-eP_eKk77rQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Alasan penolakan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/11/reject-piutang",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "11",
+                "reject-piutang"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Reject Piutang",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Alasan penolakan\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/orders/11/reject-piutang",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders",
+                    "11",
+                    "reject-piutang"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 09 Feb 2026 12:13:55 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "81"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Piutang rejected\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Order Debt Details",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA3MjUxMzQsInVzZXJfaWQiOjF9.4FXQ9Fd5iDGWRpnKZvqHP3BEZcyRf1Aw-eP_eKk77rQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/11/debt",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "11",
+                "debt"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Get Order Debt Details",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/orders/10/debt",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders",
+                    "10",
+                    "debt"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 09 Feb 2026 14:46:18 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "908"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Debt details retrieved\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"id\": 1,\n        \"order_id\": 10,\n        \"user_id\": 1,\n        \"type\": \"tenor\",\n        \"amount\": 210000,\n        \"status\": \"unpaid\",\n        \"tenor_months\": 3,\n        \"due_date\": null,\n        \"created_at\": \"2026-02-09T12:09:12.501766Z\",\n        \"updated_at\": \"2026-02-09T12:09:12.501766Z\",\n        \"deleted_at\": null,\n        \"installments\": [\n            {\n                \"id\": 1,\n                \"debt_id\": 1,\n                \"amount\": 70000,\n                \"due_date\": \"2026-03-09T12:12:18.401363Z\",\n                \"status\": \"unpaid\",\n                \"paid_at\": null,\n                \"created_at\": \"2026-02-09T12:12:18.401871Z\",\n                \"updated_at\": \"2026-02-09T12:12:18.401871Z\"\n            },\n            {\n                \"id\": 2,\n                \"debt_id\": 1,\n                \"amount\": 70000,\n                \"due_date\": \"2026-04-09T12:12:18.401363Z\",\n                \"status\": \"unpaid\",\n                \"paid_at\": null,\n                \"created_at\": \"2026-02-09T12:12:18.405219Z\",\n                \"updated_at\": \"2026-02-09T12:12:18.405219Z\"\n            },\n            {\n                \"id\": 3,\n                \"debt_id\": 1,\n                \"amount\": 70000,\n                \"due_date\": \"2026-05-09T12:12:18.401363Z\",\n                \"status\": \"unpaid\",\n                \"paid_at\": null,\n                \"created_at\": \"2026-02-09T12:12:18.406672Z\",\n                \"updated_at\": \"2026-02-09T12:12:18.406672Z\"\n            }\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Debt Payment URL",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA3MjUxMzQsInVzZXJfaWQiOjF9.4FXQ9Fd5iDGWRpnKZvqHP3BEZcyRf1Aw-eP_eKk77rQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/debts/1/pay?type=installment",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "debts",
+                "1",
+                "pay"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "installment"
+                }
+              ]
+            },
+            "description": "Jika jenis piutang adalah tenor, maka type nya installment dan id di paramnya menggunakan id installmentnya yang bisa di dapat dari get order debt detail\n\nJika jenis piutang adalah PO maka type nya PO dan id paramnya menggunakan id debt nya"
+          },
+          "response": [
+            {
+              "name": "Get Debt Payment URL",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{base_url}}/debts/1/pay?type=installment",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "debts",
+                    "1",
+                    "pay"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "installment"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 09 Feb 2026 14:55:31 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "173"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Payment URL generated\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"payment_url\": \"https://sandbox-payment.ipaymu.com/#/3348b5db-47ab-46ce-832e-3af9e38f7e6d\"\n    }\n}"
+            }
+          ]
+        }
+      ]
     }
   ],
   "auth": {

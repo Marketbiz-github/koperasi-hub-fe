@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
-import { apiRequest, biteshipService } from '@/services/apiService';
+import { apiRequest, shippingService } from '@/services/apiService';
 import { getAccessToken } from '@/utils/auth';
-import { Loader2, Save, MapPin, Truck, Store, Upload, AlertTriangle, Palette, Phone, Image as ImageIcon } from 'lucide-react';
+import { Loader2, Save, MapPin, Truck, Store, Upload, AlertTriangle, Palette, Phone, Search, Image as ImageIcon } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 import Image from 'next/image';
 
 interface Location {
@@ -75,10 +76,10 @@ export default function StoreSettingsForm() {
         cover: '',
     });
 
-    const [provinces, setProvinces] = useState<Location[]>([]);
-    const [cities, setCities] = useState<Location[]>([]);
-    const [districts, setDistricts] = useState<Location[]>([]);
-    const [areas, setAreas] = useState<Location[]>([]);
+    const [areaSearchInput, setAreaSearchInput] = useState('');
+    const [areaResults, setAreaResults] = useState<Location[]>([]);
+    const [isSearchingArea, setIsSearchingArea] = useState(false);
+    const [showAreaResults, setShowAreaResults] = useState(false);
 
     useEffect(() => {
         if (!isHydrated) {
@@ -124,11 +125,12 @@ export default function StoreSettingsForm() {
                         cover: data.cover || '',
                     });
 
-                    // Load initial location data
-                    await loadProvinces();
-                    if (data.province_id) await loadCities(data.province_id);
-                    if (data.city_id) await loadDistricts(data.city_id, data.province_id);
-                    if (data.district_id) await loadAreas(data.district_id, data.city_id, data.province_id);
+                    // Set initial area search input
+                    if (data.area && data.district && data.city && data.province) {
+                        setAreaSearchInput(`${data.area}, ${data.district}, ${data.city}, ${data.province}`);
+                    } else if (data.province) {
+                        setAreaSearchInput(data.province);
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching store:', error);
@@ -144,83 +146,57 @@ export default function StoreSettingsForm() {
         }
     }, [user, isHydrated]);
 
-    // Location Loaders
+    // Handlers
     const [uploadLoading, setUploadLoading] = useState<{ logo: boolean, cover: boolean }>({ logo: false, cover: false });
 
-    async function loadProvinces() {
-        try {
-            const res = await biteshipService.getProvinces();
-            setProvinces(res.data || []);
-        } catch (e) { console.error(e); }
-    }
-
-    async function loadCities(provinceName: string) {
-        try {
-            const res = await biteshipService.getCitiesByProvince(provinceName);
-            setCities(res.data || []);
-        } catch (e) { console.error(e); }
-    }
-
-    async function loadDistricts(cityName: string, provinceName?: string) {
-        try {
-            const res = await biteshipService.getDistrictsByCity(cityName, provinceName);
-            setDistricts(res.data || []);
-        } catch (e) { console.error(e); }
-    }
-
-    async function loadAreas(districtName: string, cityName?: string, provinceName?: string) {
-        try {
-            const res = await biteshipService.getAreasByDistrict(districtName, cityName, provinceName);
-            setAreas(res.data || []);
-        } catch (e) { console.error(e); }
-    }
-
-    // Handlers
-    const handleLocationChange = async (type: 'province' | 'city' | 'district' | 'area', value: string) => {
-        let name = '';
-        if (type === 'province') {
-            name = provinces.find(p => p.id === value)?.name || '';
-            setFormData(prev => ({ ...prev, province_id: value, province: name }));
-            setCities([]); setDistricts([]); setAreas([]);
-            setFormData(prev => ({
-                ...prev,
-                city_id: '', city: '',
-                district_id: '', district: '',
-                area_id: '', area: ''
-            }));
-            if (name) await loadCities(name);
-        } else if (type === 'city') {
-            name = cities.find(c => c.id === value)?.name || '';
-            setFormData(prev => ({ ...prev, city_id: value, city: name }));
-            setDistricts([]); setAreas([]);
-            setFormData(prev => ({
-                ...prev,
-                district_id: '', district: '',
-                area_id: '', area: ''
-            }));
-            if (name) {
-                await loadDistricts(name, formData.province);
-            }
-        } else if (type === 'district') {
-            name = districts.find(d => d.id === value)?.name || '';
-            setFormData(prev => ({ ...prev, district_id: value, district: name }));
-            setAreas([]);
-            setFormData(prev => ({ ...prev, area_id: '', area: '' }));
-            if (name) {
-                await loadAreas(name, formData.city, formData.province);
-            }
-        } else if (type === 'area') {
-            const selectedArea = areas.find(a => a.id === value);
-            name = selectedArea?.name || '';
-            if (selectedArea && 'postal_code' in selectedArea) {
-                setFormData(prev => ({
-                    ...prev,
-                    area_id: value,
-                    area: name,
-                    zipcode: selectedArea.postal_code?.toString() || ''
-                }));
-            }
+    const handleSearchArea = async (val: string) => {
+        setAreaSearchInput(val);
+        if (val.length < 3) {
+            setAreaResults([]);
+            setShowAreaResults(false);
+            return;
         }
+
+        setIsSearchingArea(true);
+        setShowAreaResults(true);
+        try {
+            const token = await getAccessToken();
+            const res = await shippingService.searchArea(val, token || undefined);
+            if (res.data?.success && res.data.areas) {
+                setAreaResults(res.data.areas.map((area: any) => ({
+                    id: area.id,
+                    name: area.name,
+                    province: area.administrative_division_level_1_name,
+                    city: area.administrative_division_level_2_name,
+                    district: area.administrative_division_level_3_name,
+                    area: area.name.split(',')[0],
+                    postal_code: area.postal_code,
+                })));
+            } else {
+                setAreaResults([]);
+            }
+        } catch (error) {
+            console.error('Error searching area:', error);
+        } finally {
+            setIsSearchingArea(false);
+        }
+    };
+
+    const handleSelectArea = (area: any) => {
+        setFormData(prev => ({
+            ...prev,
+            province: area.province,
+            province_id: area.province,
+            city: area.city,
+            city_id: area.city,
+            district: area.district,
+            district_id: area.district,
+            area: area.area,
+            area_id: area.id,
+            zipcode: area.postal_code?.toString() || '',
+        }));
+        setAreaSearchInput(area.name);
+        setShowAreaResults(false);
     };
 
     const handleCourierToggle = (courierId: string) => {
@@ -306,6 +282,7 @@ export default function StoreSettingsForm() {
         try {
             const payload = {
                 ...formData,
+                zipcode: String(formData.zipcode || ''),
                 courier: formData.courier.join(','),
                 is_gratis_ongkir: formData.is_gratis_ongkir,
             };
@@ -552,55 +529,45 @@ export default function StoreSettingsForm() {
                             />
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Provinsi <span className="text-red-500">*</span></label>
-                            <select
-                                value={formData.province_id}
-                                onChange={(e) => handleLocationChange('province', e.target.value)}
-                                className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
-                            >
-                                <option value="">Pilih Provinsi</option>
-                                {provinces.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                            </select>
-                        </div>
+                        <div className="md:col-span-2 relative">
+                            <Label htmlFor="area-search" className="block text-sm font-medium text-slate-700 mb-2">Cari Area (Kecamatan, Kota, atau Provinsi) <span className="text-red-500">*</span></Label>
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                <input
+                                    id="area-search"
+                                    type="text"
+                                    placeholder="Masukkan minimal 3 karakter untuk mencari..."
+                                    value={areaSearchInput}
+                                    onChange={(e) => handleSearchArea(e.target.value)}
+                                    className="w-full pl-10 px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                                    onFocus={() => areaSearchInput.length >= 3 && setShowAreaResults(true)}
+                                />
+                                {isSearchingArea && (
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                        <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+                                    </div>
+                                )}
+                            </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Kota/Kabupaten <span className="text-red-500">*</span></label>
-                            <select
-                                value={formData.city_id}
-                                onChange={(e) => handleLocationChange('city', e.target.value)}
-                                disabled={!formData.province_id}
-                                className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none disabled:bg-slate-100"
-                            >
-                                <option value="">Pilih Kota</option>
-                                {cities.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Kecamatan <span className="text-red-500">*</span></label>
-                            <select
-                                value={formData.district_id}
-                                onChange={(e) => handleLocationChange('district', e.target.value)}
-                                disabled={!formData.city_id}
-                                className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none disabled:bg-slate-100"
-                            >
-                                <option value="">Pilih Kecamatan</option>
-                                {districts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Kelurahan/Desa <span className="text-red-500">*</span></label>
-                            <select
-                                value={formData.area_id}
-                                onChange={(e) => handleLocationChange('area', e.target.value)}
-                                disabled={!formData.district_id}
-                                className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none disabled:bg-slate-100"
-                            >
-                                <option value="">Pilih Kelurahan</option>
-                                {areas.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-                            </select>
+                            {showAreaResults && areaResults.length > 0 && (
+                                <div className="absolute top-full left-0 right-0 z-50 mt-1 max-h-[200px] overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg">
+                                    {areaResults.map((area: any, index: number) => (
+                                        <div
+                                            key={`${area.id}-${index}`}
+                                            className="px-4 py-3 hover:bg-emerald-50 cursor-pointer text-sm border-b border-slate-50 last:border-0"
+                                            onClick={() => handleSelectArea(area)}
+                                        >
+                                            <div className="font-medium text-slate-800">{area.name}</div>
+                                            <div className="text-xs text-slate-500">{area.district}, {area.city}, {area.province}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            {showAreaResults && areaResults.length === 0 && areaSearchInput.length >= 3 && !isSearchingArea && (
+                                <div className="absolute top-full left-0 right-0 z-50 mt-1 p-4 bg-white border border-slate-200 rounded-xl shadow-lg text-sm text-center text-slate-500">
+                                    Area tidak ditemukan
+                                </div>
+                            )}
                         </div>
 
                         <div>
@@ -608,8 +575,8 @@ export default function StoreSettingsForm() {
                             <input
                                 type="text"
                                 value={formData.zipcode}
-                                onChange={(e) => setFormData({ ...formData, zipcode: e.target.value })}
-                                className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                                readOnly
+                                className="w-full px-4 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-500 outline-none cursor-not-allowed"
                             />
                         </div>
                     </div>

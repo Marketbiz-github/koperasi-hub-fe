@@ -42,6 +42,10 @@ const vendorNav = [
         title: "Produk",
         url: "/dashboard/vendor/produk",
       },
+      {
+        title: "Gudang",
+        url: "/dashboard/vendor/gudang",
+      },
     ],
   },
   {

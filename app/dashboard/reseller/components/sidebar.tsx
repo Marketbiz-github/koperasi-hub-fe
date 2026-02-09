@@ -100,6 +100,10 @@ const data = {
           title: "Produk",
           url: "/dashboard/reseller/produk",
         },
+        {
+          title: "Gudang",
+          url: "/dashboard/reseller/gudang",
+        },
       ],
     },
     {
