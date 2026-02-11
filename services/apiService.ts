@@ -79,6 +79,13 @@ export const authService = {
         })
     },
 
+    async onboarding(data: any) {
+        return apiRequest('/onboarding', {
+            method: 'POST',
+            body: data,
+        })
+    },
+
     async createFlag(token: string, name: string) {
         return apiRequest('/flags', {
             method: 'POST',
@@ -116,10 +123,11 @@ export const userService = {
         })
     },
 
-    async addAffiliation(data: { parent_id: number, child_id: number, type: string }) {
+    async addAffiliation(data: { parent_id: number, child_id: number, type: string }, token?: string) {
         return apiRequest('/users/affiliate', {
             method: 'POST',
             body: data,
+            token
         })
     }
 }

@@ -1,12 +1,23 @@
 import { NextResponse } from 'next/server'
-import { authService, adminService } from '@/services/apiService'
+import { authService, userService } from '@/services/apiService'
 
 export async function POST(req: Request) {
     try {
         const body = await req.json()
-        const { name, email, password, phone, subdomain, store_name, flag_id, captchaToken, role } = body
+        const {
+            name, email, password, phone,
+            subdomain, store_name,
+            flag_ids, // Changed from flag_id to flag_ids (array)
+            plan_id,
+            // ipaymu_password, // Removed specific field, will use password
+            captchaToken,
+            role,
+            // Affiliation fields
+            parent_id,
+            affiliation_type
+        } = body
 
-        // 0. Verify CAPTCHA
+        // 1. Verify CAPTCHA
         if (!captchaToken) {
             return NextResponse.json({ message: 'CAPTCHA token is required' }, { status: 400 });
         }
@@ -21,143 +32,94 @@ export async function POST(req: Request) {
             return NextResponse.json({ message: 'Invalid CAPTCHA' }, { status: 400 });
         }
 
-        // 1. Login as Super Admin to get token
-        const adminEmail = process.env.SUPER_ADMIN_EMAIL
-        const adminPassword = process.env.SUPER_ADMIN_PASSWORD
+        // 2. Call Onboarding API
+        // "Digunakan untuk melakukan pendaftaran user baru dengan satu endpoint... token tidak di perlukan"
 
-        if (!adminEmail || !adminPassword) {
-            throw new Error('Super Admin credentials not configured')
-        }
+        // Prepare payload for onboarding
+        const onboardingPayload = {
+            name,
+            email,
+            password,
+            phone,
+            role: role || 'vendor',
+            store_name,
+            store_subdomain: subdomain, // Mapping subdomain -> store_subdomain
+            ipaymu_password: password, // Default to account password if not provided? Or make it required? User request showed it in JSON.
+            flag_ids: Array.isArray(flag_ids) ? flag_ids.map(Number) : (flag_ids ? [Number(flag_ids)] : []),
+            plan_id: plan_id ? Number(plan_id) : 1 // Default to 1 as requested
+        };
 
-        const loginResult = await authService.login(adminEmail, adminPassword)
-        const adminToken = loginResult.data?.token
+        console.log('[DEBUG] Calling Onboarding API with:', JSON.stringify(onboardingPayload, null, 2));
 
-        if (!adminToken) {
-            throw new Error('Gagal mendapatkan token admin')
-        }
-
-        // 2. Register New User
-        let userResult;
+        let onboardingResult;
         try {
-            userResult = await authService.register({
-                name,
-                email,
-                password,
-                phone,
-                role: role || 'vendor'
-            })
+            onboardingResult = await authService.onboarding(onboardingPayload);
         } catch (error: any) {
+            console.error('Onboarding API Error:', error);
             return NextResponse.json(
                 {
-                    message: `Gagal mendaftarkan user: ${error.message}`,
+                    message: error.message || 'Gagal melakukan pendaftaran onboarding',
                     errorData: error.data
                 },
                 { status: error.status || 400 }
             )
         }
 
-        // The external API returns ID directly in data as verified by user: data.id
-        // We add fallbacks for data.user_id or data.user.id just in case the structure varies.
-        const newVendorId = userResult.data?.id || userResult.data?.user_id || userResult.data?.user?.id;
+        const newUserId = onboardingResult.data?.user?.id || onboardingResult.data?.user_id;
 
-        console.log(`[DEBUG] Register Success. Extracted New User ID: ${newVendorId} (${typeof newVendorId})`);
-        console.log(`[DEBUG] Full Register Result Data:`, JSON.stringify(userResult.data));
-
-        if (!newVendorId) {
-            console.error('Registration response missing ID:', userResult)
-            return NextResponse.json(
-                {
-                    message: 'Registrasi berhasil tapi ID user tidak ditemukan',
-                    debug: userResult.data
-                },
-                { status: 400 }
-            )
+        if (!newUserId) {
+            console.warn('[WARN] Onboarding success but no User ID returned:', onboardingResult);
         }
 
-        // 3. Assign Flag (Optional)
-        if (flag_id) {
+        // 3. Handle Affiliation (if applicable)
+        if (newUserId && parent_id && affiliation_type) {
+            console.log(`[DEBUG] Processing affiliation for User ${newUserId} -> Parent ${parent_id} (${affiliation_type})`);
+
             try {
-                // Ensure IDs are sent as numbers if possible, 
-                // some APIs are strict about type validation
-                await adminService.assignFlagToUser(adminToken, {
-                    user_id: Number(newVendorId),
-                    flag_id: Number(flag_id)
-                })
-            } catch (error: any) {
-                console.error('Assign flag fail for User:', newVendorId, 'Flag:', flag_id, 'Error:', error.message)
-                return NextResponse.json(
-                    {
-                        message: `Gagal memberikan label flag: ${error.message}`,
-                        errorData: error.data
-                    },
-                    { status: error.status || 400 }
-                )
+                // Login as Super Admin to get token for affiliation
+                const adminEmail = process.env.SUPER_ADMIN_EMAIL
+                const adminPassword = process.env.SUPER_ADMIN_PASSWORD
+
+                if (adminEmail && adminPassword) {
+                    const loginResult = await authService.login(adminEmail, adminPassword)
+                    const adminToken = loginResult.data?.token
+
+                    if (adminToken) {
+                        await userService.addAffiliation({
+                            parent_id: Number(parent_id),
+                            child_id: Number(newUserId),
+                            type: affiliation_type
+                        }, adminToken);
+                        console.log('[DEBUG] Affiliation verified successfully');
+                    } else {
+                        console.error('[ERROR] Failed to get admin token for affiliation');
+                    }
+                } else {
+                    console.error('[ERROR] Super Admin credentials not configured for affiliation');
+                }
+            } catch (affError: any) {
+                console.error('[ERROR] Affiliation failed:', affError.message);
+                // We don't block registration success if affiliation fails, but we log it.
             }
         }
-
-        // 4. Create Store
-        let storeResult;
-        try {
-            const storePayload = {
-                user_id: Number(newVendorId),
-                name: store_name,
-                subdomain: subdomain
-            };
-            console.log(`[DEBUG] Store Payload for createStore:`, JSON.stringify(storePayload));
-
-            storeResult = await authService.createStore(adminToken, storePayload)
-        } catch (error: any) {
-            console.error('Create store fail:', error)
-            return NextResponse.json(
-                {
-                    message: `Gagal membuat toko: ${error.message}`,
-                    errorData: error.data
-                },
-                { status: error.status || 400 }
-            )
-        }
-
-        const storeId = storeResult.data?.id || storeResult.data?.store?.id
-
-        if (!storeId) {
-            console.error('Store creation response missing ID:', storeResult)
-            return NextResponse.json(
-                { message: 'Toko berhasil dibuat tapi ID toko tidak ditemukan' },
-                { status: 400 }
-            )
-        }
-
-        // 5. Register iPaymu SSO
-        // try {
-        //     await adminService.registerIpaymu(adminToken, storeId, { password })
-        // } catch (error: any) {
-        //     return NextResponse.json(
-        //         { message: `Gagal registrasi iPaymu SSO: ${error.message}` },
-        //         { status: 400 }
-        //     )
-        // }
 
         return NextResponse.json({
             meta: {
                 code: 200,
                 status: 'success',
-                message: 'Vendor registration completed successfully'
+                message: 'Registration completed successfully'
             },
-            data: {
-                user_id: newVendorId,
-                store_id: storeId
-            }
+            data: onboardingResult.data
         })
 
     } catch (error: any) {
-        console.error('Unified Register error:', error)
+        console.error('Registration Route Error:', error)
         return NextResponse.json(
             {
-                message: error.message || 'Terjadi kesalahan sistem saat registrasi',
-                errorData: error.data,
+                message: error.message || 'Terjadi kesalahan sistem',
                 stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
             },
-            { status: error.status || 500 }
+            { status: 500 }
         )
     }
 }

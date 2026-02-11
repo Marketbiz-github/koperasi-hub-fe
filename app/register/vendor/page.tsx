@@ -25,7 +25,8 @@ export default function RegisterVendorPage() {
     minishop_name: '',
     password: '',
     confirmPassword: '',
-    flag_id: '',
+    ipaymu_password: '',
+    flag_ids: [] as string[],
   });
 
   const [flags, setFlags] = useState<any[]>([]);
@@ -87,6 +88,20 @@ export default function RegisterVendorPage() {
         [name]: ''
       }));
     }
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, flagId: string) => {
+    const { checked } = e.target;
+    setFormData(prev => {
+      const currentFlags = prev.flag_ids;
+      let newFlags;
+      if (checked) {
+        newFlags = [...currentFlags, flagId];
+      } else {
+        newFlags = currentFlags.filter(id => id !== flagId);
+      }
+      return { ...prev, flag_ids: newFlags };
+    });
   };
 
   const validateForm = (): boolean => {
@@ -163,7 +178,9 @@ export default function RegisterVendorPage() {
           phone: formData.phone,
           subdomain: formData.subdomain,
           store_name: formData.minishop_name,
-          flag_id: formData.flag_id || null,
+          flag_ids: formData.flag_ids || [],
+          ipaymu_password: formData.password, // Use account password
+          plan_id: 1, // Default plan
           captchaToken: token,
           role: 'vendor'
         }),
@@ -295,21 +312,30 @@ export default function RegisterVendorPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="flag_id" className="block text-sm font-semibold text-slate-700 mb-2">
-                    Referal / Flag Group
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    Pilih Jaringan Anda
                   </label>
-                  <select
-                    id="flag_id"
-                    name="flag_id"
-                    value={formData.flag_id}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
-                  >
-                    <option value="">Pilih Jika Ada</option>
-                    {flags.map((flag) => (
-                      <option key={flag.id} value={flag.id}>{flag.name}</option>
-                    ))}
-                  </select>
+                  <div className="space-y-2 max-h-40 overflow-y-auto p-3 border border-slate-300 rounded-xl bg-white">
+                    {flags.length > 0 ? (
+                      flags.map((flag) => (
+                        <div key={flag.id} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id={`flag-${flag.id}`}
+                            value={flag.id}
+                            checked={formData.flag_ids.includes(String(flag.id))}
+                            onChange={(e) => handleCheckboxChange(e, String(flag.id))}
+                            className="w-4 h-4 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500"
+                          />
+                          <label htmlFor={`flag-${flag.id}`} className="text-sm text-slate-700 cursor-pointer select-none">
+                            {flag.name}
+                          </label>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-xs text-slate-400 italic">Tidak ada flag tersedia</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -470,7 +496,7 @@ export default function RegisterVendorPage() {
             &copy; {new Date().getFullYear()} KoperasiHub Platform. Seluruh Hak Cipta Dilindungi.
           </p>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
