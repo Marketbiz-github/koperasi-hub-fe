@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { apiRequest, shippingService } from '@/services/apiService';
 import { getAccessToken } from '@/utils/auth';
+import { useDebounce } from '@/hooks/useDebounce';
 import { Loader2, Save, MapPin, Truck, Store, Upload, AlertTriangle, Palette, Phone, Search, Image as ImageIcon } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import Image from 'next/image';
@@ -77,6 +78,7 @@ export default function StoreSettingsForm() {
     });
 
     const [areaSearchInput, setAreaSearchInput] = useState('');
+    const debouncedAreaSearch = useDebounce(areaSearchInput, 500);
     const [areaResults, setAreaResults] = useState<Location[]>([]);
     const [isSearchingArea, setIsSearchingArea] = useState(false);
     const [showAreaResults, setShowAreaResults] = useState(false);
@@ -149,37 +151,56 @@ export default function StoreSettingsForm() {
     // Handlers
     const [uploadLoading, setUploadLoading] = useState<{ logo: boolean, cover: boolean }>({ logo: false, cover: false });
 
-    const handleSearchArea = async (val: string) => {
-        setAreaSearchInput(val);
-        if (val.length < 3) {
-            setAreaResults([]);
-            setShowAreaResults(false);
-            return;
-        }
-
-        setIsSearchingArea(true);
-        setShowAreaResults(true);
-        try {
-            const token = await getAccessToken();
-            const res = await shippingService.searchArea(val, token || undefined);
-            if (res.data?.success && res.data.areas) {
-                setAreaResults(res.data.areas.map((area: any) => ({
-                    id: area.id,
-                    name: area.name,
-                    province: area.administrative_division_level_1_name,
-                    city: area.administrative_division_level_2_name,
-                    district: area.administrative_division_level_3_name,
-                    area: area.name.split(',')[0],
-                    postal_code: area.postal_code,
-                })));
-            } else {
+    useEffect(() => {
+        const searchArea = async () => {
+            if (debouncedAreaSearch.length < 3) {
                 setAreaResults([]);
+                setShowAreaResults(false);
+                return;
             }
-        } catch (error) {
-            console.error('Error searching area:', error);
-        } finally {
-            setIsSearchingArea(false);
-        }
+
+            setIsSearchingArea(true);
+            setShowAreaResults(true);
+            try {
+                const token = await getAccessToken();
+                const res = await shippingService.searchArea(debouncedAreaSearch, token || undefined);
+                if (res.data?.success && res.data.areas) {
+                    setAreaResults(res.data.areas.map((area: any) => {
+                        let postalCode = area.postal_code;
+                        if (!postalCode || postalCode === 0) {
+                            // Try to parse from name
+                            const parts = area.name.split(' ');
+                            const potentialZip = parts[parts.length - 1];
+                            if (/^\d{5}$/.test(potentialZip)) {
+                                postalCode = potentialZip;
+                            }
+                        }
+
+                        return {
+                            id: area.id,
+                            name: area.name,
+                            province: area.administrative_division_level_1_name,
+                            city: area.administrative_division_level_2_name,
+                            district: area.administrative_division_level_3_name,
+                            area: area.name.split(',')[0],
+                            postal_code: postalCode,
+                        };
+                    }));
+                } else {
+                    setAreaResults([]);
+                }
+            } catch (error) {
+                console.error('Error searching area:', error);
+            } finally {
+                setIsSearchingArea(false);
+            }
+        };
+
+        searchArea();
+    }, [debouncedAreaSearch]);
+
+    const handleSearchArea = (val: string) => {
+        setAreaSearchInput(val);
     };
 
     const handleSelectArea = (area: any) => {
