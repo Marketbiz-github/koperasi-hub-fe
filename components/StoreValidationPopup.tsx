@@ -11,7 +11,7 @@ import Link from 'next/link';
 interface StoreData {
     id: number;
     description: string | null;
-    ipaymu_va: string | null;
+    // ipaymu_va removed
     province_id: number | null;
     city_id: number | null;
     district_id: number | null;
@@ -59,10 +59,10 @@ export default function StoreValidationPopup() {
                     // Check for critical missing fields as per requirement
                     const missingFields = [];
                     if (!store.description) missingFields.push('Deskripsi Toko');
-                    if (!store.ipaymu_va) missingFields.push('iPaymu VA');
+                    // ipaymu_va check removed
                     if (!store.area_id) missingFields.push('Area/Kelurahan');
                     if (!store.logo) missingFields.push('Logo Toko');
-                    if (!store.color) missingFields.push('Warna Tema');
+                    // color check removed
                     if (!store.courier) missingFields.push('Kurir Pengiriman');
 
                     if (missingFields.length > 0) {
@@ -102,10 +102,10 @@ export default function StoreValidationPopup() {
                                 <p className="font-semibold mb-1">Data yang belum lengkap:</p>
                                 <ul className="list-disc list-inside text-slate-600 space-y-1">
                                     {!storeData?.description && <li>Deskripsi Toko</li>}
-                                    {!storeData?.ipaymu_va && <li>iPaymu VA</li>}
+                                    {/* ipaymu_va check removed */}
                                     {!storeData?.area_id && <li>Alamat Lengkap (Area/Kelurahan)</li>}
                                     {!storeData?.logo && <li>Logo Toko</li>}
-                                    {!storeData?.color && <li>Warna Tema</li>}
+                                    {/* color check removed */}
                                     {!storeData?.courier && <li>Kurir Pengiriman</li>}
                                 </ul>
                             </div>

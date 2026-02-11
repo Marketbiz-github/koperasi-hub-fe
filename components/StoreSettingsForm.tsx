@@ -62,7 +62,7 @@ export default function StoreSettingsForm() {
         zipcode: '',
         phone: '',
         status: '1',
-        ipaymu_va: '',
+        // ipaymu_va removed
         province: '',
         city: '',
         district: '',
@@ -112,12 +112,12 @@ export default function StoreSettingsForm() {
                         zipcode: data.zipcode || '',
                         phone: data.phone || user.phone || '', // Fallback to user phone
                         status: data.status?.toString() || '1',
-                        ipaymu_va: data.ipaymu_va || '',
+                        // ipaymu_va removed
                         province: data.province || '',
                         city: data.city || '',
                         district: data.district || '',
                         area: data.area || '',
-                        courier: data.courier ? data.courier.split(',') : [],
+                        courier: Array.isArray(data.courier) ? data.courier : (data.courier ? data.courier.split(',') : []),
                         color: data.color || '#10b981',
                         fee_setting: data.fee_setting || 'merchant',
                         is_gratis_ongkir: data.is_gratis_ongkir?.toString() || '0',
@@ -271,7 +271,7 @@ export default function StoreSettingsForm() {
         const requiredFields = [
             { key: 'name', label: 'Nama Toko' },
             { key: 'description', label: 'Deskripsi Toko' },
-            { key: 'ipaymu_va', label: 'iPaymu VA' },
+            // ipaymu_va removed
             { key: 'alamat', label: 'Alamat Lengkap' },
             { key: 'province_id', label: 'Provinsi' },
             { key: 'city_id', label: 'Kota' },
@@ -304,7 +304,7 @@ export default function StoreSettingsForm() {
             const payload = {
                 ...formData,
                 zipcode: String(formData.zipcode || ''),
-                courier: formData.courier.join(','),
+                courier: formData.courier, // Send as array
                 is_gratis_ongkir: formData.is_gratis_ongkir,
             };
 
@@ -364,7 +364,7 @@ export default function StoreSettingsForm() {
                     <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                         <ImageIcon className="w-5 h-5 text-emerald-600" /> Logo & Cover Toko
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Logo Upload */}
                         <div className="space-y-4">
                             <label className="block text-sm font-medium text-slate-700">Logo Toko <span className="text-red-500">*</span></label>
@@ -489,46 +489,52 @@ export default function StoreSettingsForm() {
                                 required
                             />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">iPaymu VA <span className="text-red-500">*</span></label>
-                            <input
-                                type="text"
-                                value={formData.ipaymu_va}
-                                onChange={(e) => setFormData({ ...formData, ipaymu_va: e.target.value })}
-                                className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
-                                placeholder="Masukkan nomor VA iPaymu"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Status Toko</label>
-                            <select
-                                value={formData.status}
-                                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
-                            >
-                                <option value="1">Aktif</option>
-                                <option value="0">Non-Aktif</option>
-                            </select>
-                        </div>
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Warna Tema Toko</label>
-                            <div className="flex items-center gap-4">
-                                <input
-                                    type="color"
-                                    value={formData.color}
-                                    onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                                    className="h-12 w-20 rounded-xl border border-slate-300 cursor-pointer"
-                                />
-                                <input
-                                    type="text"
-                                    value={formData.color}
-                                    onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                                    className="flex-1 px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
-                                    placeholder="#10b981"
-                                />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Kiri */}
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Status Toko
+                                </label>
+                                <select
+                                    value={formData.status}
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, status: e.target.value })
+                                    }
+                                    className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                                >
+                                    <option value="1">Aktif</option>
+                                    <option value="0">Non-Aktif</option>
+                                </select>
+                            </div>
+
+                            {/* Kanan */}
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Warna Tema Toko
+                                </label>
+                                <div className="flex items-center gap-4">
+                                    <input
+                                        type="color"
+                                        value={formData.color}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, color: e.target.value })
+                                        }
+                                        className="h-12 w-20 border border-slate-300 cursor-pointer"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={formData.color}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, color: e.target.value })
+                                        }
+                                        className="flex-1 px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                                        placeholder="#10b981"
+                                    />
+                                </div>
                             </div>
                         </div>
+
                     </div>
                 </section>
 
@@ -733,6 +739,6 @@ export default function StoreSettingsForm() {
                     </button>
                 </div>
             </form>
-        </div>
+        </div >
     );
 }
