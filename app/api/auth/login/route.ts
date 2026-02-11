@@ -29,6 +29,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       message: 'Login success',
+      token, // Return token for client-side storage
       user: {
         id: user_id,
         email: email,

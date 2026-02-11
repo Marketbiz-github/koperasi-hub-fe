@@ -8,6 +8,8 @@ interface AuthState {
   isHydrated: boolean
   isLoading: boolean
   error: string | null
+  token: string | null
+  setToken: (token: string | null) => void
   setUser: (user: User | null) => void
   setUserDetail: (detail: User | null) => void
   setStore: (store: any | null) => void
@@ -22,12 +24,14 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
+  token: null,
   userDetail: null,
   store: null,
   isHydrated: false,
   isLoading: false,
   error: null,
 
+  setToken: (token) => set({ token }),
   setUser: (user) => set({ user }),
   setUserDetail: (userDetail) => set({ userDetail }),
   setStore: (store) => set({ store }),
@@ -50,6 +54,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({
         user: data.user ?? null,
         userDetail: data.user ?? null, // Sync initially from /api/auth/me
+        token: data.token ?? null,
         isHydrated: true,
       })
 
@@ -58,7 +63,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
     } catch (error) {
       console.error('Auth hydrate error:', error)
-      set({ user: null, userDetail: null, isHydrated: true })
+      set({ user: null, userDetail: null, token: null, isHydrated: true })
     }
   },
 
@@ -121,7 +126,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return { success: false, message: errorMessage }
       }
 
-      set({ user: data.user, isLoading: false })
+      set({ user: data.user, token: data.token, isLoading: false })
       return { success: true, user: data.user }
     } catch (err: any) {
       const errorMessage = 'Terjadi kesalahan sistem saat login'
@@ -166,7 +171,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await fetch('/api/auth/logout', { method: 'POST' })
     } catch { }
 
-    set({ user: null })
+    set({ user: null, token: null })
 
     // Hapus cookies di sisi client (sama seperti di proxy logic)
     document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;'

@@ -23,6 +23,7 @@ export async function GET() {
         ...result.data,
         role: role || result.data.role || 'vendor', // Fallback to cookie role if needed
       },
+      token
     })
   } catch (error) {
     // If external API fails, fallback to basic cookie info so the UI doesn't break
