@@ -50,21 +50,6 @@ const vendorNav = [
     ],
   },
   {
-    title: "Koperasi",
-    url: "#",
-    icon: IconBuildingCommunity,
-    items: [
-      {
-        title: "Koperasi",
-        url: "/dashboard/vendor/koperasi",
-      },
-      {
-        title: "Pengajuan",
-        url: "/dashboard/vendor/koperasi/pengajuan",
-      },
-    ],
-  },
-  {
     title: "Afiliasi",
     url: "#",
     icon: IconUsersGroup,
@@ -75,38 +60,38 @@ const vendorNav = [
       },
     ],
   },
-  {
-    title: "Penjualan",
-    url: "/dashboard/vendor/penjualan",
-    icon: IconCashRegister,
-  },
-  {
-    title: "Fitur",
-    url: "#",
-    icon: IconGift,
-    items: [
-      {
-        title: "Produk Unggulan",
-        url: "/dashboard/vendor/fitur/produk-unggulan",
-      },
-      {
-        title: "Produk Diminati",
-        url: "/dashboard/vendor/fitur/produk-diminati",
-      },
-      {
-        title: "Voucher",
-        url: "/dashboard/vendor/fitur/voucher",
-      },
-      {
-        title: "Manajemen Stok",
-        url: "/dashboard/vendor/fitur/manajemen-stok",
-      },
-      {
-        title: "Flash Sale",
-        url: "/dashboard/vendor/fitur/flash-sale",
-      },
-    ],
-  },
+  // {
+  //   title: "Penjualan",
+  //   url: "/dashboard/vendor/penjualan",
+  //   icon: IconCashRegister,
+  // },
+  // {
+  //   title: "Fitur",
+  //   url: "#",
+  //   icon: IconGift,
+  //   items: [
+  //     {
+  //       title: "Produk Unggulan",
+  //       url: "/dashboard/vendor/fitur/produk-unggulan",
+  //     },
+  //     {
+  //       title: "Produk Diminati",
+  //       url: "/dashboard/vendor/fitur/produk-diminati",
+  //     },
+  //     {
+  //       title: "Voucher",
+  //       url: "/dashboard/vendor/fitur/voucher",
+  //     },
+  //     {
+  //       title: "Manajemen Stok",
+  //       url: "/dashboard/vendor/fitur/manajemen-stok",
+  //     },
+  //     {
+  //       title: "Flash Sale",
+  //       url: "/dashboard/vendor/fitur/flash-sale",
+  //     },
+  //   ],
+  // },
   {
     title: "Pengaturan Toko",
     url: "/dashboard/vendor/store-settings",

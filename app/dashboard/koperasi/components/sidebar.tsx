@@ -39,25 +39,6 @@ const data = {
       icon: IconDashboard,
     },
     {
-      title: "Kelola Microsite",
-      url: "#",
-      icon: IconDeviceLaptop,
-      items: [
-        {
-          title: "Profil",
-          url: "/dashboard/koperasi/microsite/profil",
-        },
-        {
-          title: "Laporan",
-          url: "/dashboard/koperasi/microsite/laporan",
-        },
-        {
-          title: "Kegiatan",
-          url: "/dashboard/koperasi/microsite/kegiatan",
-        }
-      ],
-    },
-    {
       title: "Marketplace",
       url: "#",
       icon: IconBuildingStore,
@@ -66,26 +47,22 @@ const data = {
           title: "Marketplace",
           url: "/dashboard/koperasi/marketplace",
         },
-        {
-          title: "Pembelian",
-          url: "/dashboard/koperasi/marketplace/pembelian",
-        },
-        {
-          title: "Vendor",
-          url: "/dashboard/koperasi/marketplace/vendor",
-        },
-        {
-          title: "Pembayaran",
-          url: "/dashboard/koperasi/marketplace/pembayaran",
-        },
-        {
-          title: "Piutang",
-          url: "/dashboard/koperasi/marketplace/piutang",
-        },
-        {
-          title: "Pengiriman",
-          url: "/dashboard/koperasi/marketplace/pengiriman",
-        },
+        // {
+        //   title: "Pembelian",
+        //   url: "/dashboard/koperasi/marketplace/pembelian",
+        // },
+        // {
+        //   title: "Pembayaran",
+        //   url: "/dashboard/koperasi/marketplace/pembayaran",
+        // },
+        // {
+        //   title: "Piutang",
+        //   url: "/dashboard/koperasi/marketplace/piutang",
+        // },
+        // {
+        //   title: "Pengiriman",
+        //   url: "/dashboard/koperasi/marketplace/pengiriman",
+        // },
       ],
     },
     {
@@ -122,53 +99,53 @@ const data = {
         },
       ],
     },
-    {
-      title: "Word-of-mouth",
-      url: "#",
-      icon: IconMessageHeart,
-      items: [
-        {
-          title: "Campaign",
-          url: "/dashboard/koperasi/wom/campaign",
-        },
-        {
-          title: "Data Transaksi",
-          url: "/dashboard/koperasi/wom/data-transaksi",
-        },
-      ],
-    },
-    {
-      title: "Penjualan",
-      url: "/dashboard/koperasi/penjualan",
-      icon: IconCashRegister,
-    },
-    {
-      title: "Fitur",
-      url: "#",
-      icon: IconGift,
-      items: [
-        {
-          title: "Produk Unggulan",
-          url: "/dashboard/koperasi/fitur/produk-unggulan",
-        },
-        {
-          title: "Produk Diminati",
-          url: "/dashboard/koperasi/fitur/produk-diminati",
-        },
-        {
-          title: "Voucher",
-          url: "/dashboard/koperasi/fitur/voucher",
-        },
-        {
-          title: "Manajemen Stok",
-          url: "/dashboard/koperasi/fitur/manajemen-stok",
-        },
-        {
-          title: "Flash Sale",
-          url: "/dashboard/koperasi/fitur/flash-sale",
-        },
-      ],
-    },
+    // {
+    //   title: "Word-of-mouth",
+    //   url: "#",
+    //   icon: IconMessageHeart,
+    //   items: [
+    //     {
+    //       title: "Campaign",
+    //       url: "/dashboard/koperasi/wom/campaign",
+    //     },
+    //     {
+    //       title: "Data Transaksi",
+    //       url: "/dashboard/koperasi/wom/data-transaksi",
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: "Penjualan",
+    //   url: "/dashboard/koperasi/penjualan",
+    //   icon: IconCashRegister,
+    // },
+    // {
+    //   title: "Fitur",
+    //   url: "#",
+    //   icon: IconGift,
+    //   items: [
+    //     {
+    //       title: "Produk Unggulan",
+    //       url: "/dashboard/koperasi/fitur/produk-unggulan",
+    //     },
+    //     {
+    //       title: "Produk Diminati",
+    //       url: "/dashboard/koperasi/fitur/produk-diminati",
+    //     },
+    //     {
+    //       title: "Voucher",
+    //       url: "/dashboard/koperasi/fitur/voucher",
+    //     },
+    //     {
+    //       title: "Manajemen Stok",
+    //       url: "/dashboard/koperasi/fitur/manajemen-stok",
+    //     },
+    //     {
+    //       title: "Flash Sale",
+    //       url: "/dashboard/koperasi/fitur/flash-sale",
+    //     },
+    //   ],
+    // },
     {
       title: "Pengaturan Toko",
       url: "/dashboard/koperasi/store-settings",

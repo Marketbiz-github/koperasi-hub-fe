@@ -6,7 +6,7 @@ export default function DashboardPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Vendor Dashboard</h1>
-      <div className="my-6">
+      {/* <div className="my-6">
         <SectionCards
           items={[
             {
@@ -76,7 +76,7 @@ export default function DashboardPage() {
       </div>
 
 
-      <ChartAreaInteractive />
+      <ChartAreaInteractive /> */}
     </div>
   );
 }
