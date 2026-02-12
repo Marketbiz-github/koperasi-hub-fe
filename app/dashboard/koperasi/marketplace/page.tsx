@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -20,255 +20,79 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { ShoppingCart, Share2, Flame, Star } from "lucide-react"
+import { ShoppingCart, Star, Loader2, Search, Package, ChevronLeft, ChevronRight } from "lucide-react"
 import { useCartStore } from "@/store/cartStore"
-
-interface Vendor {
-  id: string
-  nama: string
-  image: string
-  rating: number
-}
+import { productService, storeService } from "@/services/apiService"
+import { getAccessToken } from "@/utils/auth"
+import { toast } from "sonner"
 
 interface Product {
-  id: string
-  nama: string
-  kategori: string
-  harga: string
-  hargaNumber: number
-  gambar: string
-  badge?: string
-  vendorId: string
+  id: number
+  name: string
+  sku: string
+  price: string | number
+  status: string
+  images?: { image_url: string; is_primary: boolean }[] | null
+  product_category?: { name: string } | null
 }
 
-const vendors: Vendor[] = [
-  {
-    id: "vendor-1",
-    nama: "Vendor Beras Premium",
-    image: "/images/products/beras.png",
-    rating: 4.8,
-  },
-  {
-    id: "vendor-2",
-    nama: "Vendor Sayuran Segar",
-    image: "/images/products/beras.png",
-    rating: 4.5,
-  },
-  {
-    id: "vendor-3",
-    nama: "Vendor Buah Organik",
-    image: "/images/products/beras.png",
-    rating: 4.7,
-  },
-]
-
-const productsData: Record<string, Product[]> = {
-  "vendor-1": [
-    {
-      id: "prod-1",
-      nama: "Beras Premium 5kg",
-      kategori: "Beras",
-      harga: "Rp 150.000",
-      hargaNumber: 150000,
-      gambar: "/images/products/beras.png",
-      badge: "Best Seller",
-      vendorId: "vendor-1",
-    },
-    {
-      id: "prod-2",
-      nama: "Beras Organik 10kg",
-      kategori: "Beras",
-      harga: "Rp 250.000",
-      hargaNumber: 250000,
-      gambar: "/images/products/beras.png",
-      vendorId: "vendor-1",
-    },
-    {
-      id: "prod-3",
-      nama: "Beras Merah 5kg",
-      kategori: "Beras",
-      harga: "Rp 120.000",
-      hargaNumber: 120000,
-      gambar: "/images/products/beras.png",
-      vendorId: "vendor-1",
-    },
-  ],
-  "vendor-2": [
-    {
-      id: "prod-4",
-      nama: "Kangkung Segar 1kg",
-      kategori: "Sayuran",
-      harga: "Rp 15.000",
-      hargaNumber: 15000,
-      gambar: "/images/products/beras.png",
-      badge: "Fresh",
-      vendorId: "vendor-2",
-    },
-    {
-      id: "prod-5",
-      nama: "Bayam Organik 500g",
-      kategori: "Sayuran",
-      harga: "Rp 20.000",
-      hargaNumber: 20000,
-      gambar: "/images/products/beras.png",
-      vendorId: "vendor-2",
-    },
-    {
-      id: "prod-6",
-      nama: "Tomat Merah 2kg",
-      kategori: "Sayuran",
-      harga: "Rp 30.000",
-      hargaNumber: 30000,
-      gambar: "/images/products/beras.png",
-      vendorId: "vendor-2",
-    },
-  ],
-  "vendor-3": [
-    {
-      id: "prod-7",
-      nama: "Jeruk Nipis 2kg",
-      kategori: "Buah",
-      harga: "Rp 35.000",
-      hargaNumber: 35000,
-      gambar: "/images/products/beras.png",
-      badge: "Segar",
-      vendorId: "vendor-3",
-    },
-    {
-      id: "prod-8",
-      nama: "Mangga Harum Manis 5kg",
-      kategori: "Buah",
-      harga: "Rp 60.000",
-      hargaNumber: 60000,
-      gambar: "/images/products/beras.png",
-      vendorId: "vendor-3",
-    },
-    {
-      id: "prod-9",
-      nama: "Pisang Emas 3kg",
-      kategori: "Buah",
-      harga: "Rp 25.000",
-      hargaNumber: 25000,
-      gambar: "/images/products/beras.png",
-      vendorId: "vendor-3",
-    },
-  ],
+interface Vendor {
+  id: number
+  name: string
+  logo: string | null
+  description: string | null
 }
-
-// Featured & Flash Sale Products
-const featuredProducts: Product[] = [
-  {
-    id: "featured-1",
-    nama: "Beras Premium 5kg",
-    kategori: "Beras",
-    harga: "Rp 150.000",
-    hargaNumber: 150000,
-    gambar: "/images/products/beras.png",
-    badge: "Unggulan",
-    vendorId: "vendor-1",
-  },
-  {
-    id: "featured-2",
-    nama: "Bayam Organik 500g",
-    kategori: "Sayuran",
-    harga: "Rp 20.000",
-    hargaNumber: 20000,
-    gambar: "/images/products/beras.png",
-    badge: "Unggulan",
-    vendorId: "vendor-2",
-  },
-  {
-    id: "featured-3",
-    nama: "Mangga Harum Manis 5kg",
-    kategori: "Buah",
-    harga: "Rp 60.000",
-    hargaNumber: 60000,
-    gambar: "/images/products/beras.png",
-    badge: "Unggulan",
-    vendorId: "vendor-3",
-  },
-]
-
-const flashSaleProducts: Product[] = [
-  {
-    id: "flash-1",
-    nama: "Beras Organik 10kg",
-    kategori: "Beras",
-    harga: "Rp 200.000",
-    hargaNumber: 200000,
-    gambar: "/images/products/beras.png",
-    badge: "Flash Sale 30%",
-    vendorId: "vendor-1",
-  },
-  {
-    id: "flash-2",
-    nama: "Tomat Merah 2kg",
-    kategori: "Sayuran",
-    harga: "Rp 20.000",
-    hargaNumber: 20000,
-    gambar: "/images/products/beras.png",
-    badge: "Flash Sale 50%",
-    vendorId: "vendor-2",
-  },
-  {
-    id: "flash-3",
-    nama: "Jeruk Nipis 2kg",
-    kategori: "Buah",
-    harga: "Rp 25.000",
-    hargaNumber: 25000,
-    gambar: "/images/products/beras.png",
-    badge: "Flash Sale 25%",
-    vendorId: "vendor-3",
-  },
-  {
-    id: "flash-4",
-    nama: "Pisang Emas 3kg",
-    kategori: "Buah",
-    harga: "Rp 18.000",
-    hargaNumber: 18000,
-    gambar: "/images/products/beras.png",
-    badge: "Flash Sale 40%",
-    vendorId: "vendor-3",
-  },
-]
 
 function ProductCardComponent({ product }: { product: Product }) {
   const addItem = useCartStore((s) => s.addItem)
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const primaryImage = product.images?.find(img => img.is_primary)?.image_url || product.images?.[0]?.image_url || "/images/placeholder.png"
     addItem({
-      id: product.id,
-      name: product.nama,
-      price: product.hargaNumber,
-      image: product.gambar,
-      category: product.kategori,
+      id: product.id.toString(),
+      name: product.name,
+      price: Number(product.price),
+      image: primaryImage,
+      category: product.product_category?.name || "Uncategorized",
       quantity: 1,
     })
+    toast.success(`${product.name} ditambahkan ke keranjang`)
   }
 
+  const formatCurrency = (amount: string | number) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+    }).format(Number(amount));
+  }
+
+  const primaryImage = product.images?.find(img => img.is_primary)?.image_url || product.images?.[0]?.image_url || "/images/placeholder.png"
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
-      <div className="relative h-40 bg-gray-100 overflow-hidden group">
-        {product.badge && (
-          <Badge className="absolute top-2 left-2 z-10 bg-red-500">
-            {product.badge}
-          </Badge>
-        )}
-        <Image
-          src={product.gambar}
-          alt={product.nama}
-          fill
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-        />
-      </div>
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow flex flex-col group">
+      <Link href={`/dashboard/koperasi/marketplace/${product.id}`} className="block">
+        <div className="relative h-48 bg-gray-100 overflow-hidden">
+          <Image
+            src={primaryImage}
+            alt={product.name}
+            fill
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+          />
+        </div>
+      </Link>
 
       <div className="p-3 flex-1 flex flex-col">
-        <p className="text-xs text-gray-500 mb-1">{product.kategori}</p>
-        <h3 className="font-semibold text-sm text-gray-900 mb-2 line-clamp-2">
-          {product.nama}
-        </h3>
+        <p className="text-xs text-gray-500 mb-1">{product.product_category?.name || "Uncategorized"}</p>
+        <Link href={`/dashboard/koperasi/marketplace/${product.id}`} className="hover:text-emerald-600 transition-colors">
+          <h3 className="font-semibold text-sm text-gray-900 mb-2 line-clamp-2 min-h-[40px]">
+            {product.name}
+          </h3>
+        </Link>
         <p className="text-base font-bold text-emerald-600 mb-3">
-          {product.harga}
+          {formatCurrency(product.price)}
         </p>
 
         <div className="flex gap-2 mt-auto">
@@ -279,9 +103,6 @@ function ProductCardComponent({ product }: { product: Product }) {
             <ShoppingCart size={14} />
             Tambah
           </button>
-          <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-100 transition">
-            <Share2 size={14} className="text-gray-600" />
-          </button>
         </div>
       </div>
     </div>
@@ -289,15 +110,90 @@ function ProductCardComponent({ product }: { product: Product }) {
 }
 
 export default function MarketplaceVendorPage() {
-  const [selectedVendor, setSelectedVendor] = useState<string>("vendor-1")
+  const [vendors, setVendors] = useState<Vendor[]>([])
+  const [products, setProducts] = useState<Product[]>([])
+  const [selectedVendor, setSelectedVendor] = useState<string>("all")
   const [searchQuery, setSearchQuery] = useState<string>("")
+  const [isLoading, setIsLoading] = useState(true)
+  const [isVendorsLoading, setIsVendorsLoading] = useState(true)
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const limit = 12
+
   const cartItems = useCartStore((s) => s.items)
 
-  const currentVendor = vendors.find((v) => v.id === selectedVendor)
-  const currentProducts = productsData[selectedVendor] || []
-  const filteredProducts = currentProducts.filter((p) =>
-    p.nama.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const fetchVendors = useCallback(async () => {
+    try {
+      const token = await getAccessToken()
+      if (!token) return
+      const res = await storeService.getStores(token, { limit: 100 })
+      if (res.data) {
+        if (Array.isArray(res.data)) {
+          setVendors(res.data)
+        } else if (res.data.data && Array.isArray(res.data.data)) {
+          setVendors(res.data.data)
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching vendors:', error)
+      toast.error('Gagal memuat daftar vendor')
+    } finally {
+      setIsVendorsLoading(false)
+    }
+  }, [])
+
+  const fetchProducts = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const token = await getAccessToken()
+      const params: any = {
+        page: currentPage,
+        limit: limit,
+        target_customer: 'koperasi',
+        status: 'active'
+      }
+
+      if (selectedVendor !== "all") {
+        params.store_id = selectedVendor
+      }
+
+      if (searchQuery) {
+        params.name = searchQuery
+      }
+
+      const res = await productService.getProducts(params, token || undefined)
+      if (res.data) {
+        setProducts(res.data.data || [])
+        setTotalPages(Math.ceil((res.data.meta?.total || 0) / limit))
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error)
+      toast.error('Gagal memuat produk')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [currentPage, selectedVendor, searchQuery])
+
+  useEffect(() => {
+    fetchVendors()
+  }, [fetchVendors])
+
+  useEffect(() => {
+    fetchProducts()
+  }, [fetchProducts])
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    setCurrentPage(1)
+    fetchProducts()
+  }
+
+  const selectedVendorData = Array.isArray(vendors) ? vendors.find(v => v.id.toString() === selectedVendor) : undefined
+
+  // Simulation for Featured (extracting from current products)
+  const featuredProducts = Array.isArray(products) ? products.slice(0, 3) : []
 
   return (
     <div className="space-y-6">
@@ -310,7 +206,7 @@ export default function MarketplaceVendorPage() {
           <Link href="/dashboard/koperasi/marketplace/cart">
             <Button variant="outline" className="relative">
               <ShoppingCart size={18} />
-              Keranjang
+              <span className="ml-2">Keranjang</span>
               {cartItems.length > 0 && (
                 <Badge className="absolute -top-2 -right-2 bg-red-500">
                   {cartItems.length}
@@ -321,124 +217,162 @@ export default function MarketplaceVendorPage() {
         </div>
       </div>
 
-      {/* Flash Sale Section */}
-      <Card className="border-2 border-red-200 bg-linear-to-r from-red-50 to-orange-50">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Flame className="text-red-600" size={24} />
-            <CardTitle className="text-red-600">Flash Sale</CardTitle>
-          </div>
-          <CardDescription>Penawaran terbatas, jangan sampai terlewat!</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {flashSaleProducts.map((product) => (
-              <ProductCardComponent key={product.id} product={product} />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Featured Products Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Star className="text-yellow-500" size={24} />
-            <CardTitle>Produk Unggulan</CardTitle>
-          </div>
-          <CardDescription>Produk pilihan dengan kualitas terbaik</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {featuredProducts.map((product) => (
-              <ProductCardComponent key={product.id} product={product} />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Vendor Selection & Filter Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Pilih Vendor untuk Berbelanja</CardTitle>
-          <CardDescription>Lihat dan pilih produk dari vendor terpercaya</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="text-sm font-medium mb-2 block">Vendor</label>
-            <Select value={selectedVendor} onValueChange={setSelectedVendor}>
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih vendor" />
-              </SelectTrigger>
-              <SelectContent>
-                {vendors.map((vendor) => (
-                  <SelectItem key={vendor.id} value={vendor.id}>
-                    {vendor.nama} ({vendor.rating} ⭐)
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {currentVendor && (
-            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-              <Image
-                src={currentVendor.image}
-                alt={currentVendor.nama}
-                width={80}
-                height={80}
-                className="w-20 h-20 rounded-lg object-cover"
-              />
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg">{currentVendor.nama}</h3>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-yellow-500 font-semibold">
-                    {currentVendor.rating} ⭐
-                  </span>
-                  <span className="text-sm text-gray-600">
-                    {filteredProducts.length} produk tersedia
-                  </span>
-                </div>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Sidebar Filters */}
+        <aside className="space-y-6">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Filter</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Cari Produk</label>
+                <form onSubmit={handleSearch} className="relative">
+                  <Input
+                    placeholder="Nama produk..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pr-10"
+                  />
+                  <button type="submit" className="absolute right-3 top-2.5 text-gray-400">
+                    <Search size={18} />
+                  </button>
+                </form>
               </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Vendor</label>
+                <Select value={selectedVendor} onValueChange={(val) => {
+                  setSelectedVendor(val)
+                  setCurrentPage(1)
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Semua Vendor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Vendor</SelectItem>
+                    {vendors.map((vendor) => (
+                      <SelectItem key={vendor.id} value={vendor.id.toString()}>
+                        {vendor.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {selectedVendorData && (
+                <div className="pt-4 border-t">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 border flex-shrink-0 relative">
+                      {selectedVendorData.logo ? (
+                        <Image src={selectedVendorData.logo} alt={selectedVendorData.name} fill className="object-cover" />
+                      ) : (
+                        <Package className="m-auto text-gray-300 mt-3" size={24} />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm truncate">{selectedVendorData.name}</p>
+                      <p className="text-xs text-gray-500 line-clamp-1">Vendor Terverifikasi</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+        </aside>
+
+        {/* Main Content */}
+        <div className="lg:col-span-3 space-y-6">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border">
+              <Loader2 className="h-10 w-10 animate-spin text-emerald-600 mb-4" />
+              <p className="text-gray-500">Memuat produk untuk Anda...</p>
             </div>
+          ) : products.length > 0 ? (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {products.map((product) => (
+                  <ProductCardComponent key={product.id} product={product} />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 pt-4">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(prev => prev - 1)}
+                  >
+                    <ChevronLeft size={18} />
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum = currentPage;
+                      if (currentPage <= 3) pageNum = i + 1;
+                      else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+                      else pageNum = currentPage - 2 + i;
+
+                      if (pageNum <= 0 || pageNum > totalPages) return null;
+
+                      return (
+                        <Button
+                          key={pageNum}
+                          variant={currentPage === pageNum ? "default" : "outline"}
+                          size="sm"
+                          className={currentPage === pageNum ? "bg-emerald-600 hover:bg-emerald-700" : ""}
+                          onClick={() => setCurrentPage(pageNum)}
+                        >
+                          {pageNum}
+                        </Button>
+                      )
+                    })}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(prev => prev + 1)}
+                  >
+                    <ChevronRight size={18} />
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="py-20 text-center space-y-4">
+                <div className="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto">
+                  <Package className="text-gray-300" size={40} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Produk Tidak Ditemukan</h3>
+                  <p className="text-gray-500 max-w-xs mx-auto">
+                    {searchQuery
+                      ? `Maaf, kami tidak menemukan produk "${searchQuery}". Coba kata kunci lain.`
+                      : "Maaf, belum ada produk tersedia di kategori atau vendor ini."}
+                  </p>
+                </div>
+                {(searchQuery || selectedVendor !== "all") && (
+                  <Button
+                    variant="link"
+                    className="text-emerald-600"
+                    onClick={() => {
+                      setSearchQuery("")
+                      setSelectedVendor("all")
+                      setCurrentPage(1)
+                    }}
+                  >
+                    Reset Filter
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
           )}
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">Cari Produk</label>
-            <Input
-              placeholder="Cari nama produk..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Products Grid */}
-      {filteredProducts.length > 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Produk {currentVendor?.nama}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((product) => (
-                <ProductCardComponent key={product.id} product={product} />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-gray-500">
-              {searchQuery
-                ? "Produk tidak ditemukan"
-                : "Pilih vendor untuk melihat produk"}
-            </p>
-          </CardContent>
-        </Card>
-      )}
+        </div>
+      </div>
     </div>
   )
 }

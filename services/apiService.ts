@@ -241,7 +241,7 @@ export const productCategoryService = {
 }
 
 export const productService = {
-    async getProducts(params: { store_id?: string | number, page?: number, limit?: number, name?: string, status?: string, category_id?: string | number }, token?: string) {
+    async getProducts(params: { store_id?: string | number, page?: number, limit?: number, name?: string, status?: string, category_id?: string | number, target_customer?: string }, token?: string) {
         let query = new URLSearchParams();
         if (params.page) query.append('page', params.page.toString());
         if (params.limit) query.append('limit', params.limit.toString());
@@ -249,6 +249,7 @@ export const productService = {
         if (params.name) query.append('name', params.name);
         if (params.status) query.append('status', params.status);
         if (params.category_id) query.append('product_category_id', params.category_id.toString());
+        if (params.target_customer) query.append('target_customer', params.target_customer);
 
         const queryString = query.toString();
         const endpoint = `/products${queryString ? `?${queryString}` : ''}`;
@@ -505,6 +506,18 @@ export const storeService = {
         return apiRequest(`/stores/user/${userId}`, {
             token,
         })
+    },
+
+    async getStores(token: string, params: { page?: number, limit?: number, search?: string } = {}) {
+        let query = new URLSearchParams();
+        if (params.page) query.append('page', params.page.toString());
+        if (params.limit) query.append('limit', params.limit.toString());
+        if (params.search) query.append('search', params.search);
+
+        const queryString = query.toString();
+        const endpoint = `/stores${queryString ? `?${queryString}` : ''}`;
+
+        return apiRequest(endpoint, { token });
     }
 }
 
