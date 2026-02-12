@@ -12,7 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Plus, Edit, Trash2, Search, Package, Filter, X } from 'lucide-react';
+import { Loader2, Plus, Edit, Trash2, Search, Package, Filter, X, Copy } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
     Select,
@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
-import { apiRequest } from '@/services/apiService';
+import { apiRequest, productService } from '@/services/apiService';
 import { getAccessToken } from '@/utils/auth';
 import Image from 'next/image';
 
@@ -143,6 +143,36 @@ export default function ProductListPage({ title, description, rolePath }: Produc
             setIsLoading(false);
         }
     }, [isStoreLoading, store, fetchProducts, fetchCategories]);
+
+    const handleDuplicate = async (productId: number) => {
+        const confirmDuplicate = confirm('Apakah Anda yakin ingin menduplikasi produk ini?');
+        if (!confirmDuplicate) return;
+
+        try {
+            const token = await getAccessToken();
+            if (!token) return;
+            await productService.duplicateProduct(productId, token);
+            toast.success('Produk berhasil diduplikasi');
+            fetchProducts();
+        } catch (error) {
+            toast.error('Gagal menduplikasi produk');
+        }
+    };
+
+    const handleDelete = async (productId: number) => {
+        const confirmDelete = confirm('Apakah Anda yakin ingin menghapus produk ini?');
+        if (!confirmDelete) return;
+
+        try {
+            const token = await getAccessToken();
+            if (!token) return;
+            await productService.deleteProduct(productId, token);
+            toast.success('Produk berhasil dihapus');
+            fetchProducts();
+        } catch (error) {
+            toast.error('Gagal menghapus produk');
+        }
+    };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -309,6 +339,7 @@ export default function ProductListPage({ title, description, rolePath }: Produc
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 className="h-8 w-8 text-blue-600 hover:bg-blue-50"
+                                                                title="Edit"
                                                                 onClick={() => window.location.href = `/dashboard/${rolePath}/produk/${product.id}`}
                                                             >
                                                                 <Edit className="h-4 w-4" />
@@ -316,7 +347,18 @@ export default function ProductListPage({ title, description, rolePath }: Produc
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
+                                                                className="h-8 w-8 text-emerald-600 hover:bg-emerald-50"
+                                                                title="Duplikat"
+                                                                onClick={() => handleDuplicate(product.id)}
+                                                            >
+                                                                <Copy className="h-4 w-4" />
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
                                                                 className="h-8 w-8 text-red-600 hover:bg-red-50"
+                                                                title="Hapus"
+                                                                onClick={() => handleDelete(product.id)}
                                                             >
                                                                 <Trash2 className="h-4 w-4" />
                                                             </Button>

@@ -18,7 +18,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\" : \"pisogow580@example.com\",\n    \"password\" : \"password123\"\n}",
+              "raw": "{\n    \"email\" : \"janestore1@gmail.com\",\n    \"password\" : \"password123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1498,6 +1498,125 @@
               ],
               "cookie": [],
               "body": "{\n    \"meta\": {\n        \"message\": \"Subscription history fetched successfully\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": [\n        {\n            \"id\": 1,\n            \"user_id\": 2,\n            \"plan_id\": 1,\n            \"price_paid\": \"550000\",\n            \"duration_days\": 30,\n            \"renewed_at\": \"2026-02-02T10:30:01.670295Z\",\n            \"plan\": {\n                \"id\": 1,\n                \"name\": \"PRO Package v2\",\n                \"price\": \"550000\",\n                \"duration_days\": 30,\n                \"created_at\": \"2026-02-02T10:27:33.701306Z\",\n                \"updated_at\": \"2026-02-02T10:29:03.856725Z\",\n                \"deleted_at\": null\n            }\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Order Plan (Auth)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA5NTQzODEsInVzZXJfaWQiOjExfQ.AsaILR48ELJPaNOQ8UhaqCq21b45RRV_o_c-9cZeV5Y",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan_id\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/subscriptions/order",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "subscriptions",
+                "order"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Order Plan (Auth)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"plan_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/subscriptions/order",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "subscriptions",
+                    "order"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 12 Feb 2026 04:34:01 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "357"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Plan order created\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"plan\": {\n            \"id\": 1,\n            \"name\": \"Test Bussines Package\",\n            \"price\": \"100000\",\n            \"duration_days\": 30,\n            \"created_at\": \"2026-02-09T01:24:38.055922Z\",\n            \"updated_at\": \"2026-02-09T01:24:38.055922Z\",\n            \"deleted_at\": null\n        },\n        \"payment_url\": \"https://sandbox-payment.ipaymu.com/#/e789e40b-ce91-4a3c-8af1-067f053d655e\"\n    }\n}"
             }
           ]
         }
@@ -3424,14 +3543,14 @@
       "name": "User Affiliations",
       "item": [
         {
-          "name": "Create Affiliation",
+          "name": "Request Affiliation (Auth)",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzAxMTQ0MTEsInVzZXJfaWQiOjJ9.omeX10cIN-dmoAfbLF_iJuJwBDRl5T4QVwO4R-fuJg8",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA5NDcxMDgsInVzZXJfaWQiOjF9.PHFyI5s9OJy-Yt6ubLK2Q_UFHux2kgf1qowAeG5ppVc",
                   "type": "string"
                 }
               ]
@@ -3440,7 +3559,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"parent_id\": 2,\n    \"child_id\": 1,\n    \"type\": \"koperasi_vendor\"\n}",
+              "raw": "{\n  \"parent_id\": 11,\n  \"type\": \"koperasi_vendor\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -3448,25 +3567,26 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/users/affiliate",
+              "raw": "{{base_url}}/affiliations/request",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "users",
-                "affiliate"
+                "affiliations",
+                "request"
               ]
-            }
+            },
+            "description": "child_id berdasarkan token untuk mendapatkan user id untuk di masukan ke field child_id\n\ncukup masukan parent_id saja"
           },
           "response": [
             {
-              "name": "Create Affiliation",
+              "name": "Request Affiliation (Auth)",
               "originalRequest": {
                 "method": "POST",
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"parent_id\": 2,\n    \"child_id\": 1,\n    \"type\": \"koperasi_vendor\"\n}",
+                  "raw": "{\n  \"parent_id\": 11,\n  \"type\": \"koperasi_vendor\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -3474,13 +3594,13 @@
                   }
                 },
                 "url": {
-                  "raw": "{{base_url}}/users/affiliate",
+                  "raw": "{{base_url}}/affiliations/request",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
-                    "users",
-                    "affiliate"
+                    "affiliations",
+                    "request"
                   ]
                 }
               },
@@ -3489,101 +3609,379 @@
               "_postman_previewlanguage": null,
               "header": [
                 {
-                  "key": "Date",
-                  "value": "Mon, 02 Feb 2026 10:40:26 GMT"
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
                 },
                 {
                   "key": "Content-Type",
                   "value": "application/json; charset=utf-8"
                 },
                 {
-                  "key": "Transfer-Encoding",
-                  "value": "chunked"
-                },
-                {
-                  "key": "Connection",
-                  "value": "keep-alive"
-                },
-                {
-                  "key": "access-control-allow-headers",
-                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
-                },
-                {
-                  "key": "access-control-allow-methods",
-                  "value": "POST, GET, OPTIONS, PUT, DELETE"
-                },
-                {
-                  "key": "access-control-allow-origin",
-                  "value": "*"
-                },
-                {
-                  "key": "content-security-policy",
-                  "value": "default-src 'self'"
-                },
-                {
-                  "key": "referrer-policy",
+                  "key": "Referrer-Policy",
                   "value": "strict-origin-when-cross-origin"
                 },
                 {
-                  "key": "strict-transport-security",
+                  "key": "Strict-Transport-Security",
                   "value": "max-age=31536000; includeSubDomains"
                 },
                 {
-                  "key": "x-content-type-options",
+                  "key": "X-Content-Type-Options",
                   "value": "nosniff"
                 },
                 {
-                  "key": "x-frame-options",
+                  "key": "X-Frame-Options",
                   "value": "DENY"
                 },
                 {
-                  "key": "x-xss-protection",
+                  "key": "X-Xss-Protection",
                   "value": "1; mode=block"
                 },
                 {
-                  "key": "x-envoy-upstream-service-time",
-                  "value": "1518"
+                  "key": "Date",
+                  "value": "Thu, 12 Feb 2026 03:42:51 GMT"
                 },
                 {
-                  "key": "x-koyeb-backend",
-                  "value": "was"
-                },
-                {
-                  "key": "server",
-                  "value": "cloudflare"
-                },
-                {
-                  "key": "x-koyeb-brand",
-                  "value": "koyeb_default"
-                },
-                {
-                  "key": "x-koyeb-glb",
-                  "value": "sin"
-                },
-                {
-                  "key": "cf-cache-status",
-                  "value": "DYNAMIC"
-                },
-                {
-                  "key": "Content-Encoding",
-                  "value": "br"
-                },
-                {
-                  "key": "CF-RAY",
-                  "value": "9c7911f91fe49c92-SIN"
-                },
-                {
-                  "key": "alt-svc",
-                  "value": "h3=\":443\"; ma=86400"
+                  "key": "Content-Length",
+                  "value": "254"
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"meta\": {\n        \"message\": \"Affiliation added\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": null\n}"
+              "body": "{\n    \"meta\": {\n        \"message\": \"Affiliation requested\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"id\": 1,\n        \"parent_id\": 11,\n        \"child_id\": 1,\n        \"type\": \"koperasi_vendor\",\n        \"status\": \"pending\",\n        \"created_at\": \"2026-02-12T03:42:51.057607594Z\",\n        \"updated_at\": \"2026-02-12T03:42:51.057607594Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Incoming Affiliations (Auth/Parent)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA5NTQzODEsInVzZXJfaWQiOjExfQ.AsaILR48ELJPaNOQ8UhaqCq21b45RRV_o_c-9cZeV5Y",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/affiliations/parent",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "affiliations",
+                "parent"
+              ]
+            },
+            "description": "Get all affiliation requests where you are the parent. \n\n**Query Params:**\n\n- `types` (optional, multiple): Filter by type (e.g., `?types=reseller_koperasi&types=koperasi_vendor`)."
+          },
+          "response": [
+            {
+              "name": "Get Incoming Affiliations (Auth/Parent)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/affiliations/parent",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "affiliations",
+                    "parent"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 12 Feb 2026 03:46:30 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "487"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"List of affiliations\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": [\n        {\n            \"id\": 1,\n            \"parent_id\": 11,\n            \"child_id\": 1,\n            \"type\": \"koperasi_vendor\",\n            \"status\": \"pending\",\n            \"created_at\": \"2026-02-12T03:42:51.057607Z\",\n            \"updated_at\": \"2026-02-12T03:42:51.057607Z\",\n            \"child\": {\n                \"id\": 1,\n                \"name\": \"New User\",\n                \"email\": \"pisogow580@example.com\",\n                \"phone\": \"08123456789\",\n                \"role\": \"koperasi\",\n                \"plan_id\": null,\n                \"expired_at\": null,\n                \"status\": 1,\n                \"created_at\": \"2026-02-03T03:13:04.974998Z\",\n                \"updated_at\": \"2026-02-03T03:13:04.974998Z\"\n            }\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reject Affiliation (Auth/Parent)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA5NTQzODEsInVzZXJfaWQiOjExfQ.AsaILR48ELJPaNOQ8UhaqCq21b45RRV_o_c-9cZeV5Y",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/affiliations/1/reject",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "affiliations",
+                "1",
+                "reject"
+              ]
+            },
+            "description": "Reject a pending affiliation request. Only the `parent_id` in the request can reject.  \n  \nid on param is affiliations id"
+          },
+          "response": [
+            {
+              "name": "Reject Affiliation (Auth/Parent)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/affiliations/1/reject",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "affiliations",
+                    "1",
+                    "reject"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 12 Feb 2026 03:48:30 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "85"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Affiliation rejected\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Approve Affiliation (Auth/Parent)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA5NTQzODEsInVzZXJfaWQiOjExfQ.AsaILR48ELJPaNOQ8UhaqCq21b45RRV_o_c-9cZeV5Y",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/affiliations/2/approve",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "affiliations",
+                "2",
+                "approve"
+              ]
+            },
+            "description": "Approve a pending affiliation request. Only the `parent_id` in the request can approve.  \n  \nid on param is affiliations id"
+          },
+          "response": [
+            {
+              "name": "Approve Affiliation (Auth/Parent)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{base_url}}/affiliations/2/approve",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "affiliations",
+                    "2",
+                    "approve"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 12 Feb 2026 03:51:16 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "85"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Affiliation approved\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": null\n}"
             }
           ]
         }
       ],
-      "description": "Menejemen jaringan afiliasi\n\n**Affiliation Types** :\n\n- **koperasi_vendor** : Koperasi affiliated with a Vendor.\n    \n- **reseller_koperasi** : Reseller affiliated with a Koperasi\n    \n- **affiliator_koperasi** : Affiliator affiliated with a Koperasi\n    \n- **affiliator_vendor** : Affiliator affiliated with a Vendor\n    \n- **affiliator_reseller** : Affiliator affiliated with a Reseller.\n    \n\n**Response Codes** : \\`200\\`, \\`400\\`, \\`403\\`"
+      "description": "Menejemen jaringan afiliasi\n\n**Affiliation Types** :\n\n- **koperasi_vendor** : Koperasi affiliated with a Vendor.\n    \n- **reseller_koperasi** : Reseller affiliated with a Koperasi\n    \n- **affiliator_koperasi** : Affiliator affiliated with a Koperasi\n    \n- **affiliator_vendor** : Affiliator affiliated with a Vendor\n    \n- **affiliator_reseller** : Affiliator affiliated with a Reseller.\n    \n\n**Response Codes** : \\`200\\`, \\`400\\`, \\`403\\`  \n  \n**NOTE :**  \nSelain affiliasi affiliator , semua request affiliasi membutuhkan approval"
     },
     {
       "name": "Ipaymu SSO",
@@ -3953,7 +4351,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA2ODUzNzQsInVzZXJfaWQiOjF9.kayy_kq8WcR8oUIs56Lp0VwXb6rz9sC6mvd4gn2rta4",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA5NDcxMDgsInVzZXJfaWQiOjF9.PHFyI5s9OJy-Yt6ubLK2Q_UFHux2kgf1qowAeG5ppVc",
                   "type": "string"
                 }
               ]
@@ -3962,7 +4360,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"user_id\" : 3,\n    \"name\": \"Toko Sejahtera\",\n    \"description\": \"Menyediakan segala kebutuhan pokok\",\n    \"phone\": \"081234567890\",\n    \"alamat\": \"Jl. Sudirman No. 10, Jakarta\"\n}",
+              "raw": "{\n    \"user_id\" : 3,\n    \"name\": \"Toko Sejahtera\",\n    \"description\": \"Menyediakan segala kebutuhan pokok\",\n    \"phone\": \"081234567890\",\n    \"alamat\": \"Jl. Sudirman No. 10, Jakarta\",\n    \"courier\": [\"jne\", \"sicepat\"]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -6489,7 +6887,8 @@
                   "value": "10"
                 }
               ]
-            }
+            },
+            "description": "`GET /products` **Query Params:**\n\n- `page` (default 1)\n    \n- `limit` (default 10)\n    \n- `store_id` (optional): Filter by store ID.\n    \n- `target_customer` (optional): Filter by target audience (`customer`, `reseller`, `koperasi`)."
           },
           "response": [
             {
@@ -6652,7 +7051,8 @@
                   "value": "1"
                 }
               ]
-            }
+            },
+            "description": "`GET /products` **Query Params:**\n\n- `page` (default 1)\n    \n- `limit` (default 10)\n    \n- `store_id` (optional): Filter by store ID.\n    \n- `target_customer` (optional): Filter by target audience (`customer`, `reseller`, `koperasi`)."
           },
           "response": [
             {
@@ -6943,7 +7343,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzAxMTQ0MTEsInVzZXJfaWQiOjJ9.omeX10cIN-dmoAfbLF_iJuJwBDRl5T4QVwO4R-fuJg8",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA5NDcxMDgsInVzZXJfaWQiOjF9.PHFyI5s9OJy-Yt6ubLK2Q_UFHux2kgf1qowAeG5ppVc",
                   "type": "string"
                 }
               ]
@@ -6952,7 +7352,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"price\": \"14500000\",\n    \"name\": \"iPhone 13 Pro Max\",\n    \"images\": [\n        {\n            \"image_url\": \"http://new-image.jpg\",\n            \"is_primary\": true,\n            \"display_order\": 1\n        }\n    ]\n}",
+              "raw": "{\n    \"price\": \"14500000\",\n    \"name\": \"iPhone 13 Pro Max\",\n    \"images\": [\n        {\n            \"image_url\": \"http://new-image2.jpg\",\n            \"is_primary\": true,\n            \"display_order\": 1\n        }\n    ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -10235,7 +10635,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA3MjUxMzQsInVzZXJfaWQiOjF9.4FXQ9Fd5iDGWRpnKZvqHP3BEZcyRf1Aw-eP_eKk77rQ",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA5NDcxMDgsInVzZXJfaWQiOjF9.PHFyI5s9OJy-Yt6ubLK2Q_UFHux2kgf1qowAeG5ppVc",
                   "type": "string"
                 }
               ]
@@ -10259,7 +10659,8 @@
               "path": [
                 "orders"
               ]
-            }
+            },
+            "description": "**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category`: `instant` (default) atau `piutang`\n    \n- `debt_type`: `tenor` atau po (wajib jika `piutang`)\n    \n- `tenor_months`: Jumlah bulan (wajib jika `tenor`)\n    \n\nNOTE\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login."
           },
           "response": [
             {
@@ -10428,7 +10829,8 @@
                   "value": "1"
                 }
               ]
-            }
+            },
+            "description": "**Query Parameters:**\n\n- `user_id`: Filter by Store Owner ID.\n    \n- `buyer_id`: Filter by Registered Buyer ID.\n    \n- `store_id`: Filter by Store ID.\n    \n- `status`: Filter by order status.\n    \n- `payment_status`: Filter by payment status.\n    \n- `search`: Search by order number.\n    \n- `page`: Page number (default: 1).\n    \n- `limit`: Items per page (default: 10)."
           },
           "response": [
             {
@@ -11188,7 +11590,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA3MjUxMzQsInVzZXJfaWQiOjF9.4FXQ9Fd5iDGWRpnKZvqHP3BEZcyRf1Aw-eP_eKk77rQ",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA5NDcxMDgsInVzZXJfaWQiOjF9.PHFyI5s9OJy-Yt6ubLK2Q_UFHux2kgf1qowAeG5ppVc",
                   "type": "string"
                 }
               ]
@@ -11197,7 +11599,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"tenor\",\n    \"tenor_months\": 3\n}",
+              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"tenor\",\n    \"tenor_months\": 3,\n    \"buyer_id\" : 11\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -11212,7 +11614,8 @@
               "path": [
                 "orders"
               ]
-            }
+            },
+            "description": "**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category`: `instant` (default) atau `piutang`\n    \n- `debt_type`: `tenor` atau po (wajib jika `piutang`)\n    \n- `tenor_months`: Jumlah bulan (wajib jika `tenor`)\n    \n\nNOTE\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login."
           },
           "response": [
             {
@@ -11329,7 +11732,8 @@
               "path": [
                 "orders"
               ]
-            }
+            },
+            "description": "**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category`: `instant` (default) atau `piutang`\n    \n- `debt_type`: `tenor` atau po (wajib jika `piutang`)\n    \n- `tenor_months`: Jumlah bulan (wajib jika `tenor`)\n    \n\nNOTE\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login."
           },
           "response": [
             {
@@ -11910,6 +12314,118 @@
               ],
               "cookie": [],
               "body": "{\n    \"meta\": {\n        \"message\": \"Payment URL generated\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"payment_url\": \"https://sandbox-payment.ipaymu.com/#/3348b5db-47ab-46ce-832e-3af9e38f7e6d\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Debts",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA5NDcxMDgsInVzZXJfaWQiOjF9.PHFyI5s9OJy-Yt6ubLK2Q_UFHux2kgf1qowAeG5ppVc",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/debts?buyer_id=11",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "debts"
+              ],
+              "query": [
+                {
+                  "key": "buyer_id",
+                  "value": "11"
+                }
+              ]
+            },
+            "description": "**Query Parameters:**\n\n- `user_id`: Filter by Store Owner ID.\n    \n- `buyer_id`: Filter by Registered Buyer ID (via Order).\n    \n- `store_id`: Filter by Store ID (via Order).\n    \n- `status`: Filter by debt status (`unpaid`, `partially_paid`, paid).\n    \n- `page`: Page number (default: 1).\n    \n- `limit`: Items per page (default: 10)."
+          },
+          "response": [
+            {
+              "name": "Get All Debts",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/debts?buyer_id=11",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "debts"
+                  ],
+                  "query": [
+                    {
+                      "key": "buyer_id",
+                      "value": "11"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 12 Feb 2026 02:45:06 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "398"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Debts fetched successfully\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"debts\": [\n            {\n                \"id\": 5,\n                \"order_id\": 17,\n                \"user_id\": 1,\n                \"buyer_id\": 11,\n                \"type\": \"tenor\",\n                \"amount\": 210000,\n                \"status\": \"unpaid\",\n                \"tenor_months\": 3,\n                \"due_date\": null,\n                \"created_at\": \"2026-02-12T02:44:43.82821Z\",\n                \"updated_at\": \"2026-02-12T02:44:43.82821Z\",\n                \"deleted_at\": null\n            }\n        ],\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"limit\": 10,\n            \"total\": 1\n        }\n    }\n}"
             }
           ]
         }

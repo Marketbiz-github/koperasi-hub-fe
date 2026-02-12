@@ -281,6 +281,126 @@ export const productService = {
             method: 'DELETE',
             token,
         });
+    },
+
+    async duplicateProduct(id: string | number, token: string) {
+        return apiRequest(`/products/${id}/duplicate`, {
+            method: 'POST',
+            token,
+        });
+    }
+}
+
+export const productOptionService = {
+    async getList(token: string, params: { product_id?: string | number, store_id?: string | number }) {
+        let query = new URLSearchParams();
+        if (params.product_id) query.append('product_id', params.product_id.toString());
+        if (params.store_id) query.append('store_id', params.store_id.toString());
+        return apiRequest(`/product-options?${query.toString()}`, { token });
+    },
+    async create(token: string, data: { store_id: number; product_id: number; name: string }) {
+        return apiRequest('/product-options', {
+            method: 'POST',
+            body: data,
+            token,
+        });
+    },
+    async update(token: string, id: string | number, data: { name: string }) {
+        return apiRequest(`/product-options/${id}`, {
+            method: 'PUT',
+            body: data,
+            token,
+        });
+    },
+    async delete(token: string, id: string | number) {
+        return apiRequest(`/product-options/${id}`, {
+            method: 'DELETE',
+            token,
+        });
+    }
+}
+
+export const productOptionValueService = {
+    async getList(token: string, params: { option_id?: string | number, store_id?: string | number, product_id?: string | number }) {
+        let query = new URLSearchParams();
+        if (params.option_id) query.append('option_id', params.option_id.toString());
+        if (params.store_id) query.append('store_id', params.store_id.toString());
+        if (params.product_id) query.append('product_id', params.product_id.toString());
+        return apiRequest(`/product-option-values?${query.toString()}`, { token });
+    },
+    async create(token: string, data: { store_id: number; product_option_id: number; value: string; image?: string }) {
+        return apiRequest('/product-option-values', {
+            method: 'POST',
+            body: data,
+            token,
+        });
+    },
+    async update(token: string, id: string | number, data: { value: string; image?: string }) {
+        return apiRequest(`/product-option-values/${id}`, {
+            method: 'PUT',
+            body: data,
+            token,
+        });
+    },
+    async delete(token: string, id: string | number) {
+        return apiRequest(`/product-option-values/${id}`, {
+            method: 'DELETE',
+            token,
+        });
+    }
+}
+
+export const productVariantService = {
+    async getList(token: string, productId: string | number) {
+        return apiRequest(`/products/${productId}/variants`, { token });
+    },
+    async create(token: string, data: {
+        store_id: number;
+        product_id: number;
+        sku: string;
+        price: string | number;
+        discount_price?: string | number;
+        weight: number;
+        image?: string;
+        is_active?: boolean;
+        option_value_ids: number[]
+    }) {
+        return apiRequest('/product-variants', {
+            method: 'POST',
+            body: data,
+            token,
+        });
+    },
+    async update(token: string, id: string | number, data: any) {
+        return apiRequest(`/product-variants/${id}`, {
+            method: 'PUT',
+            body: data,
+            token,
+        });
+    },
+    async delete(token: string, id: string | number) {
+        return apiRequest(`/product-variants/${id}`, {
+            method: 'DELETE',
+            token,
+        });
+    }
+}
+
+export const inventoryService = {
+    async updateStock(token: string, data: {
+        product_id: number;
+        product_variant_id?: number;
+        gudang_id: number;
+        stock: number;
+    }) {
+        return apiRequest('/inventory/stock', {
+            method: 'POST',
+            body: data,
+            token,
+        });
+    },
+    async getStockByProduct(token: string, productId: string | number) {
+        return apiRequest(`/inventory/product/${productId}`, { token });
     }
 }
 
