@@ -1534,7 +1534,8 @@
                 "subscriptions",
                 "order"
               ]
-            }
+            },
+            "description": "Setelah user membayar otomatis ipaymu mengirim callback ke webhook, setelah itu plan dan expired at user akan berubah sesuai dengan yang di order  \n  \nOrder plan user id di sesuaikan dengan token yang di gunakan saat hit endpoint"
           },
           "response": [
             {
@@ -10782,6 +10783,242 @@
           ]
         },
         {
+          "name": "Create Order Tenor Payment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA5NDcxMDgsInVzZXJfaWQiOjF9.PHFyI5s9OJy-Yt6ubLK2Q_UFHux2kgf1qowAeG5ppVc",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"tenor\",\n    \"tenor_months\": 3,\n    \"buyer_id\" : 11\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category`: `instant` (default) atau `piutang`\n    \n- `debt_type`: `tenor` atau po (wajib jika `piutang`)\n    \n- `tenor_months`: Jumlah bulan (wajib jika `tenor`)\n    \n\nNOTE\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login."
+          },
+          "response": [
+            {
+              "name": "Create Order Tenor Payment",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"tenor\",\n    \"tenor_months\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/orders",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 09 Feb 2026 12:09:12 GMT"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Order created successfully\",\n        \"code\": 201,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"order\": {\n            \"id\": 10,\n            \"order_number\": \"ORD-20260209-19668\",\n            \"user_id\": 1,\n            \"store_id\": 1,\n            \"gudang_id\": 1,\n            \"status\": \"waiting_approval\",\n            \"payment_category\": \"piutang\",\n            \"debt_status\": \"pending_approval\",\n            \"subtotal\": 200000,\n            \"shipping_cost\": 10000,\n            \"discount_amount\": 0,\n            \"total_amount\": 210000,\n            \"customer_name\": \"Budi\",\n            \"customer_email\": \"budi@example.com\",\n            \"customer_phone\": \"08123456789\",\n            \"customer_address\": \"Jl. Merdeka No. 1\",\n            \"customer_province\": \"DKI Jakarta\",\n            \"customer_city\": \"Jakarta Selatan\",\n            \"customer_district\": \"Tebet\",\n            \"customer_subdistrict\": \"Tebet Barat\",\n            \"customer_zipcode\": \"12810\",\n            \"warehouse_name\": \"Gudang Pusat\",\n            \"warehouse_address\": \"Jl. Raya Denpasar\",\n            \"warehouse_province\": \"Bali\",\n            \"warehouse_city\": \"Denpasar\",\n            \"warehouse_district\": \"Denpasar Selatan\",\n            \"warehouse_subdistrict\": \"Sesetan\",\n            \"warehouse_zipcode\": \"80223\",\n            \"courier_name\": \"JNE\",\n            \"courier_service\": \"Reguler\",\n            \"courier_code\": \"jne\",\n            \"tracking_number\": null,\n            \"payment_method\": \"ipaymu\",\n            \"payment_status\": \"unpaid\",\n            \"paid_at\": null,\n            \"payment_expired_at\": null,\n            \"ipaymu_session_id\": null,\n            \"ipaymu_transaction_id\": null,\n            \"ipaymu_payment_url\": null,\n            \"ipaymu_payment_name\": null,\n            \"ipaymu_payment_method\": null,\n            \"ipaymu_amount\": null,\n            \"ipaymu_fee\": null,\n            \"ipaymu_expired_at\": null,\n            \"ipaymu_paid_at\": null,\n            \"ipaymu_callback_url\": null,\n            \"ipaymu_response\": null,\n            \"stock_reserved\": true,\n            \"stock_reserved_at\": \"2026-02-09T12:09:12.383419668Z\",\n            \"stock_reserved_until\": null,\n            \"customer_notes\": \"Packing kayu\",\n            \"admin_notes\": null,\n            \"items\": [\n                {\n                    \"id\": 19,\n                    \"order_id\": 10,\n                    \"product_id\": 1,\n                    \"product_variant_id\": 2,\n                    \"gudang_id\": 1,\n                    \"product_name\": \"iPhone 13 Pro\",\n                    \"product_sku\": \"blue-256\",\n                    \"variant_name\": \"Ocean Blue, 256 Gb\",\n                    \"price\": 50000,\n                    \"quantity\": 2,\n                    \"subtotal\": 100000,\n                    \"discount_amount\": 0,\n                    \"total\": 100000,\n                    \"weight\": \"200\",\n                    \"stock_reserved\": 2,\n                    \"stock_deducted\": false,\n                    \"created_at\": \"2026-02-09T12:09:12.492335835Z\",\n                    \"updated_at\": \"2026-02-09T12:09:12.492335835Z\"\n                },\n                {\n                    \"id\": 20,\n                    \"order_id\": 10,\n                    \"product_id\": 1,\n                    \"product_variant_id\": 3,\n                    \"gudang_id\": 1,\n                    \"product_name\": \"iPhone 13 Pro\",\n                    \"product_sku\": \"grey-512\",\n                    \"variant_name\": \"Grey Metalic, 512 Gb\",\n                    \"price\": 50000,\n                    \"quantity\": 2,\n                    \"subtotal\": 100000,\n                    \"discount_amount\": 0,\n                    \"total\": 100000,\n                    \"weight\": \"200\",\n                    \"stock_reserved\": 2,\n                    \"stock_deducted\": false,\n                    \"created_at\": \"2026-02-09T12:09:12.492335835Z\",\n                    \"updated_at\": \"2026-02-09T12:09:12.492335835Z\"\n                }\n            ],\n            \"created_at\": \"2026-02-09T12:09:12.489916168Z\",\n            \"updated_at\": \"2026-02-09T12:09:12.489916168Z\",\n            \"deleted_at\": null\n        },\n        \"payment_url\": null\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Order PO payment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA3MjUxMzQsInVzZXJfaWQiOjF9.4FXQ9Fd5iDGWRpnKZvqHP3BEZcyRf1Aw-eP_eKk77rQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"po\" \n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category`: `instant` (default) atau `piutang`\n    \n- `debt_type`: `tenor` atau po (wajib jika `piutang`)\n    \n- `tenor_months`: Jumlah bulan (wajib jika `tenor`)\n    \n\nNOTE\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login."
+          },
+          "response": [
+            {
+              "name": "Create Order PO payment",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"po\" \n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/orders",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 09 Feb 2026 12:10:22 GMT"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Order created successfully\",\n        \"code\": 201,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"order\": {\n            \"id\": 11,\n            \"order_number\": \"ORD-20260209-99422\",\n            \"user_id\": 1,\n            \"store_id\": 1,\n            \"gudang_id\": 1,\n            \"status\": \"waiting_approval\",\n            \"payment_category\": \"piutang\",\n            \"debt_status\": \"pending_approval\",\n            \"subtotal\": 200000,\n            \"shipping_cost\": 10000,\n            \"discount_amount\": 0,\n            \"total_amount\": 210000,\n            \"customer_name\": \"Budi\",\n            \"customer_email\": \"budi@example.com\",\n            \"customer_phone\": \"08123456789\",\n            \"customer_address\": \"Jl. Merdeka No. 1\",\n            \"customer_province\": \"DKI Jakarta\",\n            \"customer_city\": \"Jakarta Selatan\",\n            \"customer_district\": \"Tebet\",\n            \"customer_subdistrict\": \"Tebet Barat\",\n            \"customer_zipcode\": \"12810\",\n            \"warehouse_name\": \"Gudang Pusat\",\n            \"warehouse_address\": \"Jl. Raya Denpasar\",\n            \"warehouse_province\": \"Bali\",\n            \"warehouse_city\": \"Denpasar\",\n            \"warehouse_district\": \"Denpasar Selatan\",\n            \"warehouse_subdistrict\": \"Sesetan\",\n            \"warehouse_zipcode\": \"80223\",\n            \"courier_name\": \"JNE\",\n            \"courier_service\": \"Reguler\",\n            \"courier_code\": \"jne\",\n            \"tracking_number\": null,\n            \"payment_method\": \"ipaymu\",\n            \"payment_status\": \"unpaid\",\n            \"paid_at\": null,\n            \"payment_expired_at\": null,\n            \"ipaymu_session_id\": null,\n            \"ipaymu_transaction_id\": null,\n            \"ipaymu_payment_url\": null,\n            \"ipaymu_payment_name\": null,\n            \"ipaymu_payment_method\": null,\n            \"ipaymu_amount\": null,\n            \"ipaymu_fee\": null,\n            \"ipaymu_expired_at\": null,\n            \"ipaymu_paid_at\": null,\n            \"ipaymu_callback_url\": null,\n            \"ipaymu_response\": null,\n            \"stock_reserved\": true,\n            \"stock_reserved_at\": \"2026-02-09T12:10:21.300799422Z\",\n            \"stock_reserved_until\": null,\n            \"customer_notes\": \"Packing kayu\",\n            \"admin_notes\": null,\n            \"items\": [\n                {\n                    \"id\": 21,\n                    \"order_id\": 11,\n                    \"product_id\": 1,\n                    \"product_variant_id\": 2,\n                    \"gudang_id\": 1,\n                    \"product_name\": \"iPhone 13 Pro\",\n                    \"product_sku\": \"blue-256\",\n                    \"variant_name\": \"Ocean Blue, 256 Gb\",\n                    \"price\": 50000,\n                    \"quantity\": 2,\n                    \"subtotal\": 100000,\n                    \"discount_amount\": 0,\n                    \"total\": 100000,\n                    \"weight\": \"200\",\n                    \"stock_reserved\": 2,\n                    \"stock_deducted\": false,\n                    \"created_at\": \"2026-02-09T12:10:22.165088798Z\",\n                    \"updated_at\": \"2026-02-09T12:10:22.165088798Z\"\n                },\n                {\n                    \"id\": 22,\n                    \"order_id\": 11,\n                    \"product_id\": 1,\n                    \"product_variant_id\": 3,\n                    \"gudang_id\": 1,\n                    \"product_name\": \"iPhone 13 Pro\",\n                    \"product_sku\": \"grey-512\",\n                    \"variant_name\": \"Grey Metalic, 512 Gb\",\n                    \"price\": 50000,\n                    \"quantity\": 2,\n                    \"subtotal\": 100000,\n                    \"discount_amount\": 0,\n                    \"total\": 100000,\n                    \"weight\": \"200\",\n                    \"stock_reserved\": 2,\n                    \"stock_deducted\": false,\n                    \"created_at\": \"2026-02-09T12:10:22.165088798Z\",\n                    \"updated_at\": \"2026-02-09T12:10:22.165088798Z\"\n                }\n            ],\n            \"created_at\": \"2026-02-09T12:10:22.163296173Z\",\n            \"updated_at\": \"2026-02-09T12:10:22.163296173Z\",\n            \"deleted_at\": null\n        },\n        \"payment_url\": null\n    }\n}"
+            }
+          ]
+        },
+        {
           "name": "List Order",
           "protocolProfileBehavior": {
             "disableBodyPruning": true
@@ -11581,245 +11818,9 @@
               "body": "{\n    \"meta\": {\n        \"message\": \"Order cancelled\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": null\n}"
             }
           ]
-        },
-        {
-          "name": "Create Order Tenor Payment",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA5NDcxMDgsInVzZXJfaWQiOjF9.PHFyI5s9OJy-Yt6ubLK2Q_UFHux2kgf1qowAeG5ppVc",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"tenor\",\n    \"tenor_months\": 3,\n    \"buyer_id\" : 11\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/orders",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "orders"
-              ]
-            },
-            "description": "**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category`: `instant` (default) atau `piutang`\n    \n- `debt_type`: `tenor` atau po (wajib jika `piutang`)\n    \n- `tenor_months`: Jumlah bulan (wajib jika `tenor`)\n    \n\nNOTE\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login."
-          },
-          "response": [
-            {
-              "name": "Create Order Tenor Payment",
-              "originalRequest": {
-                "method": "POST",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"tenor\",\n    \"tenor_months\": 3\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{base_url}}/orders",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "orders"
-                  ]
-                }
-              },
-              "status": "Created",
-              "code": 201,
-              "_postman_previewlanguage": null,
-              "header": [
-                {
-                  "key": "Access-Control-Allow-Headers",
-                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
-                },
-                {
-                  "key": "Access-Control-Allow-Methods",
-                  "value": "POST, GET, OPTIONS, PUT, DELETE"
-                },
-                {
-                  "key": "Access-Control-Allow-Origin",
-                  "value": "*"
-                },
-                {
-                  "key": "Content-Security-Policy",
-                  "value": "default-src 'self'"
-                },
-                {
-                  "key": "Content-Type",
-                  "value": "application/json; charset=utf-8"
-                },
-                {
-                  "key": "Referrer-Policy",
-                  "value": "strict-origin-when-cross-origin"
-                },
-                {
-                  "key": "Strict-Transport-Security",
-                  "value": "max-age=31536000; includeSubDomains"
-                },
-                {
-                  "key": "X-Content-Type-Options",
-                  "value": "nosniff"
-                },
-                {
-                  "key": "X-Frame-Options",
-                  "value": "DENY"
-                },
-                {
-                  "key": "X-Xss-Protection",
-                  "value": "1; mode=block"
-                },
-                {
-                  "key": "Date",
-                  "value": "Mon, 09 Feb 2026 12:09:12 GMT"
-                },
-                {
-                  "key": "Transfer-Encoding",
-                  "value": "chunked"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n    \"meta\": {\n        \"message\": \"Order created successfully\",\n        \"code\": 201,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"order\": {\n            \"id\": 10,\n            \"order_number\": \"ORD-20260209-19668\",\n            \"user_id\": 1,\n            \"store_id\": 1,\n            \"gudang_id\": 1,\n            \"status\": \"waiting_approval\",\n            \"payment_category\": \"piutang\",\n            \"debt_status\": \"pending_approval\",\n            \"subtotal\": 200000,\n            \"shipping_cost\": 10000,\n            \"discount_amount\": 0,\n            \"total_amount\": 210000,\n            \"customer_name\": \"Budi\",\n            \"customer_email\": \"budi@example.com\",\n            \"customer_phone\": \"08123456789\",\n            \"customer_address\": \"Jl. Merdeka No. 1\",\n            \"customer_province\": \"DKI Jakarta\",\n            \"customer_city\": \"Jakarta Selatan\",\n            \"customer_district\": \"Tebet\",\n            \"customer_subdistrict\": \"Tebet Barat\",\n            \"customer_zipcode\": \"12810\",\n            \"warehouse_name\": \"Gudang Pusat\",\n            \"warehouse_address\": \"Jl. Raya Denpasar\",\n            \"warehouse_province\": \"Bali\",\n            \"warehouse_city\": \"Denpasar\",\n            \"warehouse_district\": \"Denpasar Selatan\",\n            \"warehouse_subdistrict\": \"Sesetan\",\n            \"warehouse_zipcode\": \"80223\",\n            \"courier_name\": \"JNE\",\n            \"courier_service\": \"Reguler\",\n            \"courier_code\": \"jne\",\n            \"tracking_number\": null,\n            \"payment_method\": \"ipaymu\",\n            \"payment_status\": \"unpaid\",\n            \"paid_at\": null,\n            \"payment_expired_at\": null,\n            \"ipaymu_session_id\": null,\n            \"ipaymu_transaction_id\": null,\n            \"ipaymu_payment_url\": null,\n            \"ipaymu_payment_name\": null,\n            \"ipaymu_payment_method\": null,\n            \"ipaymu_amount\": null,\n            \"ipaymu_fee\": null,\n            \"ipaymu_expired_at\": null,\n            \"ipaymu_paid_at\": null,\n            \"ipaymu_callback_url\": null,\n            \"ipaymu_response\": null,\n            \"stock_reserved\": true,\n            \"stock_reserved_at\": \"2026-02-09T12:09:12.383419668Z\",\n            \"stock_reserved_until\": null,\n            \"customer_notes\": \"Packing kayu\",\n            \"admin_notes\": null,\n            \"items\": [\n                {\n                    \"id\": 19,\n                    \"order_id\": 10,\n                    \"product_id\": 1,\n                    \"product_variant_id\": 2,\n                    \"gudang_id\": 1,\n                    \"product_name\": \"iPhone 13 Pro\",\n                    \"product_sku\": \"blue-256\",\n                    \"variant_name\": \"Ocean Blue, 256 Gb\",\n                    \"price\": 50000,\n                    \"quantity\": 2,\n                    \"subtotal\": 100000,\n                    \"discount_amount\": 0,\n                    \"total\": 100000,\n                    \"weight\": \"200\",\n                    \"stock_reserved\": 2,\n                    \"stock_deducted\": false,\n                    \"created_at\": \"2026-02-09T12:09:12.492335835Z\",\n                    \"updated_at\": \"2026-02-09T12:09:12.492335835Z\"\n                },\n                {\n                    \"id\": 20,\n                    \"order_id\": 10,\n                    \"product_id\": 1,\n                    \"product_variant_id\": 3,\n                    \"gudang_id\": 1,\n                    \"product_name\": \"iPhone 13 Pro\",\n                    \"product_sku\": \"grey-512\",\n                    \"variant_name\": \"Grey Metalic, 512 Gb\",\n                    \"price\": 50000,\n                    \"quantity\": 2,\n                    \"subtotal\": 100000,\n                    \"discount_amount\": 0,\n                    \"total\": 100000,\n                    \"weight\": \"200\",\n                    \"stock_reserved\": 2,\n                    \"stock_deducted\": false,\n                    \"created_at\": \"2026-02-09T12:09:12.492335835Z\",\n                    \"updated_at\": \"2026-02-09T12:09:12.492335835Z\"\n                }\n            ],\n            \"created_at\": \"2026-02-09T12:09:12.489916168Z\",\n            \"updated_at\": \"2026-02-09T12:09:12.489916168Z\",\n            \"deleted_at\": null\n        },\n        \"payment_url\": null\n    }\n}"
-            }
-          ]
-        },
-        {
-          "name": "Create Order PO payment",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA3MjUxMzQsInVzZXJfaWQiOjF9.4FXQ9Fd5iDGWRpnKZvqHP3BEZcyRf1Aw-eP_eKk77rQ",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"po\" \n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/orders",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "orders"
-              ]
-            },
-            "description": "**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category`: `instant` (default) atau `piutang`\n    \n- `debt_type`: `tenor` atau po (wajib jika `piutang`)\n    \n- `tenor_months`: Jumlah bulan (wajib jika `tenor`)\n    \n\nNOTE\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login."
-          },
-          "response": [
-            {
-              "name": "Create Order PO payment",
-              "originalRequest": {
-                "method": "POST",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"po\" \n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{base_url}}/orders",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "orders"
-                  ]
-                }
-              },
-              "status": "Created",
-              "code": 201,
-              "_postman_previewlanguage": null,
-              "header": [
-                {
-                  "key": "Access-Control-Allow-Headers",
-                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
-                },
-                {
-                  "key": "Access-Control-Allow-Methods",
-                  "value": "POST, GET, OPTIONS, PUT, DELETE"
-                },
-                {
-                  "key": "Access-Control-Allow-Origin",
-                  "value": "*"
-                },
-                {
-                  "key": "Content-Security-Policy",
-                  "value": "default-src 'self'"
-                },
-                {
-                  "key": "Content-Type",
-                  "value": "application/json; charset=utf-8"
-                },
-                {
-                  "key": "Referrer-Policy",
-                  "value": "strict-origin-when-cross-origin"
-                },
-                {
-                  "key": "Strict-Transport-Security",
-                  "value": "max-age=31536000; includeSubDomains"
-                },
-                {
-                  "key": "X-Content-Type-Options",
-                  "value": "nosniff"
-                },
-                {
-                  "key": "X-Frame-Options",
-                  "value": "DENY"
-                },
-                {
-                  "key": "X-Xss-Protection",
-                  "value": "1; mode=block"
-                },
-                {
-                  "key": "Date",
-                  "value": "Mon, 09 Feb 2026 12:10:22 GMT"
-                },
-                {
-                  "key": "Transfer-Encoding",
-                  "value": "chunked"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n    \"meta\": {\n        \"message\": \"Order created successfully\",\n        \"code\": 201,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"order\": {\n            \"id\": 11,\n            \"order_number\": \"ORD-20260209-99422\",\n            \"user_id\": 1,\n            \"store_id\": 1,\n            \"gudang_id\": 1,\n            \"status\": \"waiting_approval\",\n            \"payment_category\": \"piutang\",\n            \"debt_status\": \"pending_approval\",\n            \"subtotal\": 200000,\n            \"shipping_cost\": 10000,\n            \"discount_amount\": 0,\n            \"total_amount\": 210000,\n            \"customer_name\": \"Budi\",\n            \"customer_email\": \"budi@example.com\",\n            \"customer_phone\": \"08123456789\",\n            \"customer_address\": \"Jl. Merdeka No. 1\",\n            \"customer_province\": \"DKI Jakarta\",\n            \"customer_city\": \"Jakarta Selatan\",\n            \"customer_district\": \"Tebet\",\n            \"customer_subdistrict\": \"Tebet Barat\",\n            \"customer_zipcode\": \"12810\",\n            \"warehouse_name\": \"Gudang Pusat\",\n            \"warehouse_address\": \"Jl. Raya Denpasar\",\n            \"warehouse_province\": \"Bali\",\n            \"warehouse_city\": \"Denpasar\",\n            \"warehouse_district\": \"Denpasar Selatan\",\n            \"warehouse_subdistrict\": \"Sesetan\",\n            \"warehouse_zipcode\": \"80223\",\n            \"courier_name\": \"JNE\",\n            \"courier_service\": \"Reguler\",\n            \"courier_code\": \"jne\",\n            \"tracking_number\": null,\n            \"payment_method\": \"ipaymu\",\n            \"payment_status\": \"unpaid\",\n            \"paid_at\": null,\n            \"payment_expired_at\": null,\n            \"ipaymu_session_id\": null,\n            \"ipaymu_transaction_id\": null,\n            \"ipaymu_payment_url\": null,\n            \"ipaymu_payment_name\": null,\n            \"ipaymu_payment_method\": null,\n            \"ipaymu_amount\": null,\n            \"ipaymu_fee\": null,\n            \"ipaymu_expired_at\": null,\n            \"ipaymu_paid_at\": null,\n            \"ipaymu_callback_url\": null,\n            \"ipaymu_response\": null,\n            \"stock_reserved\": true,\n            \"stock_reserved_at\": \"2026-02-09T12:10:21.300799422Z\",\n            \"stock_reserved_until\": null,\n            \"customer_notes\": \"Packing kayu\",\n            \"admin_notes\": null,\n            \"items\": [\n                {\n                    \"id\": 21,\n                    \"order_id\": 11,\n                    \"product_id\": 1,\n                    \"product_variant_id\": 2,\n                    \"gudang_id\": 1,\n                    \"product_name\": \"iPhone 13 Pro\",\n                    \"product_sku\": \"blue-256\",\n                    \"variant_name\": \"Ocean Blue, 256 Gb\",\n                    \"price\": 50000,\n                    \"quantity\": 2,\n                    \"subtotal\": 100000,\n                    \"discount_amount\": 0,\n                    \"total\": 100000,\n                    \"weight\": \"200\",\n                    \"stock_reserved\": 2,\n                    \"stock_deducted\": false,\n                    \"created_at\": \"2026-02-09T12:10:22.165088798Z\",\n                    \"updated_at\": \"2026-02-09T12:10:22.165088798Z\"\n                },\n                {\n                    \"id\": 22,\n                    \"order_id\": 11,\n                    \"product_id\": 1,\n                    \"product_variant_id\": 3,\n                    \"gudang_id\": 1,\n                    \"product_name\": \"iPhone 13 Pro\",\n                    \"product_sku\": \"grey-512\",\n                    \"variant_name\": \"Grey Metalic, 512 Gb\",\n                    \"price\": 50000,\n                    \"quantity\": 2,\n                    \"subtotal\": 100000,\n                    \"discount_amount\": 0,\n                    \"total\": 100000,\n                    \"weight\": \"200\",\n                    \"stock_reserved\": 2,\n                    \"stock_deducted\": false,\n                    \"created_at\": \"2026-02-09T12:10:22.165088798Z\",\n                    \"updated_at\": \"2026-02-09T12:10:22.165088798Z\"\n                }\n            ],\n            \"created_at\": \"2026-02-09T12:10:22.163296173Z\",\n            \"updated_at\": \"2026-02-09T12:10:22.163296173Z\",\n            \"deleted_at\": null\n        },\n        \"payment_url\": null\n    }\n}"
-            }
-          ]
         }
       ],
-      "description": "Menejemen order\n\n**Order Status**\n\n| **Status** | **Deskripsi** |\n| --- | --- |\n| pending | Pesanan baru dibuat, menunggu pembayaran. Stok sudah di-reserve |\n| paid | Pembayaran berhasil dikonfirmasi (via iPaymu) |\n| processing | Pesanan sedang disiapkan/dipacking di gudang |\n| shipped | Barang telah diserahkan ke kurir dan nomor resi telah di-update |\n| delivered | Barang telah sampai di tujuan |\n| completed | Transaksi selesai (barang diterima dan dikonfirmasi pembeli) |\n| cancelled | Pesanan dibatalkan (oleh admin/pembeli). Reservasi stok dilepaskan |\n| refunded | Dana dikembalikan ke pembeli |\n| failed | Terjadi kesalahan pada proses pembayaran atau sistem |\n| expired | Waktu pembayaran habis. Reservasi stok dilepaskan otomatis |"
+      "description": "Menejemen order\n\n**Order Status**\n\n| **Status** | **Deskripsi** |\n| --- | --- |\n| pending | Pesanan baru dibuat, menunggu pembayaran. Stok sudah di-reserve |\n| paid | Pembayaran berhasil dikonfirmasi (via iPaymu) |\n| processing | Pesanan sedang disiapkan/dipacking di gudang |\n| shipped | Barang telah diserahkan ke kurir dan nomor resi telah di-update |\n| delivered | Barang telah sampai di tujuan |\n| completed | Transaksi selesai (barang diterima dan dikonfirmasi pembeli) |\n| cancelled | Pesanan dibatalkan (oleh admin/pembeli). Reservasi stok dilepaskan |\n| refunded | Dana dikembalikan ke pembeli |\n| failed | Terjadi kesalahan pada proses pembayaran atau sistem |\n| expired | Waktu pembayaran habis. Reservasi stok dilepaskan otomatis |\n\n**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category` (string, required): \"instant\" or \"piutang\"\n    \n- `debt_type` (string, optional): \"tenor\" or \"po\" (if category is piutang)\n    \n- `tenor_months` (int, optional): number of months for tenor\n    \n- `buyer_id` (int, optional): Manuel override for Buyer ID (defaults to authenticated user)\n    \n- `shared_product_id` (int, optional): ID dari `shared_product` (didapat dari param sh di URL) untuk pelacakan komisi.\n    \n\n**NOTE!!**\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login."
     },
     {
       "name": "Piutang",

@@ -451,3 +451,60 @@ export const gudangService = {
     }
 }
 
+export const affiliationService = {
+    async create(token: string, data: { parent_id: number; type: string }) {
+        return apiRequest('/affiliations/request', {
+            method: 'POST',
+            body: data,
+            token,
+        })
+    },
+
+    async getIncoming(token: string, params: { types?: string[] } = {}) {
+        let query = new URLSearchParams();
+        if (params.types && params.types.length > 0) {
+            params.types.forEach(type => query.append('types', type));
+        }
+
+        const queryString = query.toString();
+        const endpoint = `/affiliations/parent${queryString ? `?${queryString}` : ''}`;
+
+        return apiRequest(endpoint, {
+            token,
+        })
+    },
+
+    async approve(token: string, id: number | string) {
+        return apiRequest(`/affiliations/${id}/approve`, {
+            method: 'POST',
+            token,
+        })
+    },
+
+    async reject(token: string, id: number | string) {
+        return apiRequest(`/affiliations/${id}/reject`, {
+            method: 'POST',
+            token,
+        })
+    },
+
+    // Helper to find parents (users) by role
+    async getParents(token: string, params: { role: string; search?: string }) {
+        let query = new URLSearchParams();
+        query.append('role', params.role);
+        if (params.search) query.append('search', params.search);
+
+        return apiRequest(`/users?${query.toString()}`, {
+            token,
+        })
+    }
+}
+
+export const storeService = {
+    async getStoreByUserId(token: string, userId: string | number) {
+        return apiRequest(`/stores/user/${userId}`, {
+            token,
+        })
+    }
+}
+

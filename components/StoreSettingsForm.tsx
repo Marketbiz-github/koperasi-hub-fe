@@ -259,7 +259,7 @@ export default function StoreSettingsForm() {
 
             const data = await res.json();
             if (data.success) {
-                setFormData(prev => ({ ...prev, [type]: data.path }));
+                setFormData(prev => ({ ...prev, [type]: data.url }));
             } else {
                 setMessage({ type: 'error', text: data.error || 'Gagal mengunggah gambar' });
             }

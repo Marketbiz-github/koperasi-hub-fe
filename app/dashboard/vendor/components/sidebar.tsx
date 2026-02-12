@@ -8,7 +8,8 @@ import {
   IconCashRegister,
   IconSettings,
   IconUsers,
-  IconInnerShadowTop
+  IconInnerShadowTop,
+  IconUsersGroup
 } from "@tabler/icons-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -60,6 +61,17 @@ const vendorNav = [
       {
         title: "Pengajuan",
         url: "/dashboard/vendor/koperasi/pengajuan",
+      },
+    ],
+  },
+  {
+    title: "Afiliasi",
+    url: "#",
+    icon: IconUsersGroup,
+    items: [
+      {
+        title: "Permintaan Masuk",
+        url: "/dashboard/vendor/afiliasi/masuk",
       },
     ],
   },

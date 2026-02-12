@@ -134,7 +134,7 @@ export default function GeneralCategoryPage() {
 
             const data = await res.json();
             if (data.success) {
-                setFormData(prev => ({ ...prev, image: data.path }));
+                setFormData(prev => ({ ...prev, image: data.url }));
                 toast.success('Gambar berhasil diunggah');
             } else {
                 toast.error(data.error || 'Gagal mengunggah gambar');

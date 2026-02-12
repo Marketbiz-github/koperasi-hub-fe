@@ -11,6 +11,7 @@ import {
   IconDeviceLaptop,
   IconCashRegister,
   IconBuildingStore,
+  IconUsersGroup,
 } from "@tabler/icons-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -84,6 +85,21 @@ const data = {
         {
           title: "Pengiriman",
           url: "/dashboard/koperasi/marketplace/pengiriman",
+        },
+      ],
+    },
+    {
+      title: "Afiliasi",
+      url: "#",
+      icon: IconUsersGroup,
+      items: [
+        {
+          title: "Request Vendor",
+          url: "/dashboard/koperasi/afiliasi/request",
+        },
+        {
+          title: "Permintaan Masuk",
+          url: "/dashboard/koperasi/afiliasi/masuk",
         },
       ],
     },
