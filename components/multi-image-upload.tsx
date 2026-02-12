@@ -3,6 +3,8 @@
 import { useState } from "react"
 import Image from "next/image"
 import { X } from "lucide-react"
+import { validateImage } from "@/utils/image-validation"
+import { toast } from "sonner"
 
 export function MultiImageUpload() {
   const [images, setImages] = useState<File[]>([])
@@ -10,7 +12,22 @@ export function MultiImageUpload() {
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (!e.target.files) return
-    setImages((prev) => [...prev, ...Array.from(e.target.files || [])])
+    const newFiles = Array.from(e.target.files);
+
+    // Validate
+    const validFiles: File[] = [];
+    newFiles.forEach(file => {
+      const validation = validateImage(file);
+      if (validation.valid) {
+        validFiles.push(file);
+      } else {
+        toast.error(`${file.name}: ${validation.error}`);
+      }
+    });
+
+    if (validFiles.length > 0) {
+      setImages((prev) => [...prev, ...validFiles])
+    }
   }
 
   function handleDrag(e: React.DragEvent<HTMLDivElement>) {
@@ -28,8 +45,22 @@ export function MultiImageUpload() {
     e.stopPropagation()
     setDragActive(false)
 
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setImages((prev) => [...prev, ...Array.from(e.dataTransfer.files)])
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const newFiles = Array.from(e.dataTransfer.files);
+      const validFiles: File[] = [];
+
+      newFiles.forEach(file => {
+        const validation = validateImage(file);
+        if (validation.valid) {
+          validFiles.push(file);
+        } else {
+          toast.error(`${file.name}: ${validation.error}`);
+        }
+      });
+
+      if (validFiles.length > 0) {
+        setImages((prev) => [...prev, ...validFiles])
+      }
     }
   }
 
@@ -44,11 +75,10 @@ export function MultiImageUpload() {
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
-        className={`relative rounded-lg border-2 border-dashed transition-colors ${
-          dragActive
+        className={`relative rounded-lg border-2 border-dashed transition-colors ${dragActive
             ? "border-blue-500 bg-blue-50"
             : "border-gray-300 bg-gray-50 hover:border-gray-400"
-        }`}
+          }`}
       >
         <div className="flex flex-col items-center justify-center gap-2 p-6 text-center">
           <svg
@@ -82,7 +112,7 @@ export function MultiImageUpload() {
             className="hidden"
           />
           <p className="text-xs text-gray-500 mt-1">
-            PNG, JPG, GIF hingga 10MB
+            PNG, JPG, GIF hingga 1MB
           </p>
         </div>
       </div>

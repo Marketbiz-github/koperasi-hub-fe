@@ -31,6 +31,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { validateImage } from '@/utils/image-validation';
 
 interface GeneralCategory {
     id: number;
@@ -113,6 +114,12 @@ export default function GeneralCategoryPage() {
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+
+        const validation = validateImage(file);
+        if (!validation.valid) {
+            toast.error(validation.error);
+            return;
+        }
 
         setIsUploading(true);
         const formDataUpload = new FormData();

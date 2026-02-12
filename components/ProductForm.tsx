@@ -969,6 +969,8 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                                                                 <th className="px-4 py-3 font-semibold text-emerald-700">Varian</th>
                                                                 <th className="px-4 py-3 font-semibold text-emerald-700">SKU</th>
                                                                 <th className="px-4 py-3 font-semibold text-emerald-700">Harga</th>
+                                                                <th className="px-4 py-3 font-semibold text-emerald-700">H. Diskon</th>
+                                                                <th className="px-4 py-3 font-semibold text-emerald-700">Gudang</th>
                                                                 <th className="px-4 py-3 font-semibold text-emerald-700">Stok</th>
                                                                 <th className="px-4 py-3 font-semibold text-emerald-700 w-24 text-center">Aksi</th>
                                                             </tr>
@@ -995,6 +997,11 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                                                                         <td className="px-4 py-3 font-medium">{gv.optionValues.join(' / ')}</td>
                                                                         <td className="px-4 py-3 font-mono text-xs">{gv.sku}</td>
                                                                         <td className="px-4 py-3">Rp {Number(gv.price).toLocaleString()}</td>
+                                                                        <td className="px-4 py-3">Rp {Number(gv.discount_price).toLocaleString()}</td>
+                                                                        <td className="px-4 py-3">
+                                                                            {warehouses.find(w => w.id.toString() === gv.gudang_id)?.nama_gudang ||
+                                                                                warehouses.find(w => w.id.toString() === gv.gudang_id)?.name || '-'}
+                                                                        </td>
                                                                         <td className="px-4 py-3">{gv.stock}</td>
                                                                         <td className="px-4 py-3 text-center">
                                                                             <Button

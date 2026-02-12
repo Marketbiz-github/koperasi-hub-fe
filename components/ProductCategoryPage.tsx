@@ -34,6 +34,7 @@ import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import { apiRequest } from '@/services/apiService';
 import { getAccessToken } from '@/utils/auth';
+import { validateImage } from '@/utils/image-validation';
 
 interface ProductCategory {
     id: number;
@@ -160,6 +161,12 @@ export default function ProductCategoryPageShared({ title, description }: Produc
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+
+        const validation = validateImage(file);
+        if (!validation.valid) {
+            toast.error(validation.error);
+            return;
+        }
 
         setIsUploading(true);
         const formDataUpload = new FormData();
