@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { uploadToCloudinary } from '@/lib/cloudinary';
+import { validateImage } from '@/utils/image-validation';
 
 export async function POST(req: NextRequest) {
     try {
@@ -9,38 +9,38 @@ export async function POST(req: NextRequest) {
         const role = formData.get('role') as string;
         const userId = formData.get('userId') as string;
         const storeId = formData.get('storeId') as string;
-        const type = formData.get('type') as string;
+        const subject = formData.get('type') as string; // User calls it 'subject' in requirements, mapping from 'type'
 
         if (!file) {
             return NextResponse.json({ error: 'Missing file' }, { status: 400 });
         }
 
-        let relativeDir = '';
-        if (role && userId && storeId && type) {
-            relativeDir = path.join('images', role, String(userId), String(storeId), type);
-        } else if (role === 'categories') {
-            relativeDir = path.join('images', 'categories');
-        } else {
-            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        // Validate image format and size
+        const validation = validateImage(file);
+        if (!validation.valid) {
+            return NextResponse.json({ error: validation.error }, { status: 400 });
         }
 
-        const uploadDir = path.join(process.cwd(), 'public', relativeDir);
-        await mkdir(uploadDir, { recursive: true });
+        if (!role || !userId || !storeId || !subject) {
+            // If some fields are missing, and it's not a generic category upload
+            if (role === 'categories') {
+                // handle special case if needed
+            } else {
+                return NextResponse.json({ error: 'Missing required fields for folder structure' }, { status: 400 });
+            }
+        }
+
+        // Folder structure: images/role/userid/storeid/subject
+        const folder = `images/${role}/${userId}/${storeId}/${subject}`.replace(/\/+$/, '');
 
         const buffer = Buffer.from(await file.arrayBuffer());
-        const filename = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
 
-        const filePath = path.join(uploadDir, filename);
-        await writeFile(filePath, buffer);
-
-        // Generate full URL
-        const appUrl = process.env.APP_URL?.replace(/\/$/, '') || '';
-        const fileUrl = `${appUrl}/${relativeDir.replace(/\\/g, '/')}/${filename}`;
+        const result = await uploadToCloudinary(buffer, folder, file.name);
 
         return NextResponse.json({
             success: true,
-            url: fileUrl,
-            path: `/${relativeDir.replace(/\\/g, '/')}/${filename}`
+            url: result.secure_url,
+            public_id: result.public_id
         });
     } catch (error: any) {
         console.error('Upload error:', error);

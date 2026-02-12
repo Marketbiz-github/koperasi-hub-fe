@@ -54,6 +54,7 @@ import {
 import { getAccessToken } from '@/utils/auth';
 import { useAuthStore } from '@/store/authStore';
 import Image from 'next/image';
+import { validateImage } from '@/utils/image-validation';
 
 interface ProductFormProps {
     rolePath: string;
@@ -300,7 +301,18 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
         const files = e.target.files;
         if (!files) return;
 
-        const newImages = Array.from(files).map((file, index) => ({
+        const filesArray = Array.from(files);
+
+        // Validate each file
+        for (const file of filesArray) {
+            const validation = validateImage(file);
+            if (!validation.valid) {
+                toast.error(`${file.name}: ${validation.error}`);
+                return;
+            }
+        }
+
+        const newImages = filesArray.map((file, index) => ({
             image_url: URL.createObjectURL(file),
             is_primary: images.length === 0 && index === 0,
             display_order: images.length + index + 1,
@@ -483,6 +495,13 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
     const handleVariantImageChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+
+        const validation = validateImage(file);
+        if (!validation.valid) {
+            toast.error(validation.error);
+            return;
+        }
+
         updateGeneratedVariant(index, 'file', file);
     };
 

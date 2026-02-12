@@ -8,6 +8,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { Loader2, Save, MapPin, Truck, Store, Upload, AlertTriangle, Palette, Phone, Search, Image as ImageIcon } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import Image from 'next/image';
+import { validateImage } from '@/utils/image-validation';
 
 interface Location {
     id: string | number;
@@ -235,6 +236,12 @@ export default function StoreSettingsForm() {
         const file = e.target.files?.[0];
         if (!file || !user || !store) return;
 
+        const validation = validateImage(file);
+        if (!validation.valid) {
+            setMessage({ type: 'error', text: `${file.name}: ${validation.error}` });
+            return;
+        }
+
         setUploadLoading(prev => ({ ...prev, [type]: true }));
 
         try {
@@ -395,7 +402,7 @@ export default function StoreSettingsForm() {
                                         className="absolute inset-0 opacity-0 cursor-pointer z-20 disabled:cursor-not-allowed"
                                     />
                                 </div>
-                                <p className="text-xs text-slate-500 mt-2">Format: PNG, JPG (Maks. 2MB)</p>
+                                <p className="text-xs text-slate-500 mt-2">Format: PNG, JPG, WEBP, GIF (Maks. 1MB)</p>
                             </div>
                         </div>
 
