@@ -17,9 +17,9 @@ function RegisterKoperasiContent() {
     const searchParams = useSearchParams();
     const { executeRecaptcha } = useGoogleReCaptcha();
 
-    // Affiliation logic from URL
-    const parentId = searchParams.get('parent_id');
-    const affiliationType = searchParams.get('type');
+    // Affiliation logic removed
+    // const parentId = searchParams.get('parent_id');
+    // const affiliationType = searchParams.get('type');
 
     const [formData, setFormData] = useState({
         subdomain: '',
@@ -170,7 +170,7 @@ function RegisterKoperasiContent() {
         setIsLoading(true);
 
         try {
-            const response = await fetch('/api/register/vendor', {
+            const response = await fetch('/api/register/koperasi', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -187,9 +187,6 @@ function RegisterKoperasiContent() {
                     ipaymu_password: formData.password, // Use account password
                     captchaToken: token,
                     role: 'koperasi',
-                    // Affiliation info
-                    parent_id: parentId,
-                    affiliation_type: affiliationType
                 }),
             });
 
