@@ -2,83 +2,85 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Star, MapPin, Phone, Mail, Globe, Facebook, Instagram, Twitter, Share2, ShoppingBag } from 'lucide-react';
+import { Star, MapPin, Phone, Mail, Globe, Facebook, Instagram, Twitter, Share2, ShoppingBag, Loader2, Store as StoreIcon, Package } from 'lucide-react';
 import CarouselBanner from '@/components/carousel-banner';
 import Header from '../../marketplace/components/Header';
 import Footer from '../../marketplace/components/Footer';
 import ProductCard from '../../marketplace/components/ProductCard';
 import Link from 'next/link';
+import { storeService, productService } from '@/services/apiService';
+import { getPublicAccessToken } from '@/utils/auth';
 
 export default function StorePage({
-    params,
-    }: {
-    params: Promise<{ storeId: string }>
-    }) {
-    const { storeId } = React.use(params);
+  params,
+}: {
+  params: Promise<{ storeId: string }>
+}) {
+  const { storeId } = React.use(params);
+  const [store, setStore] = React.useState<any>(null);
+  const [products, setProducts] = React.useState<any[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
 
-  // Mock Store Data
-  const store = {
-    id: storeId,
-    name: 'Toko Beras Premium',
-    image: '/images/products/beras.png',
-    banner: '/images/banners/suka2.webp',
-    description: 'Toko terpercaya menjual beras berkualitas tinggi dari berbagai daerah di Indonesia. Semua produk dijamin asli dan segar.',
-    rating: 4.8,
-    reviews: 2453,
-    followers: 5230,
-    productSold: 12450,
-    address: 'Jl. Merdeka No. 123, Jakarta Pusat, DKI Jakarta',
-    phone: '+62 812-3456-7890',
-    email: 'info@tokoberasprremium.com',
-    website: 'www.tokoberasprremium.com',
-    social: {
-      facebook: 'https://facebook.com',
-      instagram: 'https://instagram.com',
-      twitter: 'https://twitter.com',
-    },
-    verified: true,
-  };
+  const fetchData = React.useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const token = await getPublicAccessToken();
 
-  // Mock Featured Products
-  const featuredProducts = Array(3).fill(null).map((_, index) => ({
-    id: `featured-${index + 1}`,
-    name: 'Beras Premium Jakarta',
-    category: 'Beras Pilihan',
-    price: 'Rp 150.000',
-    badge: 'Best',
-    image: '/images/products/beras.png',
-    rating: 4.8,
-    reviews: 234,
-    sold: 1250,
-    owner: store,
-  }));
+      // Fetch Store Detail
+      // Assuming there's a getStoreDetail or similar. If not, use getStores with search/filter
+      // For now, let's look if apiService has getStoreDetail. It doesn't seem to have id-based detail.
+      // storeService has getStoreByUserId.
+      // Let's assume storeId here is actually the store id or we search by it.
+      const res = await storeService.getStores(token || '', { search: storeId, limit: 1 });
+      const storeData = res.data?.data?.[0] || res.data?.[0]; // Handle different response formats
 
-  // Mock Flash Sale Products
-  const flashSaleProducts = Array(4).fill(null).map((_, index) => ({
-    id: `flash-${index + 1}`,
-    name: 'Beras Flash Sale',
-    category: 'Beras',
-    price: 'Rp 85.000',
-    badge: '-40%',
-    image: '/images/products/beras.png',
-    rating: 4.7,
-    reviews: 145,
-    sold: 890,
-    owner: store,
-  }));
+      if (storeData) {
+        setStore(storeData);
 
-  // All Products
-  const allProducts = Array(12).fill(null).map((_, index) => ({
-    id: `product-${index + 1}`,
-    name: 'Beras Berkualitas',
-    category: 'Beras',
-    price: 'Rp 120.000',
-    image: '/images/products/beras.png',
-    rating: 4.8,
-    reviews: 567,
-    sold: 2340,
-    owner: store,
-  }));
+        // Fetch Products for this store
+        const prodRes = await productService.getProducts({
+          store_id: storeData.id,
+          limit: 12,
+          target_customer: 'customer'
+        }, token || '');
+        setProducts(prodRes.data?.data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching store data:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [storeId]);
+
+  React.useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!store) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Header />
+        <div className="flex-1 flex flex-col items-center justify-center gap-4">
+          <StoreIcon className="w-16 h-16 text-gray-300" />
+          <h1 className="text-2xl font-bold text-gray-500">Toko tidak ditemukan</h1>
+          <Link href="/marketplace" className="text-emerald-600 font-semibold">Kembali ke Marketplace</Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-b from-gray-50 to-white flex flex-col">
@@ -88,15 +90,15 @@ export default function StorePage({
       {/* Main Content */}
       <main className="flex-1">
         <div className="max-w-7xl mx-auto w-full px-4 py-12">
-            {/* Banner Carousel */}
-            <div className="w-full mb-12">
-                <CarouselBanner
-                images={[store.banner, store.banner, store.banner]}
-                autoPlay={true}
-                interval={5000}
-                height="h-56 md:h-80"
-                />
-            </div>
+          {/* Banner Carousel */}
+          <div className="w-full mb-12">
+            <CarouselBanner
+              images={[store.banner, store.banner, store.banner]}
+              autoPlay={true}
+              interval={5000}
+              height="h-56 md:h-80"
+            />
+          </div>
 
           {/* Premium Profile Card */}
           <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 mb-12 border border-gray-100">
@@ -124,7 +126,7 @@ export default function StorePage({
               <div className="md:col-span-2">
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{store.name}</h1>
                 <p className="text-gray-600 leading-relaxed mb-6">{store.description}</p>
-                
+
                 <div className="flex flex-wrap gap-3">
                   <button className="border-2 border-gray-300 text-gray-600 hover:border-gray-400 px-8 py-3 rounded-lg font-semibold transition-all flex items-center gap-2">
                     <Share2 size={18} />
@@ -139,13 +141,13 @@ export default function StorePage({
                   <div className="bg-linear-to-br from-blue-50 to-blue-100 p-5 rounded-xl border border-blue-200">
                     <div className="flex items-center gap-2 mb-2">
                       <Star size={20} className="fill-yellow-400 text-yellow-400" />
-                      <span className="text-2xl font-bold text-gray-900">{store.rating}</span>
+                      <span className="text-2xl font-bold text-gray-900">{store.rating || 0}</span>
                     </div>
-                    <p className="text-sm text-gray-600 font-medium">{store.reviews.toLocaleString('id-ID')} Ulasan</p>
+                    <p className="text-sm text-gray-600 font-medium">{(store.reviews || 0).toLocaleString('id-ID')} Ulasan</p>
                   </div>
 
                   <div className="bg-linear-to-br from-green-50 to-green-100 p-5 rounded-xl border border-green-200">
-                    <p className="text-2xl font-bold text-green-600 mb-1">{(store.followers / 1000).toFixed(1)}K</p>
+                    <p className="text-2xl font-bold text-green-600 mb-1">{((store.followers || 0) / 1000).toFixed(1)}K</p>
                     <p className="text-sm text-gray-600 font-medium">Pengikut</p>
                   </div>
 
@@ -153,7 +155,7 @@ export default function StorePage({
                     <div className="flex items-center gap-2">
                       <ShoppingBag size={18} className="text-orange-600" />
                       <div>
-                        <p className="text-2xl font-bold text-orange-600">{(store.productSold / 1000).toFixed(1)}K</p>
+                        <p className="text-2xl font-bold text-orange-600">{((store.productSold || 0) / 1000).toFixed(1)}K</p>
                         <p className="text-sm text-gray-600 font-medium">Terjual</p>
                       </div>
                     </div>
@@ -168,54 +170,27 @@ export default function StorePage({
             </div>
           </div>
 
-          
 
-          {/* Featured Products */}
-          <div className="mb-12">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">✨ Produk Unggulan</h2>
-                <p className="text-gray-600">Koleksi pilihan terbaik dari toko kami</p>
-              </div>
-              <Link href="#" className="text-[#10b981] hover:text-[#0a8659] font-semibold flex items-center gap-2 text-lg">
-                Lihat Semua
-                <span>→</span>
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </div>
-
-          {/* Flash Sale */}
-          <div className="mb-12">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="bg-linear-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-lg">
-                ⚡ FLASH SALE
-              </div>
-              <h2 className="text-3xl font-bold text-gray-900">Penawaran Terbatas</h2>
-              <span className="ml-auto text-sm text-gray-500">Stok terbatas!</span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {flashSaleProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </div>
 
           {/* All Products */}
           <div>
             <div className="mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">📦 Semua Produk</h2>
-              <p className="text-gray-600">Jelajahi koleksi lengkap produk kami</p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">📦 Produk {store.name}</h2>
+              <p className="text-gray-600">Jelajahi koleksi lengkap produk dari toko ini</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              {allProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            {products.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-xl shadow-sm p-12 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 mb-12">
+                <Package className="w-16 h-16 text-gray-200" />
+                <h3 className="text-xl font-bold text-gray-500">Belum ada produk</h3>
+                <p className="text-gray-400">Toko ini belum memiliki produk aktif saat ini.</p>
+              </div>
+            )}
 
             {/* Pagination */}
             <div className="flex items-center justify-center gap-2">
@@ -260,13 +235,13 @@ export default function StorePage({
                       </div>
                     </div>
                   )}
-                  {store.phone && (
+                  {store.phone_number && (
                     <div className="flex gap-4 p-4 bg-gray-50 rounded-lg hover:bg-linear-to-r hover:from-green-50 hover:to-transparent transition">
                       <Phone size={20} className="text-[#10b981] shrink-0" />
                       <div>
                         <p className="text-sm text-gray-500 font-medium mb-1">Telepon</p>
-                        <a href={`tel:${store.phone}`} className="text-gray-700 hover:text-[#10b981] transition">
-                          {store.phone}
+                        <a href={`tel:${store.phone_number}`} className="text-gray-700 hover:text-[#10b981] transition">
+                          {store.phone_number}
                         </a>
                       </div>
                     </div>
@@ -278,17 +253,6 @@ export default function StorePage({
                         <p className="text-sm text-gray-500 font-medium mb-1">Email</p>
                         <a href={`mailto:${store.email}`} className="text-gray-700 hover:text-[#10b981] transition">
                           {store.email}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                  {store.website && (
-                    <div className="flex gap-4 p-4 bg-gray-50 rounded-lg hover:bg-linear-to-r hover:from-purple-50 hover:to-transparent transition">
-                      <Globe size={20} className="text-[#10b981] shrink-0" />
-                      <div>
-                        <p className="text-sm text-gray-500 font-medium mb-1">Website</p>
-                        <a href={`https://${store.website}`} target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-[#10b981] transition">
-                          {store.website}
                         </a>
                       </div>
                     </div>
@@ -305,46 +269,11 @@ export default function StorePage({
                   <h3 className="text-xl font-bold text-gray-900">Ikuti Kami</h3>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
-                  {store.social.facebook && (
-                    <a
-                      href={store.social.facebook}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group flex flex-col items-center gap-3 p-6 bg-linear-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-xl hover:shadow-lg transition-all hover:scale-105"
-                    >
-                      <div className="w-12 h-12 rounded-lg bg-blue-600 flex items-center justify-center group-hover:bg-blue-700 transition shadow-md">
-                        <Facebook size={24} className="text-white" />
-                      </div>
-                      <span className="text-sm font-semibold text-gray-800">Facebook</span>
-                    </a>
-                  )}
-                  {store.social.instagram && (
-                    <a
-                      href={store.social.instagram}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group flex flex-col items-center gap-3 p-6 bg-linear-to-br from-pink-50 to-pink-100 border-2 border-pink-200 rounded-xl hover:shadow-lg transition-all hover:scale-105"
-                    >
-                      <div className="w-12 h-12 rounded-lg bg-pink-600 flex items-center justify-center group-hover:bg-pink-700 transition shadow-md">
-                        <Instagram size={24} className="text-white" />
-                      </div>
-                      <span className="text-sm font-semibold text-gray-800">Instagram</span>
-                    </a>
-                  )}
-                  {store.social.twitter && (
-                    <a
-                      href={store.social.twitter}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group flex flex-col items-center gap-3 p-6 bg-linear-to-br from-sky-50 to-sky-100 border-2 border-sky-200 rounded-xl hover:shadow-lg transition-all hover:scale-105"
-                    >
-                      <div className="w-12 h-12 rounded-lg bg-sky-500 flex items-center justify-center group-hover:bg-sky-600 transition shadow-md">
-                        <Twitter size={24} className="text-white" />
-                      </div>
-                      <span className="text-sm font-semibold text-gray-800">Twitter</span>
-                    </a>
-                  )}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Since real store might not have social in current schema, we can fallback or hide */}
+                  <div className="col-span-full py-8 text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                    <p className="text-sm text-gray-400 italic">Informasi sosial media belum tersedia</p>
+                  </div>
                 </div>
               </div>
             </div>

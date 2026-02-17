@@ -80,7 +80,7 @@ export default function KoperasiHubPage() {
                 </span>
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+              <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
                 Bisnis Anda Berkembang
                 <span className="block text-yellow-400">bersama Koperasi Indonesia</span>
               </h1>
@@ -96,7 +96,7 @@ export default function KoperasiHubPage() {
                     <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center shrink-0">
                       <i className="fas fa-check text-white text-xs"></i>
                     </div>
-                    <span className="text-base md:text-lg text-green-50">{feature}</span>
+                    <span className="text-green-50">{feature}</span>
                   </div>
                 ))}
               </div>
@@ -142,10 +142,10 @@ export default function KoperasiHubPage() {
       <section id="tentang" className="py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
               Mengapa Memilih <span className="text-green-600">KoperasiHub</span>?
             </h2>
-            <p className="text-lg md:text-xl text-gray-600">
+            <p className="text-gray-600">
               Platform terpercaya untuk ekosistem bisnis Indonesia
             </p>
           </div>
@@ -190,10 +190,10 @@ export default function KoperasiHubPage() {
       <section id="cara-kerja" className="py-16 md:py-20 bg-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
               Cara Kerja Platform
             </h2>
-            <p className="text-lg md:text-xl text-gray-600">Pilih alur sesuai peran Anda</p>
+            <p className="text-gray-600">Pilih alur sesuai peran Anda</p>
           </div>
 
           {/* Tab Navigation */}
@@ -203,8 +203,8 @@ export default function KoperasiHubPage() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-6 py-3 font-semibold rounded-xl transition ${activeTab === tab
-                    ? 'gradient-green text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                  ? 'gradient-green text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
                   }`}
               >
                 {tab === 'vendor' ? 'Vendor' : 'Koperasi'}
@@ -310,10 +310,10 @@ export default function KoperasiHubPage() {
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full -ml-32 -mb-32 animate-float" style={{ animationDelay: '1s' }}></div>
 
             <div className="relative z-10">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6">
                 Butuh Informasi Layanan?
               </h2>
-              <p className="text-lg md:text-xl text-green-100 mb-8 md:mb-10 max-w-2xl mx-auto">
+              <p className="text-green-100 mb-8 md:mb-10 max-w-2xl mx-auto">
                 Hubungi tim kami untuk konsultasi & penawaran terbaik
               </p>
               <a
@@ -334,8 +334,8 @@ export default function KoperasiHubPage() {
       <section className="py-16 md:py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">FAQ</h2>
-            <p className="text-lg md:text-xl text-gray-600">Pertanyaan yang sering diajukan</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">FAQ</h2>
+            <p className="text-gray-600">Pertanyaan yang sering diajukan</p>
           </div>
 
           <div className="space-y-4">
