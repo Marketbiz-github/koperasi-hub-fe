@@ -6,13 +6,35 @@ import { useAuthStore } from '@/store/authStore';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import Image from 'next/image'
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import { useEffect } from 'react';
 
 import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isLoading, error, clearError } = useAuthStore();
+  const { login, isLoading, error, clearError, user, isHydrated } = useAuthStore();
   const { executeRecaptcha } = useGoogleReCaptcha();
+
+  useEffect(() => {
+    if (isHydrated && user) {
+      const role = user.role;
+      let dashboardPath = '/dashboard';
+
+      if (role === 'super_admin') {
+        dashboardPath = '/dashboard/super_admin';
+      } else if (role === 'vendor') {
+        dashboardPath = '/dashboard/vendor';
+      } else if (role === 'koperasi') {
+        dashboardPath = '/dashboard/koperasi';
+      } else if (role === 'reseller') {
+        dashboardPath = '/dashboard/reseller';
+      } else {
+        dashboardPath = '/dashboard/affiliator';
+      }
+
+      router.push(dashboardPath);
+    }
+  }, [user, isHydrated, router]);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

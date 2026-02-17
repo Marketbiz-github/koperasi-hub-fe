@@ -28,7 +28,15 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // 2. Handle /dashboard landing page redirect
+  // 2. Redirect authenticated users away from /login or /register
+  if (accessToken && (pathname === '/login' || pathname.startsWith('/register'))) {
+    if (userRole && roleRouteMap[userRole]) {
+      return NextResponse.redirect(new URL(roleRouteMap[userRole], request.url));
+    }
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  // 3. Handle /dashboard landing page redirect
   if (pathname === '/dashboard') {
     if (accessToken && userRole && roleRouteMap[userRole]) {
       return NextResponse.redirect(new URL(roleRouteMap[userRole], request.url));
@@ -51,5 +59,9 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login/:path*'],
+  matcher: [
+    '/dashboard/:path*',
+    '/login',
+    '/register/:path*',
+  ],
 };
