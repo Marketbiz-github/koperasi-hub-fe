@@ -2,6 +2,7 @@
 
 import { IconChevronRight, type Icon } from "@tabler/icons-react"
 import { usePathname, useRouter } from "next/navigation"
+import Link from "next/link"
 import * as React from "react"
 
 import {
@@ -33,7 +34,6 @@ export function NavMain({
     }[]
   }[]
 }) {
-  const router = useRouter()
   const pathname = usePathname()
 
   const isActive = (url: string) => {
@@ -76,11 +76,10 @@ export function NavMain({
                             <SidebarMenuSubButton
                               asChild
                               isActive={isActive(subItem.url)}
-                              onClick={() => router.push(subItem.url)}
                             >
-                              <a href={subItem.url}>
+                              <Link href={subItem.url}>
                                 <span>{subItem.title}</span>
-                              </a>
+                              </Link>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         ))}
@@ -93,13 +92,12 @@ export function NavMain({
                   <SidebarMenuButton
                     tooltip={item.title}
                     isActive={isActive(item.url)}
-                    onClick={() => router.push(item.url)}
                     asChild
                   >
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )}

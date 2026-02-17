@@ -11,6 +11,7 @@ import {
     SidebarMenuItem,
     SidebarMenuButton,
 } from "@/components/ui/sidebar"
+import Link from "next/link"
 import {
     IconDashboard,
     IconUsers,
@@ -49,7 +50,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             size="lg"
                             asChild
                         >
-                            <a href="/dashboard/super_admin">
+                            <Link href="/dashboard/super_admin">
                                 <div className="flex items-center gap-4">
                                     <IconUserHeart className="size-5" />
                                     <div className="flex flex-col gap-0.5 leading-none">
@@ -57,7 +58,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         <span className="text-xs text-muted-foreground uppercase">{user?.role}</span>
                                     </div>
                                 </div>
-                            </a>
+                            </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>

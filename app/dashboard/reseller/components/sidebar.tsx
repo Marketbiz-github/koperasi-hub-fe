@@ -25,6 +25,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import Link from "next/link"
 
 const data = {
   user: {
@@ -162,7 +163,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               size="lg"
               asChild
             >
-              <a href="/dashboard/reseller">
+              <Link href="/dashboard/reseller">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg overflow-hidden border bg-background">
                   {store?.logo ? (
                     <img src={store.logo} alt={store.name} className="size-full object-cover" />
@@ -178,7 +179,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </span>
                   <span className="text-xs text-muted-foreground uppercase">{user?.role || 'RESELLER'}</span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

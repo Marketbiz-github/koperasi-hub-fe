@@ -13,17 +13,14 @@ export function AdminLayoutClient({ children }: { children: ReactNode }) {
   const { user, hydrate, isHydrated } = useAuthStore();
 
   useEffect(() => {
-    hydrate();
-  }, [hydrate]);
-
-  useEffect(() => {
     if (isHydrated && !user) {
       router.push('/login');
     }
   }, [isHydrated, user, router]);
 
   // ⏳ Tunggu auth selesai dicek
-  if (!isHydrated || !user) return null;
+  if (!isHydrated) return null;
+  if (!user) return null;
 
   // Jika user ada tapi role tidak sesuai, show access denied
   if (user.role !== 'super_admin') {

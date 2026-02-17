@@ -12,9 +12,6 @@ export function KoperasiLayoutClient({ children }: { children: ReactNode }) {
   const { user, store, hydrate, isHydrated } = useAuthStore();
   const router = useRouter();
 
-  useEffect(() => {
-    hydrate();
-  }, [hydrate]);
 
   useEffect(() => {
     if (store?.logo) {
@@ -35,7 +32,8 @@ export function KoperasiLayoutClient({ children }: { children: ReactNode }) {
   }, [isHydrated, user, router]);
 
   // ⏳ Tunggu auth selesai dicek
-  if (!isHydrated || !user) return null;
+  if (!isHydrated) return null;
+  if (!user) return null;
 
   // Jika user ada tapi role tidak sesuai, show access denied
   if (user.role !== 'koperasi') {
