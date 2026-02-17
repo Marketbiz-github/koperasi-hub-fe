@@ -161,7 +161,6 @@ export default function StoreSettingsForm() {
             }
 
             setIsSearchingArea(true);
-            setShowAreaResults(true);
             try {
                 const token = await getAccessToken();
                 const res = await shippingService.searchArea(debouncedAreaSearch, token || undefined);
@@ -202,6 +201,11 @@ export default function StoreSettingsForm() {
 
     const handleSearchArea = (val: string) => {
         setAreaSearchInput(val);
+        if (val.length >= 3) {
+            setShowAreaResults(true);
+        } else {
+            setShowAreaResults(false);
+        }
     };
 
     const handleSelectArea = (area: any) => {
