@@ -8,7 +8,7 @@ const roleRouteMap: Record<string, string> = {
   vendor: '/dashboard/vendor',
   super_admin: '/dashboard/super_admin',
   koperasi: '/dashboard/koperasi',
-  affiliator: '/dashboard/affiliator',
+  affiliator: '/dashboard/promotor',
 }
 
 export default function DashboardPage() {

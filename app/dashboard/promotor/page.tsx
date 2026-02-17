@@ -5,7 +5,7 @@ import { TopSelling } from "@/components/top-selling";
 export default function DashboardPage() {
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Affiliator Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-4">Promotor Dashboard</h1>
       <div className="my-6">
         <SectionCards
           items={[

@@ -28,10 +28,10 @@ export default function LoginForm({
     <div className="min-h-screen flex">
       {/* Left side - Background Image with Overlay */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-linear-to-br from-slate-700 to-slate-900">
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center opacity-40"
           style={{
-            backgroundImage: `url('/images/affiliator/login/affiliator.jpg')`,
+            backgroundImage: `url('/images/promotor/login/promotor.jpg')`,
           }}
         />
       </div>
@@ -41,7 +41,7 @@ export default function LoginForm({
         <div className="w-full max-w-md">
           <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
-              Login Affiliator
+              Login Promotor
             </h1>
 
             <form onSubmit={onSubmit} className="space-y-6">
@@ -113,9 +113,9 @@ export default function LoginForm({
             {/* Register Link */}
             <div className="mt-8 pt-6 border-t border-gray-200">
               <p className="text-center text-gray-600">
-                Belum jadi vendor?{' '}
+                Belum jadi Promotor?{' '}
                 <Link
-                  href="/register"
+                  href="/register/promotor"
                   className="font-semibold text-gray-900 hover:text-green-600 transition-colors"
                 >
                   Daftar

@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { AccessDenied } from "@/components/access-denied";
 
-export function AffiliatorLayoutClient({ children }: { children: ReactNode }) {
+export function PromotorLayoutClient({ children }: { children: ReactNode }) {
   const { user, store, hydrate, isHydrated } = useAuthStore();
   const router = useRouter();
 

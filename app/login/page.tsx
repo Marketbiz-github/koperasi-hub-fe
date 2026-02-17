@@ -29,7 +29,7 @@ export default function LoginPage() {
       } else if (role === 'reseller') {
         dashboardPath = '/dashboard/reseller';
       } else {
-        dashboardPath = '/dashboard/affiliator';
+        dashboardPath = '/dashboard/promotor';
       }
 
       router.push(dashboardPath);
@@ -69,7 +69,7 @@ export default function LoginPage() {
       } else if (role === 'reseller') {
         router.push('/dashboard/reseller');
       } else {
-        router.push('/dashboard/affiliator');
+        router.push('/dashboard/promotor');
       }
     }
   }
@@ -184,7 +184,7 @@ export default function LoginPage() {
               </Link>
 
               {/* Row 2: Koperasi & Reseller (Side-by-side, Outlined like current Koperasi) */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 mb-3">
                 <Link
                   href="/register/koperasi"
                   className="py-2.5 px-4 rounded-xl border border-slate-200 text-emerald-600 font-bold text-xs hover:bg-emerald-50 hover:border-emerald-200 transition-all text-center"
@@ -198,6 +198,12 @@ export default function LoginPage() {
                   Daftar Reseller
                 </Link>
               </div>
+              <Link
+                href="/register/promotor"
+                className="w-full py-2.5 px-4 rounded-xl border border-slate-200 text-emerald-600 font-bold text-xs hover:bg-emerald-50 hover:border-emerald-200 transition-all text-center"
+              >
+                Daftar Sebagai Promotor
+              </Link>
             </div>
           </div>
         </div>

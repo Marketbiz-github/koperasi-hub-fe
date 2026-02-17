@@ -13,15 +13,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "KoperasiHub - Platform Terpadu untuk Vendor, Koperasi & Affiliator",
-  description: "KoperasiHub adalah platform e-commerce terpadu yang menghubungkan vendor, koperasi, dan affiliator. Kelola toko, produk, dan penjualan Anda dengan mudah.",
+  title: "KoperasiHub - Platform Terpadu untuk Vendor, Koperasi & Promotor",
+  description: "KoperasiHub adalah platform e-commerce terpadu yang menghubungkan vendor, koperasi, dan promotor. Kelola toko, produk, dan penjualan Anda dengan mudah.",
   keywords: [
     "koperasi",
     "e-commerce",
     "platform digital",
     "vendor",
     "marketplace",
-    "affiliator",
+    "promotor",
     "toko online",
     "sistem penjualan",
   ],
@@ -33,8 +33,8 @@ export const metadata: Metadata = {
     locale: "id_ID",
     url: "https://koperasi.hub",
     siteName: "KoperasiHub",
-    title: "KoperasiHub - Platform Terpadu untuk Vendor, Koperasi & Affiliator",
-    description: "Platform e-commerce terpadu yang menghubungkan vendor, koperasi, dan affiliator Indonesia.",
+    title: "KoperasiHub - Platform Terpadu untuk Vendor, Koperasi & Promotor",
+    description: "Platform e-commerce terpadu yang menghubungkan vendor, koperasi, dan promotor Indonesia.",
     images: [
       {
         url: "https://koperasi.hub/og-image.jpg",
@@ -47,8 +47,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "KoperasiHub - Platform Terpadu untuk Vendor, Koperasi & Affiliator",
-    description: "Platform e-commerce terpadu yang menghubungkan vendor, koperasi, dan affiliator Indonesia.",
+    title: "KoperasiHub - Platform Terpadu untuk Vendor, Koperasi & Promotor",
+    description: "Platform e-commerce terpadu yang menghubungkan vendor, koperasi, dan promotor Indonesia.",
     images: ["https://koperasi.hub/og-image.jpg"],
     creator: "@koperasihub",
   },

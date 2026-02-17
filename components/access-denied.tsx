@@ -56,7 +56,7 @@ export function AccessDenied({ allowedRole }: AccessDeniedProps) {
                   vendor: '/dashboard/vendor',
                   super_admin: '/dashboard/super_admin',
                   koperasi: '/dashboard/koperasi',
-                  affiliator: '/dashboard/affiliator',
+                  affiliator: '/dashboard/promotor',
                   reseller: '/dashboard/reseller',
                 };
                 const route = user?.role ? roleRouteMap[user.role] : '/dashboard';

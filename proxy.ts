@@ -4,7 +4,7 @@ const protectedRoutes = [
   '/dashboard/vendor',
   '/dashboard/super_admin',
   '/dashboard/koperasi',
-  '/dashboard/affiliator',
+  '/dashboard/promotor',
   '/dashboard/reseller',
 ];
 
@@ -12,7 +12,7 @@ const roleRouteMap: Record<string, string> = {
   vendor: '/dashboard/vendor',
   super_admin: '/dashboard/super_admin',
   koperasi: '/dashboard/koperasi',
-  affiliator: '/dashboard/affiliator',
+  affiliator: '/dashboard/promotor',
   reseller: '/dashboard/reseller',
 };
 

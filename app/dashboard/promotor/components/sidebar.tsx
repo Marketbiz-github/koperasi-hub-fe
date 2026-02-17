@@ -35,7 +35,7 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/dashboard/affiliator",
+      url: "/dashboard/promotor",
       icon: IconDashboard,
     },
     {
@@ -45,15 +45,15 @@ const data = {
       items: [
         {
           title: "Profil",
-          url: "/dashboard/affiliator/microsite/profil",
+          url: "/dashboard/promotor/microsite/profil",
         },
         {
           title: "Laporan",
-          url: "/dashboard/affiliator/microsite/laporan",
+          url: "/dashboard/promotor/microsite/laporan",
         },
         {
           title: "Kegiatan",
-          url: "/dashboard/affiliator/microsite/kegiatan",
+          url: "/dashboard/promotor/microsite/kegiatan",
         }
       ],
     },
@@ -64,27 +64,27 @@ const data = {
       items: [
         {
           title: "Marketplace",
-          url: "/dashboard/affiliator/marketplace",
+          url: "/dashboard/promotor/marketplace",
         },
         {
           title: "Pembelian",
-          url: "/dashboard/affiliator/marketplace/pembelian",
+          url: "/dashboard/promotor/marketplace/pembelian",
         },
         {
           title: "Vendor",
-          url: "/dashboard/affiliator/marketplace/vendor",
+          url: "/dashboard/promotor/marketplace/vendor",
         },
         {
           title: "Pembayaran",
-          url: "/dashboard/affiliator/marketplace/pembayaran",
+          url: "/dashboard/promotor/marketplace/pembayaran",
         },
         {
           title: "Piutang",
-          url: "/dashboard/affiliator/marketplace/piutang",
+          url: "/dashboard/promotor/marketplace/piutang",
         },
         {
           title: "Pengiriman",
-          url: "/dashboard/affiliator/marketplace/pengiriman",
+          url: "/dashboard/promotor/marketplace/pengiriman",
         },
       ],
     },
@@ -95,11 +95,11 @@ const data = {
       items: [
         {
           title: "Kategori Produk",
-          url: "/dashboard/affiliator/produk/kategori",
+          url: "/dashboard/promotor/produk/kategori",
         },
         {
           title: "Produk",
-          url: "/dashboard/affiliator/produk",
+          url: "/dashboard/promotor/produk",
         },
       ],
     },
@@ -110,17 +110,17 @@ const data = {
       items: [
         {
           title: "Campaign",
-          url: "/dashboard/affiliator/wom/campaign",
+          url: "/dashboard/promotor/wom/campaign",
         },
         {
           title: "Data Transaksi",
-          url: "/dashboard/affiliator/wom/data-transaksi",
+          url: "/dashboard/promotor/wom/data-transaksi",
         },
       ],
     },
     {
       title: "Penjualan",
-      url: "/dashboard/affiliator/penjualan",
+      url: "/dashboard/promotor/penjualan",
       icon: IconCashRegister,
     },
     {
@@ -130,29 +130,29 @@ const data = {
       items: [
         {
           title: "Produk Unggulan",
-          url: "/dashboard/affiliator/fitur/produk-unggulan",
+          url: "/dashboard/promotor/fitur/produk-unggulan",
         },
         {
           title: "Produk Diminati",
-          url: "/dashboard/affiliator/fitur/produk-diminati",
+          url: "/dashboard/promotor/fitur/produk-diminati",
         },
         {
           title: "Voucher",
-          url: "/dashboard/affiliator/fitur/voucher",
+          url: "/dashboard/promotor/fitur/voucher",
         },
         {
           title: "Manajemen Stok",
-          url: "/dashboard/affiliator/fitur/manajemen-stok",
+          url: "/dashboard/promotor/fitur/manajemen-stok",
         },
         {
           title: "Flash Sale",
-          url: "/dashboard/affiliator/fitur/flash-sale",
+          url: "/dashboard/promotor/fitur/flash-sale",
         },
       ],
     },
     {
       title: "Pengaturan Toko",
-      url: "/dashboard/affiliator/store-settings",
+      url: "/dashboard/promotor/store-settings",
       icon: IconSettings,
     },
   ],
@@ -170,7 +170,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               size="lg"
               asChild
             >
-              <Link href="/dashboard/affiliator">
+              <Link href="/dashboard/promotor">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg overflow-hidden border bg-background">
                   {store?.logo ? (
                     <img src={store.logo} alt={store.name} className="size-full object-cover" />
@@ -184,7 +184,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className="font-semibold text-base truncate">
                     {store?.name || 'Loading...'}
                   </span>
-                  <span className="text-xs text-muted-foreground uppercase">{user?.role || 'AFFILIATOR'}</span>
+                  <span className="text-xs text-muted-foreground uppercase">{user?.role === 'affiliator' ? 'PROMOTOR' : (user?.role || 'VENDOR')}</span>
                 </div>
               </Link>
             </SidebarMenuButton>
