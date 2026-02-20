@@ -67,6 +67,8 @@ export function proxy(request: NextRequest) {
     subdomain = hostname.replace('.localhost:3000', '');
   } else if (!mainDomains.includes(hostname)) {
     subdomain = hostname;
+  } else if (hostname.endsWith('.koperasi-hub-fe.vercel.app')) {
+    subdomain = hostname.replace('.koperasi-hub-fe.vercel.app', '');
   }
 
   if (subdomain && subdomain !== 'www' && !mainDomains.includes(hostname)) {
