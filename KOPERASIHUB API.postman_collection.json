@@ -3536,6 +3536,126 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "User Search",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE1MTE1MDksInVzZXJfaWQiOjExfQ.F6eRal1gfG1hyXHJxS1cDnzH8GPfGZfHHoWrTM00zws",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"role\" : \"vendor\",\n    \"store_name\" : \"Sejahtera\",\n    \"page\" : 1,\n    \"limit\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/users/search",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "search"
+              ]
+            },
+            "description": "Role dan Store name optional, bisa salah satu bisa kombinasi"
+          },
+          "response": [
+            {
+              "name": "User Search",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"role\" : \"vendor\",\n    \"store_name\" : \"Sejahtera\",\n    \"page\" : 1,\n    \"limit\": 10\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/users/search",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "search"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Wed, 18 Feb 2026 14:34:29 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "403"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Search results\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"data\": [\n            {\n                \"id\": 1,\n                \"name\": \"New User\",\n                \"email\": \"pisogow580@example.com\",\n                \"phone\": \"08123456789\",\n                \"role\": \"koperasi\",\n                \"plan_id\": null,\n                \"expired_at\": null,\n                \"status\": 1,\n                \"campaign_balance\": 0,\n                \"affiliate_share_balance\": 0,\n                \"created_at\": \"2026-02-03T03:13:04.974998Z\",\n                \"updated_at\": \"2026-02-03T03:13:04.974998Z\"\n            }\n        ],\n        \"meta\": {\n            \"limit\": 10,\n            \"page\": 1,\n            \"total\": 2\n        }\n    }\n}"
+            }
+          ]
         }
       ],
       "description": "Manajemen profil\n\n**User Roles** : \\`super_admin\\`, \\`vendor\\`, \\`koperasi\\`, \\`reseller\\`, \\`affiliator\\`.\n\n**Response Codes** : \\`200\\`, \\`400\\`, \\`403\\`"
@@ -4896,6 +5016,110 @@
               ],
               "cookie": [],
               "body": "{\n    \"meta\": {\n        \"message\": \"User stores detail\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": [\n        {\n            \"id\": 1,\n            \"user_id\": 1,\n            \"uuid\": \"41b17feb-d705-47cc-be6c-a124221744a6\",\n            \"name\": \"Toko Sejahtera\",\n            \"ipaymu_va\": null,\n            \"ipaymu_response\": null,\n            \"subdomain\": null,\n            \"domain\": null,\n            \"slogan\": null,\n            \"description\": \"Menyediakan segala kebutuhan pokok\",\n            \"alamat\": \"Jl. Sudirman No. 10, Jakarta\",\n            \"province_id\": null,\n            \"city_id\": null,\n            \"district_id\": null,\n            \"area_id\": null,\n            \"province\": null,\n            \"city\": null,\n            \"district\": null,\n            \"area\": null,\n            \"courier\": null,\n            \"phone\": \"081234567890\",\n            \"zipcode\": null,\n            \"logo\": null,\n            \"cover\": null,\n            \"color\": null,\n            \"status\": null,\n            \"type\": null,\n            \"payment_method\": null,\n            \"latitude\": null,\n            \"longitude\": null,\n            \"fee_setting\": null,\n            \"theme_id\": null,\n            \"is_gratis_ongkir\": null,\n            \"gratis_ongkir_unit\": null,\n            \"gratis_ongkir_value\": null,\n            \"created_at\": \"2026-02-03T03:14:56.819775Z\",\n            \"updated_at\": \"2026-02-03T03:14:56.819775Z\",\n            \"deleted_at\": null\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Store By Domain / Subdomain",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/stores/lookup?subdomain=jane",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "stores",
+                "lookup"
+              ],
+              "query": [
+                {
+                  "key": "subdomain",
+                  "value": "jane"
+                }
+              ]
+            },
+            "description": "Di param silahkan masukan domain atau subdomain, bisa keduanya sesuai kebutuhan."
+          },
+          "response": [
+            {
+              "name": "Get Store By Domain / Subdomain",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/stores/lookup?subdomain=jane",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "stores",
+                    "lookup"
+                  ],
+                  "query": [
+                    {
+                      "key": "subdomain",
+                      "value": "jane"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Wed, 18 Feb 2026 14:36:29 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "850"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Store detail\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"id\": 6,\n        \"user_id\": 4,\n        \"uuid\": \"8cdb53bc-eb9d-47be-8ca2-b9467b7e3a5a\",\n        \"name\": \"Toko Jane\",\n        \"ipaymu_va\": \"1179028123456789\",\n        \"ipaymu_response\": null,\n        \"subdomain\": \"jane\",\n        \"domain\": \"jane-store.com\",\n        \"slogan\": null,\n        \"description\": \"Toko retail serba ada\",\n        \"alamat\": \"Jl. Merdeka No. 10\",\n        \"province_id\": null,\n        \"city_id\": null,\n        \"district_id\": null,\n        \"area_id\": null,\n        \"province\": null,\n        \"city\": null,\n        \"district\": null,\n        \"area\": null,\n        \"courier\": null,\n        \"phone\": \"08123456789\",\n        \"zipcode\": null,\n        \"logo\": null,\n        \"cover\": null,\n        \"color\": null,\n        \"status\": null,\n        \"type\": null,\n        \"payment_method\": null,\n        \"latitude\": null,\n        \"longitude\": null,\n        \"fee_setting\": null,\n        \"theme_id\": null,\n        \"is_gratis_ongkir\": null,\n        \"gratis_ongkir_unit\": null,\n        \"gratis_ongkir_value\": null,\n        \"created_at\": \"2026-02-09T01:24:48.287601Z\",\n        \"updated_at\": \"2026-02-09T01:24:49.585992Z\",\n        \"deleted_at\": null\n    }\n}"
             }
           ]
         }
@@ -7663,6 +7887,116 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Product Search",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Iphone\",\n  \"page\": 1,\n  \"limit\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/products/search",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "search"
+              ]
+            },
+            "description": "Bisa di filter berdasarkan slug , name , category_id, general_category_id , atau store_id"
+          },
+          "response": [
+            {
+              "name": "Product Search",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"iPhone\",\n  \"page\": 1,\n  \"limit\": 10\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/products/search",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products",
+                    "search"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Wed, 18 Feb 2026 14:41:08 GMT"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Search results\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"data\": [\n            {\n                \"id\": 2,\n                \"user_id\": 11,\n                \"store_id\": 12,\n                \"product_category_id\": 1,\n                \"general_category_id\": 1,\n                \"sku\": \"IPHONE-14\",\n                \"name\": \"iPhone 14 Pro\",\n                \"slug\": \"iphone-14-pro\",\n                \"short_description\": null,\n                \"long_description\": null,\n                \"price\": \"15000000\",\n                \"discount_price\": null,\n                \"status\": \"active\",\n                \"dropshiper_unit\": null,\n                \"dropshiper_value\": null,\n                \"weight\": \"200\",\n                \"length\": \"15\",\n                \"width\": \"8\",\n                \"height\": \"1\",\n                \"target_customer\": \"reseller\",\n                \"is_gratis_ongkir\": true,\n                \"is_cashback\": false,\n                \"cashback_unit\": null,\n                \"cashback_value\": null,\n                \"uuid\": \"a57857a3-7fb1-493b-a1d8-97850adba996\",\n                \"created_at\": \"2026-02-03T03:17:55.915099Z\",\n                \"updated_at\": \"2026-02-03T03:17:55.915099Z\",\n                \"deleted_at\": null,\n                \"product_category\": {\n                    \"id\": 1,\n                    \"user_id\": 2,\n                    \"store_id\": 1,\n                    \"name\": \"Smartphones\",\n                    \"image\": \"https://example.com/phone.jpg\",\n                    \"category_parent\": null,\n                    \"category_grand_parent\": null,\n                    \"status\": \"active\",\n                    \"created_at\": \"2026-02-03T03:16:52.492237Z\",\n                    \"updated_at\": \"2026-02-03T03:16:52.492237Z\",\n                    \"deleted_at\": null\n                },\n                \"general_category\": {\n                    \"id\": 1,\n                    \"name\": \"Electronics\",\n                    \"image\": \"https://example.com/image.jpg\",\n                    \"category_parent\": null,\n                    \"category_grand_parent\": null,\n                    \"status\": \"1\",\n                    \"created_at\": \"2026-02-03T03:16:11.035596Z\",\n                    \"updated_at\": \"2026-02-03T03:16:11.035596Z\",\n                    \"deleted_at\": null\n                },\n                \"images\": [\n                    {\n                        \"id\": 3,\n                        \"product_id\": 2,\n                        \"image_url\": \"http://image-1.jpg\",\n                        \"is_primary\": true,\n                        \"display_order\": 1,\n                        \"created_at\": \"2026-02-03T03:17:55.923527Z\",\n                        \"updated_at\": \"2026-02-03T03:17:55.923527Z\",\n                        \"deleted_at\": null\n                    },\n                    {\n                        \"id\": 4,\n                        \"product_id\": 2,\n                        \"image_url\": \"http://image-2.jpg\",\n                        \"is_primary\": false,\n                        \"display_order\": 2,\n                        \"created_at\": \"2026-02-03T03:17:55.923527Z\",\n                        \"updated_at\": \"2026-02-03T03:17:55.923527Z\",\n                        \"deleted_at\": null\n                    }\n                ],\n                \"total_stock\": 0\n            },\n            {\n                \"id\": 1,\n                \"user_id\": 11,\n                \"store_id\": 12,\n                \"product_category_id\": 1,\n                \"general_category_id\": 1,\n                \"sku\": \"IPHONE-13\",\n                \"name\": \"iPhone 13 Pro Max\",\n                \"slug\": \"iphone-13-pro-max\",\n                \"short_description\": null,\n                \"long_description\": null,\n                \"price\": \"14500000\",\n                \"discount_price\": null,\n                \"status\": \"active\",\n                \"dropshiper_unit\": null,\n                \"dropshiper_value\": null,\n                \"weight\": \"200\",\n                \"length\": \"15\",\n                \"width\": \"8\",\n                \"height\": \"1\",\n                \"target_customer\": \"reseller\",\n                \"is_gratis_ongkir\": true,\n                \"is_cashback\": false,\n                \"cashback_unit\": null,\n                \"cashback_value\": null,\n                \"uuid\": \"7a8df9b2-94be-4747-b24b-a5954608ec40\",\n                \"created_at\": \"2026-02-03T03:17:39.95923Z\",\n                \"updated_at\": \"2026-02-12T02:58:47.15444Z\",\n                \"deleted_at\": null,\n                \"product_category\": {\n                    \"id\": 1,\n                    \"user_id\": 2,\n                    \"store_id\": 1,\n                    \"name\": \"Smartphones\",\n                    \"image\": \"https://example.com/phone.jpg\",\n                    \"category_parent\": null,\n                    \"category_grand_parent\": null,\n                    \"status\": \"active\",\n                    \"created_at\": \"2026-02-03T03:16:52.492237Z\",\n                    \"updated_at\": \"2026-02-03T03:16:52.492237Z\",\n                    \"deleted_at\": null\n                },\n                \"general_category\": {\n                    \"id\": 1,\n                    \"name\": \"Electronics\",\n                    \"image\": \"https://example.com/image.jpg\",\n                    \"category_parent\": null,\n                    \"category_grand_parent\": null,\n                    \"status\": \"1\",\n                    \"created_at\": \"2026-02-03T03:16:11.035596Z\",\n                    \"updated_at\": \"2026-02-03T03:16:11.035596Z\",\n                    \"deleted_at\": null\n                },\n                \"images\": [\n                    {\n                        \"id\": 5,\n                        \"product_id\": 1,\n                        \"image_url\": \"http://new-image2.jpg\",\n                        \"is_primary\": true,\n                        \"display_order\": 1,\n                        \"created_at\": \"2026-02-12T02:51:34.755577Z\",\n                        \"updated_at\": \"2026-02-12T02:58:47.157085Z\",\n                        \"deleted_at\": null\n                    }\n                ],\n                \"total_stock\": 126,\n                \"inventory\": [\n                    {\n                        \"id\": 1,\n                        \"product_id\": 1,\n                        \"product_variant_id\": 1,\n                        \"gudang_id\": 1,\n                        \"stock\": 50,\n                        \"created_at\": \"2026-02-03T03:23:53.983387Z\",\n                        \"updated_at\": \"2026-02-03T03:23:53.983387Z\",\n                        \"deleted_at\": null\n                    },\n                    {\n                        \"id\": 2,\n                        \"product_id\": 1,\n                        \"product_variant_id\": 2,\n                        \"gudang_id\": 1,\n                        \"stock\": 38,\n                        \"created_at\": \"2026-02-03T03:24:04.977706Z\",\n                        \"updated_at\": \"2026-02-04T07:26:27.820459Z\",\n                        \"deleted_at\": null\n                    },\n                    {\n                        \"id\": 3,\n                        \"product_id\": 1,\n                        \"product_variant_id\": 3,\n                        \"gudang_id\": 1,\n                        \"stock\": 38,\n                        \"created_at\": \"2026-02-03T03:24:12.639337Z\",\n                        \"updated_at\": \"2026-02-04T07:26:27.823098Z\",\n                        \"deleted_at\": null\n                    }\n                ],\n                \"variants\": [\n                    {\n                        \"id\": 1,\n                        \"store_id\": 1,\n                        \"product_id\": 1,\n                        \"sku\": \"grey-256\",\n                        \"price\": \"50000\",\n                        \"discount_price\": \"\",\n                        \"weight\": 200,\n                        \"image\": \"\",\n                        \"is_active\": true,\n                        \"created_at\": \"2026-02-03T03:22:13.353834Z\",\n                        \"updated_at\": \"2026-02-03T03:22:13.414499Z\",\n                        \"deleted_at\": null,\n                        \"total_stock\": 50,\n                        \"inventory\": [\n                            {\n                                \"gudang_id\": 1,\n                                \"stock\": 50\n                            }\n                        ],\n                        \"option_values\": [\n                            {\n                                \"id\": 1,\n                                \"store_id\": 1,\n                                \"product_option_id\": 1,\n                                \"value\": \"Grey Metalic\",\n                                \"image\": \"http://image-red.jpg\",\n                                \"created_at\": \"2026-02-03T03:19:49.837407Z\",\n                                \"updated_at\": \"2026-02-03T03:19:49.837407Z\",\n                                \"deleted_at\": null,\n                                \"option\": {\n                                    \"id\": 1,\n                                    \"store_id\": 1,\n                                    \"product_id\": 1,\n                                    \"name\": \"Warna\",\n                                    \"created_at\": \"2026-02-03T03:18:32.786234Z\",\n                                    \"updated_at\": \"2026-02-03T03:18:32.786234Z\",\n                                    \"deleted_at\": null\n                                }\n                            },\n                            {\n                                \"id\": 3,\n                                \"store_id\": 1,\n                                \"product_option_id\": 2,\n                                \"value\": \"256 Gb\",\n                                \"image\": \"http://image-red.jpg\",\n                                \"created_at\": \"2026-02-03T03:20:22.637356Z\",\n                                \"updated_at\": \"2026-02-03T03:20:22.637356Z\",\n                                \"deleted_at\": null,\n                                \"option\": {\n                                    \"id\": 2,\n                                    \"store_id\": 1,\n                                    \"product_id\": 1,\n                                    \"name\": \"Memori\",\n                                    \"created_at\": \"2026-02-03T03:18:55.852116Z\",\n                                    \"updated_at\": \"2026-02-03T03:18:55.852116Z\",\n                                    \"deleted_at\": null\n                                }\n                            }\n                        ]\n                    },\n                    {\n                        \"id\": 2,\n                        \"store_id\": 1,\n                        \"product_id\": 1,\n                        \"sku\": \"blue-256\",\n                        \"price\": \"50000\",\n                        \"discount_price\": \"\",\n                        \"weight\": 200,\n                        \"image\": \"\",\n                        \"is_active\": true,\n                        \"created_at\": \"2026-02-03T03:22:37.804811Z\",\n                        \"updated_at\": \"2026-02-03T03:22:37.816382Z\",\n                        \"deleted_at\": null,\n                        \"total_stock\": 38,\n                        \"inventory\": [\n                            {\n                                \"gudang_id\": 1,\n                                \"stock\": 38\n                            }\n                        ],\n                        \"option_values\": [\n                            {\n                                \"id\": 2,\n                                \"store_id\": 1,\n                                \"product_option_id\": 1,\n                                \"value\": \"Ocean Blue\",\n                                \"image\": \"http://image-red.jpg\",\n                                \"created_at\": \"2026-02-03T03:20:02.632205Z\",\n                                \"updated_at\": \"2026-02-03T03:20:02.632205Z\",\n                                \"deleted_at\": null,\n                                \"option\": {\n                                    \"id\": 1,\n                                    \"store_id\": 1,\n                                    \"product_id\": 1,\n                                    \"name\": \"Warna\",\n                                    \"created_at\": \"2026-02-03T03:18:32.786234Z\",\n                                    \"updated_at\": \"2026-02-03T03:18:32.786234Z\",\n                                    \"deleted_at\": null\n                                }\n                            },\n                            {\n                                \"id\": 3,\n                                \"store_id\": 1,\n                                \"product_option_id\": 2,\n                                \"value\": \"256 Gb\",\n                                \"image\": \"http://image-red.jpg\",\n                                \"created_at\": \"2026-02-03T03:20:22.637356Z\",\n                                \"updated_at\": \"2026-02-03T03:20:22.637356Z\",\n                                \"deleted_at\": null,\n                                \"option\": {\n                                    \"id\": 2,\n                                    \"store_id\": 1,\n                                    \"product_id\": 1,\n                                    \"name\": \"Memori\",\n                                    \"created_at\": \"2026-02-03T03:18:55.852116Z\",\n                                    \"updated_at\": \"2026-02-03T03:18:55.852116Z\",\n                                    \"deleted_at\": null\n                                }\n                            }\n                        ]\n                    },\n                    {\n                        \"id\": 3,\n                        \"store_id\": 1,\n                        \"product_id\": 1,\n                        \"sku\": \"grey-512\",\n                        \"price\": \"50000\",\n                        \"discount_price\": \"\",\n                        \"weight\": 200,\n                        \"image\": \"\",\n                        \"is_active\": true,\n                        \"created_at\": \"2026-02-03T03:22:54.238682Z\",\n                        \"updated_at\": \"2026-02-03T03:22:54.25512Z\",\n                        \"deleted_at\": null,\n                        \"total_stock\": 38,\n                        \"inventory\": [\n                            {\n                                \"gudang_id\": 1,\n                                \"stock\": 38\n                            }\n                        ],\n                        \"option_values\": [\n                            {\n                                \"id\": 1,\n                                \"store_id\": 1,\n                                \"product_option_id\": 1,\n                                \"value\": \"Grey Metalic\",\n                                \"image\": \"http://image-red.jpg\",\n                                \"created_at\": \"2026-02-03T03:19:49.837407Z\",\n                                \"updated_at\": \"2026-02-03T03:19:49.837407Z\",\n                                \"deleted_at\": null,\n                                \"option\": {\n                                    \"id\": 1,\n                                    \"store_id\": 1,\n                                    \"product_id\": 1,\n                                    \"name\": \"Warna\",\n                                    \"created_at\": \"2026-02-03T03:18:32.786234Z\",\n                                    \"updated_at\": \"2026-02-03T03:18:32.786234Z\",\n                                    \"deleted_at\": null\n                                }\n                            },\n                            {\n                                \"id\": 4,\n                                \"store_id\": 1,\n                                \"product_option_id\": 2,\n                                \"value\": \"512 Gb\",\n                                \"image\": \"http://image-red.jpg\",\n                                \"created_at\": \"2026-02-03T03:20:27.852702Z\",\n                                \"updated_at\": \"2026-02-03T03:20:27.852702Z\",\n                                \"deleted_at\": null,\n                                \"option\": {\n                                    \"id\": 2,\n                                    \"store_id\": 1,\n                                    \"product_id\": 1,\n                                    \"name\": \"Memori\",\n                                    \"created_at\": \"2026-02-03T03:18:55.852116Z\",\n                                    \"updated_at\": \"2026-02-03T03:18:55.852116Z\",\n                                    \"deleted_at\": null\n                                }\n                            }\n                        ]\n                    }\n                ]\n            }\n        ],\n        \"meta\": {\n            \"limit\": 10,\n            \"page\": 1,\n            \"total\": 2\n        }\n    }\n}"
+            }
+          ]
         }
       ],
       "description": "Menejemen produk store"
@@ -12427,6 +12761,1050 @@
               ],
               "cookie": [],
               "body": "{\n    \"meta\": {\n        \"message\": \"Debts fetched successfully\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"debts\": [\n            {\n                \"id\": 5,\n                \"order_id\": 17,\n                \"user_id\": 1,\n                \"buyer_id\": 11,\n                \"type\": \"tenor\",\n                \"amount\": 210000,\n                \"status\": \"unpaid\",\n                \"tenor_months\": 3,\n                \"due_date\": null,\n                \"created_at\": \"2026-02-12T02:44:43.82821Z\",\n                \"updated_at\": \"2026-02-12T02:44:43.82821Z\",\n                \"deleted_at\": null\n            }\n        ],\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"limit\": 10,\n            \"total\": 1\n        }\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Campaign",
+      "item": [
+        {
+          "name": "Campaign Owner",
+          "item": [
+            {
+              "name": "Saldo Campaign Topup",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE0NzY5OTAsInVzZXJfaWQiOjExfQ.v2fkObmWSaaTllIxIptGhRCAsgWTNDkVQ_mlRdq1YRc",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"amount\": 100000\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/campaigns/topup",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "campaigns",
+                    "topup"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Vendor Topup",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n    \"amount\": 100000\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/campaigns/topup",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "campaigns",
+                        "topup"
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "Access-Control-Allow-Headers",
+                      "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Methods",
+                      "value": "POST, GET, OPTIONS, PUT, DELETE"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Origin",
+                      "value": "*"
+                    },
+                    {
+                      "key": "Content-Security-Policy",
+                      "value": "default-src 'self'"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Referrer-Policy",
+                      "value": "strict-origin-when-cross-origin"
+                    },
+                    {
+                      "key": "Strict-Transport-Security",
+                      "value": "max-age=31536000; includeSubDomains"
+                    },
+                    {
+                      "key": "X-Content-Type-Options",
+                      "value": "nosniff"
+                    },
+                    {
+                      "key": "X-Frame-Options",
+                      "value": "DENY"
+                    },
+                    {
+                      "key": "X-Xss-Protection",
+                      "value": "1; mode=block"
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 18 Feb 2026 05:16:30 GMT"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "360"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"meta\": {\n        \"message\": \"Topup request created\",\n        \"code\": 201,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"id\": 1,\n        \"user_id\": 11,\n        \"amount\": 100000,\n        \"reference_id\": \"TOPUP-CP-11-1771391788\",\n        \"payment_url\": \"https://sandbox-payment.ipaymu.com/#/d41474ed-d6cc-40b0-9dec-ba81f40c2342\",\n        \"status\": \"pending\",\n        \"created_at\": \"2026-02-18T05:16:30.467940676Z\",\n        \"updated_at\": \"2026-02-18T05:16:30.467940676Z\"\n    }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Create Campaign",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE0NzY5OTAsInVzZXJfaWQiOjExfQ.v2fkObmWSaaTllIxIptGhRCAsgWTNDkVQ_mlRdq1YRc",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n   \"product_id\": 1,\n   \"fee_per_click\": 100,\n   \"fee_per_reshare\": 50,\n   \"fee_per_sale\": 5000,\n   \"max_budget\": 1000000\n }",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/campaigns",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "campaigns"
+                  ]
+                },
+                "description": "NOTE :\n\n- Jika saldo vendor < `fee_per_click`, status otomatis diset `is_active: false` (Draft)."
+              },
+              "response": [
+                {
+                  "name": "Create Campaign",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n   \"product_id\": 1,\n   \"fee_per_click\": 100,\n   \"fee_per_reshare\": 50,\n   \"fee_per_sale\": 5000,\n   \"max_budget\": 1000000\n }",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/campaigns",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "campaigns"
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "Access-Control-Allow-Headers",
+                      "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Methods",
+                      "value": "POST, GET, OPTIONS, PUT, DELETE"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Origin",
+                      "value": "*"
+                    },
+                    {
+                      "key": "Content-Security-Policy",
+                      "value": "default-src 'self'"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Referrer-Policy",
+                      "value": "strict-origin-when-cross-origin"
+                    },
+                    {
+                      "key": "Strict-Transport-Security",
+                      "value": "max-age=31536000; includeSubDomains"
+                    },
+                    {
+                      "key": "X-Content-Type-Options",
+                      "value": "nosniff"
+                    },
+                    {
+                      "key": "X-Frame-Options",
+                      "value": "DENY"
+                    },
+                    {
+                      "key": "X-Xss-Protection",
+                      "value": "1; mode=block"
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 18 Feb 2026 05:07:28 GMT"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "325"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"meta\": {\n        \"message\": \"Campaign created\",\n        \"code\": 201,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"id\": 1,\n        \"product_id\": 1,\n        \"fee_per_click\": 100,\n        \"fee_per_reshare\": 50,\n        \"fee_per_sale\": 5000,\n        \"max_budget\": 1000000,\n        \"current_spent\": 0,\n        \"is_active\": true,\n        \"created_by\": 11,\n        \"created_at\": \"2026-02-18T05:07:28.577856509Z\",\n        \"updated_at\": \"2026-02-18T05:07:28.577856509Z\"\n    }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Update Campaign",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE0NzY5OTAsInVzZXJfaWQiOjExfQ.v2fkObmWSaaTllIxIptGhRCAsgWTNDkVQ_mlRdq1YRc",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n   \"fee_per_click\": 150,\n   \"fee_per_reshare\": 50,\n   \"fee_per_sale\": 5000,\n   \"max_budget\": 1000000,\n   \"is_active\": true\n }",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/campaigns/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "campaigns",
+                    "1"
+                  ]
+                },
+                "description": "**Validation** :\n\n- Aktivasi ke `is_active: true` akan **ditolak** jika saldo tidak cukup.\n    \n- `max_budget` tidak bisa lebih kecil dari `current_spent`."
+              },
+              "response": [
+                {
+                  "name": "Update Campaign",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n   \"fee_per_click\": 150,\n   \"fee_per_reshare\": 50,\n   \"fee_per_sale\": 5000,\n   \"max_budget\": 1000000,\n   \"is_active\": true\n }",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/campaigns/1",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "campaigns",
+                        "1"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "Access-Control-Allow-Headers",
+                      "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Methods",
+                      "value": "POST, GET, OPTIONS, PUT, DELETE"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Origin",
+                      "value": "*"
+                    },
+                    {
+                      "key": "Content-Security-Policy",
+                      "value": "default-src 'self'"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Referrer-Policy",
+                      "value": "strict-origin-when-cross-origin"
+                    },
+                    {
+                      "key": "Strict-Transport-Security",
+                      "value": "max-age=31536000; includeSubDomains"
+                    },
+                    {
+                      "key": "X-Content-Type-Options",
+                      "value": "nosniff"
+                    },
+                    {
+                      "key": "X-Frame-Options",
+                      "value": "DENY"
+                    },
+                    {
+                      "key": "X-Xss-Protection",
+                      "value": "1; mode=block"
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 18 Feb 2026 05:20:11 GMT"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "322"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"meta\": {\n        \"message\": \"Campaign updated\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"id\": 1,\n        \"product_id\": 1,\n        \"fee_per_click\": 150,\n        \"fee_per_reshare\": 50,\n        \"fee_per_sale\": 5000,\n        \"max_budget\": 1000000,\n        \"current_spent\": 0,\n        \"is_active\": true,\n        \"created_by\": 11,\n        \"created_at\": \"2026-02-18T05:07:28.577856Z\",\n        \"updated_at\": \"2026-02-18T05:20:11.009098958Z\"\n    }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Delete Campaign",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE0NzY5OTAsInVzZXJfaWQiOjExfQ.v2fkObmWSaaTllIxIptGhRCAsgWTNDkVQ_mlRdq1YRc",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{base_url}}/campaigns/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "campaigns",
+                    "1"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Delete Campaign (Vendor)",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": ""
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/campaigns/1",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "campaigns",
+                        "1"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "Access-Control-Allow-Headers",
+                      "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Methods",
+                      "value": "POST, GET, OPTIONS, PUT, DELETE"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Origin",
+                      "value": "*"
+                    },
+                    {
+                      "key": "Content-Security-Policy",
+                      "value": "default-src 'self'"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Referrer-Policy",
+                      "value": "strict-origin-when-cross-origin"
+                    },
+                    {
+                      "key": "Strict-Transport-Security",
+                      "value": "max-age=31536000; includeSubDomains"
+                    },
+                    {
+                      "key": "X-Content-Type-Options",
+                      "value": "nosniff"
+                    },
+                    {
+                      "key": "X-Frame-Options",
+                      "value": "DENY"
+                    },
+                    {
+                      "key": "X-Xss-Protection",
+                      "value": "1; mode=block"
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 18 Feb 2026 05:22:21 GMT"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "81"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"meta\": {\n        \"message\": \"Campaign deleted\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": null\n}"
+                }
+              ]
+            },
+            {
+              "name": "Get Store Campaigns",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE0NzY5OTAsInVzZXJfaWQiOjExfQ.v2fkObmWSaaTllIxIptGhRCAsgWTNDkVQ_mlRdq1YRc",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{base_url}}/campaigns/store/12",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "campaigns",
+                    "store",
+                    "12"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Get Store Campaigns",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": ""
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/campaigns/store/12",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "campaigns",
+                        "store",
+                        "12"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "Access-Control-Allow-Headers",
+                      "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Methods",
+                      "value": "POST, GET, OPTIONS, PUT, DELETE"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Origin",
+                      "value": "*"
+                    },
+                    {
+                      "key": "Content-Security-Policy",
+                      "value": "default-src 'self'"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Referrer-Policy",
+                      "value": "strict-origin-when-cross-origin"
+                    },
+                    {
+                      "key": "Strict-Transport-Security",
+                      "value": "max-age=31536000; includeSubDomains"
+                    },
+                    {
+                      "key": "X-Content-Type-Options",
+                      "value": "nosniff"
+                    },
+                    {
+                      "key": "X-Frame-Options",
+                      "value": "DENY"
+                    },
+                    {
+                      "key": "X-Xss-Protection",
+                      "value": "1; mode=block"
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 18 Feb 2026 05:28:39 GMT"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "1029"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"meta\": {\n        \"message\": \"Success\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": [\n        {\n            \"id\": 2,\n            \"product_id\": 1,\n            \"fee_per_click\": 100,\n            \"fee_per_reshare\": 50,\n            \"fee_per_sale\": 5000,\n            \"max_budget\": 1000000,\n            \"current_spent\": 0,\n            \"is_active\": true,\n            \"created_by\": 11,\n            \"created_at\": \"2026-02-18T05:22:35.829349Z\",\n            \"updated_at\": \"2026-02-18T05:22:35.829349Z\",\n            \"product\": {\n                \"id\": 1,\n                \"user_id\": 11,\n                \"store_id\": 12,\n                \"product_category_id\": 1,\n                \"general_category_id\": 1,\n                \"sku\": \"IPHONE-13\",\n                \"name\": \"iPhone 13 Pro Max\",\n                \"slug\": \"iphone-13-pro-max\",\n                \"short_description\": null,\n                \"long_description\": null,\n                \"price\": \"14500000\",\n                \"discount_price\": null,\n                \"status\": \"active\",\n                \"dropshiper_unit\": null,\n                \"dropshiper_value\": null,\n                \"weight\": \"200\",\n                \"length\": \"15\",\n                \"width\": \"8\",\n                \"height\": \"1\",\n                \"target_customer\": \"reseller\",\n                \"is_gratis_ongkir\": true,\n                \"is_cashback\": false,\n                \"cashback_unit\": null,\n                \"cashback_value\": null,\n                \"uuid\": \"7a8df9b2-94be-4747-b24b-a5954608ec40\",\n                \"created_at\": \"2026-02-03T03:17:39.95923Z\",\n                \"updated_at\": \"2026-02-12T02:58:47.15444Z\",\n                \"deleted_at\": null,\n                \"product_category\": null,\n                \"general_category\": null,\n                \"images\": null,\n                \"total_stock\": 0\n            }\n        }\n    ]\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Affiliator",
+          "item": [
+            {
+              "name": "Generate Share Link",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE0NzY5OTAsInVzZXJfaWQiOjExfQ.v2fkObmWSaaTllIxIptGhRCAsgWTNDkVQ_mlRdq1YRc",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/products/1/share",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products",
+                    "1",
+                    "share"
+                  ]
+                },
+                "description": "**Query Params Optional :**\n\n- sh (optional, parent share code untuk bonus re-share)"
+              },
+              "response": [
+                {
+                  "name": "Generate Share Link",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/products/1/share",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "products",
+                        "1",
+                        "share"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "Access-Control-Allow-Headers",
+                      "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Methods",
+                      "value": "POST, GET, OPTIONS, PUT, DELETE"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Origin",
+                      "value": "*"
+                    },
+                    {
+                      "key": "Content-Security-Policy",
+                      "value": "default-src 'self'"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Referrer-Policy",
+                      "value": "strict-origin-when-cross-origin"
+                    },
+                    {
+                      "key": "Strict-Transport-Security",
+                      "value": "max-age=31536000; includeSubDomains"
+                    },
+                    {
+                      "key": "X-Content-Type-Options",
+                      "value": "nosniff"
+                    },
+                    {
+                      "key": "X-Frame-Options",
+                      "value": "DENY"
+                    },
+                    {
+                      "key": "X-Xss-Protection",
+                      "value": "1; mode=block"
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 18 Feb 2026 05:37:36 GMT"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "636"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"meta\": {\n        \"message\": \"Success\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"url\": \"http://localhost:8080/p/iphone-13-pro-max?sh=11-e0f5fb03\",\n        \"facebook_url\": \"https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A8080%2Fp%2Fiphone-13-pro-max%3Fsh%3D11-e0f5fb03\",\n        \"twitter_url\": \"https://twitter.com/intent/tweet?text=Check+out+this+product%3A+iPhone+13+Pro+Max+http%3A%2F%2Flocalhost%3A8080%2Fp%2Fiphone-13-pro-max%3Fsh%3D11-e0f5fb03\",\n        \"whatsapp_url\": \"https://api.whatsapp.com/send?text=Check+out+this+product%3A+iPhone+13+Pro+Max+http%3A%2F%2Flocalhost%3A8080%2Fp%2Fiphone-13-pro-max%3Fsh%3D11-e0f5fb03\",\n        \"share_code\": \"11-e0f5fb03\"\n    }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Track Click (Public)",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"share_code\": \"11-e0f5fb03\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/campaigns/track-click",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "campaigns",
+                    "track-click"
+                  ]
+                },
+                "description": "**Query Params Optional :**\n\n- sh (optional, parent share code untuk bonus re-share)"
+              },
+              "response": [
+                {
+                  "name": "Track Click (Public)",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n    \"share_code\": \"11-e0f5fb03\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/campaigns/track-click",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "campaigns",
+                        "track-click"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "Access-Control-Allow-Headers",
+                      "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Methods",
+                      "value": "POST, GET, OPTIONS, PUT, DELETE"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Origin",
+                      "value": "*"
+                    },
+                    {
+                      "key": "Content-Security-Policy",
+                      "value": "default-src 'self'"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Referrer-Policy",
+                      "value": "strict-origin-when-cross-origin"
+                    },
+                    {
+                      "key": "Strict-Transport-Security",
+                      "value": "max-age=31536000; includeSubDomains"
+                    },
+                    {
+                      "key": "X-Content-Type-Options",
+                      "value": "nosniff"
+                    },
+                    {
+                      "key": "X-Frame-Options",
+                      "value": "DENY"
+                    },
+                    {
+                      "key": "X-Xss-Protection",
+                      "value": "1; mode=block"
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 18 Feb 2026 05:55:03 GMT"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "81"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"meta\": {\n        \"message\": \"Tracking success\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": null\n}"
+                }
+              ]
+            },
+            {
+              "name": "Affiliator Withdrawal",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE0NzY5OTAsInVzZXJfaWQiOjExfQ.v2fkObmWSaaTllIxIptGhRCAsgWTNDkVQ_mlRdq1YRc",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"amount\": 50000\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/campaigns/withdrawal",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "campaigns",
+                    "withdrawal"
+                  ]
+                },
+                "description": "NOTE :\n\n- Akan ada pengecheckan balance saldo affiliator pada API ini, jika balance tidak mencukupi, maka request akan gagal.\n    \n- Akun di sesuaikan dengan request token"
+              },
+              "response": [
+                {
+                  "name": "Affiliator Withdrawal",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n    \"amount\": 50000\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/campaigns/withdrawal",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "campaigns",
+                        "withdrawal"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "Access-Control-Allow-Headers",
+                      "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Methods",
+                      "value": "POST, GET, OPTIONS, PUT, DELETE"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Origin",
+                      "value": "*"
+                    },
+                    {
+                      "key": "Content-Security-Policy",
+                      "value": "default-src 'self'"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Referrer-Policy",
+                      "value": "strict-origin-when-cross-origin"
+                    },
+                    {
+                      "key": "Strict-Transport-Security",
+                      "value": "max-age=31536000; includeSubDomains"
+                    },
+                    {
+                      "key": "X-Content-Type-Options",
+                      "value": "nosniff"
+                    },
+                    {
+                      "key": "X-Frame-Options",
+                      "value": "DENY"
+                    },
+                    {
+                      "key": "X-Xss-Protection",
+                      "value": "1; mode=block"
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 18 Feb 2026 05:58:13 GMT"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "234"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"meta\": {\n        \"message\": \"Withdrawal request created\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"id\": 1,\n        \"user_id\": 11,\n        \"amount\": 50000,\n        \"status\": \"pending\",\n        \"created_at\": \"2026-02-18T05:58:13.599051292Z\",\n        \"updated_at\": \"2026-02-18T05:58:13.599051292Z\"\n    }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Get Affiliator Stats",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE0NzY5OTAsInVzZXJfaWQiOjExfQ.v2fkObmWSaaTllIxIptGhRCAsgWTNDkVQ_mlRdq1YRc",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{base_url}}/affiliator/stats",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "affiliator",
+                    "stats"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Get Affiliator Stats",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": ""
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/affiliator/stats",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "affiliator",
+                        "stats"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "Access-Control-Allow-Headers",
+                      "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Methods",
+                      "value": "POST, GET, OPTIONS, PUT, DELETE"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Origin",
+                      "value": "*"
+                    },
+                    {
+                      "key": "Content-Security-Policy",
+                      "value": "default-src 'self'"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Referrer-Policy",
+                      "value": "strict-origin-when-cross-origin"
+                    },
+                    {
+                      "key": "Strict-Transport-Security",
+                      "value": "max-age=31536000; includeSubDomains"
+                    },
+                    {
+                      "key": "X-Content-Type-Options",
+                      "value": "nosniff"
+                    },
+                    {
+                      "key": "X-Frame-Options",
+                      "value": "DENY"
+                    },
+                    {
+                      "key": "X-Xss-Protection",
+                      "value": "1; mode=block"
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 18 Feb 2026 06:44:06 GMT"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "1272"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"meta\": {\n        \"message\": \"Success\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"active_shares\": [\n            {\n                \"id\": 1,\n                \"affiliator_id\": 11,\n                \"campaign_id\": 2,\n                \"share_code\": \"11-e0f5fb03\",\n                \"parent_shared_product_id\": null,\n                \"created_at\": \"2026-02-18T05:37:36.377353Z\",\n                \"updated_at\": \"2026-02-18T05:37:36.377353Z\",\n                \"campaign\": {\n                    \"id\": 2,\n                    \"product_id\": 1,\n                    \"fee_per_click\": 100,\n                    \"fee_per_reshare\": 50,\n                    \"fee_per_sale\": 5000,\n                    \"max_budget\": 1000000,\n                    \"current_spent\": 100,\n                    \"is_active\": true,\n                    \"created_by\": 11,\n                    \"created_at\": \"2026-02-18T05:22:35.829349Z\",\n                    \"updated_at\": \"2026-02-18T05:55:03.138213Z\",\n                    \"product\": {\n                        \"id\": 1,\n                        \"user_id\": 11,\n                        \"store_id\": 12,\n                        \"product_category_id\": 1,\n                        \"general_category_id\": 1,\n                        \"sku\": \"IPHONE-13\",\n                        \"name\": \"iPhone 13 Pro Max\",\n                        \"slug\": \"iphone-13-pro-max\",\n                        \"short_description\": null,\n                        \"long_description\": null,\n                        \"price\": \"14500000\",\n                        \"discount_price\": null,\n                        \"status\": \"active\",\n                        \"dropshiper_unit\": null,\n                        \"dropshiper_value\": null,\n                        \"weight\": \"200\",\n                        \"length\": \"15\",\n                        \"width\": \"8\",\n                        \"height\": \"1\",\n                        \"target_customer\": \"reseller\",\n                        \"is_gratis_ongkir\": true,\n                        \"is_cashback\": false,\n                        \"cashback_unit\": null,\n                        \"cashback_value\": null,\n                        \"uuid\": \"7a8df9b2-94be-4747-b24b-a5954608ec40\",\n                        \"created_at\": \"2026-02-03T03:17:39.95923Z\",\n                        \"updated_at\": \"2026-02-12T02:58:47.15444Z\",\n                        \"deleted_at\": null,\n                        \"product_category\": null,\n                        \"general_category\": null,\n                        \"images\": null,\n                        \"total_stock\": 0\n                    }\n                }\n            }\n        ],\n        \"total_commission\": 100\n    }\n}"
+                }
+              ]
             }
           ]
         }
