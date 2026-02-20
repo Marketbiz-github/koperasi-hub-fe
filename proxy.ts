@@ -61,14 +61,14 @@ export function proxy(request: NextRequest) {
   ];
 
   let subdomain = '';
-  if (hostname.endsWith('.koperasi-hub-fe.test')) {
+  if (hostname.endsWith('.koperasi-hub-fe.vercel.app')) {
+    subdomain = hostname.replace('.koperasi-hub-fe.vercel.app', '');
+  } else if (hostname.endsWith('.koperasi-hub-fe.test')) {
     subdomain = hostname.replace('.koperasi-hub-fe.test', '');
   } else if (hostname.endsWith('.localhost:3000')) {
     subdomain = hostname.replace('.localhost:3000', '');
   } else if (!mainDomains.includes(hostname)) {
     subdomain = hostname;
-  } else if (hostname.endsWith('.koperasi-hub-fe.vercel.app')) {
-    subdomain = hostname.replace('.koperasi-hub-fe.vercel.app', '');
   }
 
   if (subdomain && subdomain !== 'www' && !mainDomains.includes(hostname)) {
