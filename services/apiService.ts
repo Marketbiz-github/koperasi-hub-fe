@@ -530,6 +530,12 @@ export const storeService = {
         const endpoint = `/stores${queryString ? `?${queryString}` : ''}`;
 
         return apiRequest(endpoint, { token });
+    },
+
+    async lookup(token: string, search: string) {
+        return apiRequest(`/stores/lookup?subdomain=${search}`, {
+            token,
+        });
     }
 }
 

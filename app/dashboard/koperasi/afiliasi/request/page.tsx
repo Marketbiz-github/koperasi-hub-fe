@@ -326,7 +326,8 @@ export default function RequestAffiliationPage() {
                                                 <Globe className="w-3 h-3 text-slate-400" /> Domain
                                             </h4>
                                             {(() => {
-                                                const displayDomain = selectedStore.domain || (selectedStore.subdomain ? `${selectedStore.subdomain}.koperasi-hub-fe.test` : '-');
+                                                const appName = typeof window !== 'undefined' ? window.location.host.split('.').slice(-2).join('.') : 'koperasi-hub-fe.test';
+                                                const displayDomain = selectedStore.domain || (selectedStore.subdomain ? `${selectedStore.subdomain}.${appName}` : '-');
                                                 return displayDomain !== '-' ? (
                                                     <a
                                                         href={`https://${displayDomain}`}

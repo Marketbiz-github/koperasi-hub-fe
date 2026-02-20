@@ -19,7 +19,9 @@ const roleRouteMap: Record<string, string> = {
 const oldLoginRoutes = ['/login/vendor', '/login/super_admin', '/login/koperasi', '/login/affiliator'];
 
 export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const url = request.nextUrl;
+  const { pathname } = url;
+  const hostname = request.headers.get('host') || '';
   const accessToken = request.cookies.get('access_token')?.value;
   const userRole = request.cookies.get('role')?.value;
 
@@ -44,24 +46,55 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // 3. Protect dashboard routes
+  // 4. Protect dashboard routes
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
-
   if (isProtectedRoute && !accessToken) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // 4. Role-based access within protected routes
-  // (Optional: can be added here if we want strictly strict middleware checks)
-  // For now, layouts handle specific permission checks for better UI/UX (Access Denied page).
+  // --- Subdomain / Multi-tenant Logic ---
+  const mainDomains = [
+    'koperasi-hub-fe.test',
+    'localhost:3000',
+    'koperasihub.com',
+  ];
+
+  let subdomain = '';
+  if (hostname.endsWith('.koperasi-hub-fe.test')) {
+    subdomain = hostname.replace('.koperasi-hub-fe.test', '');
+  } else if (hostname.endsWith('.localhost:3000')) {
+    subdomain = hostname.replace('.localhost:3000', '');
+  } else if (!mainDomains.includes(hostname)) {
+    subdomain = hostname;
+  }
+
+  if (subdomain && subdomain !== 'www' && !mainDomains.includes(hostname)) {
+    if (
+      pathname.startsWith('/_next') ||
+      pathname.startsWith('/api') ||
+      pathname.startsWith('/static') ||
+      pathname.includes('.')
+    ) {
+      return NextResponse.next();
+    }
+
+    if (pathname === '/') {
+      return NextResponse.rewrite(new URL(`/store/${subdomain}`, request.url));
+    }
+  }
 
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    '/dashboard/:path*',
-    '/login',
-    '/register/:path*',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };

@@ -2,14 +2,15 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Star, MapPin, Phone, Mail, Globe, Facebook, Instagram, Twitter, Share2, ShoppingBag, Loader2, Store as StoreIcon, Package } from 'lucide-react';
+import { Star, ShoppingBag, Loader2, Store as StoreIcon, Package, Share2 } from 'lucide-react';
 import CarouselBanner from '@/components/carousel-banner';
-import Header from '../../marketplace/components/Header';
-import Footer from '../../marketplace/components/Footer';
 import ProductCard from '../../marketplace/components/ProductCard';
 import Link from 'next/link';
 import { storeService, productService } from '@/services/apiService';
 import { getPublicAccessToken } from '@/utils/auth';
+import StoreHeader from './components/StoreHeader';
+import StoreFooter from './components/StoreFooter';
+import StoreProductCard from './components/StoreProductCard';
 
 export default function StorePage({
   params,
@@ -26,13 +27,9 @@ export default function StorePage({
     try {
       const token = await getPublicAccessToken();
 
-      // Fetch Store Detail
-      // Assuming there's a getStoreDetail or similar. If not, use getStores with search/filter
-      // For now, let's look if apiService has getStoreDetail. It doesn't seem to have id-based detail.
-      // storeService has getStoreByUserId.
-      // Let's assume storeId here is actually the store id or we search by it.
-      const res = await storeService.getStores(token || '', { search: storeId, limit: 1 });
-      const storeData = res.data?.data?.[0] || res.data?.[0]; // Handle different response formats
+      // Fetch Store Detail using lookup
+      const res = await storeService.lookup(token || '', storeId);
+      const storeData = res.data;
 
       if (storeData) {
         setStore(storeData);
@@ -58,230 +55,205 @@ export default function StorePage({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        <Header />
+      <div className="min-h-screen bg-white flex flex-col">
+        <div className="h-20 border-b border-slate-100 animate-pulse" />
         <div className="flex-1 flex items-center justify-center">
           <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
         </div>
-        <Footer />
       </div>
     );
   }
 
   if (!store) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        <Header />
+      <div className="min-h-screen bg-white flex flex-col">
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
-          <StoreIcon className="w-16 h-16 text-gray-300" />
-          <h1 className="text-2xl font-bold text-gray-500">Toko tidak ditemukan</h1>
-          <Link href="/marketplace" className="text-emerald-600 font-semibold">Kembali ke Marketplace</Link>
+          <StoreIcon className="w-16 h-16 text-slate-200" />
+          <h1 className="text-2xl font-bold text-slate-500 tracking-tight">Toko tidak ditemukan</h1>
+          <Link href="/marketplace" className="text-emerald-600 font-bold hover:underline">Kembali ke Marketplace</Link>
         </div>
-        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-gray-50 to-white flex flex-col">
-      <Header />
-
+    <div
+      className="min-h-screen bg-white flex flex-col font-sans"
+      style={{
+        '--store-primary': store.color || '#10b981',
+        '--store-primary-soft': `${store.color || '#10b981'}15` // 15% opacity
+      } as React.CSSProperties}
+    >
+      <StoreHeader store={store} />
 
       {/* Main Content */}
       <main className="flex-1">
-        <div className="max-w-7xl mx-auto w-full px-4 py-12">
+        <div className="max-w-7xl mx-auto w-full px-4 py-8 md:py-12">
           {/* Banner Carousel */}
           <div className="w-full mb-12">
             <CarouselBanner
-              images={[store.banner, store.banner, store.banner]}
+              images={[store.cover, store.cover, store.cover].filter(Boolean) as string[]}
               autoPlay={true}
               interval={5000}
-              height="h-56 md:h-80"
+              height="h-48 md:h-72"
             />
           </div>
 
-          {/* Premium Profile Card */}
-          <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 mb-12 border border-gray-100">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-center">
-              {/* Store Avatar */}
-              <div className="md:col-span-1 flex flex-col items-center">
-                <div className="relative mb-6">
-                  <div className="absolute inset-0 bg-linear-to-r from-[#10b981] to-[#2F5755] rounded-full blur-lg opacity-30"></div>
-                  <Image
-                    src={store.image}
-                    alt={store.name}
-                    width={140}
-                    height={140}
-                    className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-lg relative z-10"
-                  />
+          {/* Minimalist Profile Section */}
+          <div className="mb-16">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+              {/* Store Avatar & Basic Info */}
+              <div className="md:col-span-8 flex flex-col md:flex-row items-center md:items-start gap-8">
+                <div className="relative shrink-0">
+                  <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2rem] border-4 border-white shadow-xl shadow-slate-200/50 relative z-10 overflow-hidden bg-slate-50 flex items-center justify-center">
+                    {store.logo ? (
+                      <Image
+                        src={store.logo}
+                        alt={store.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 128px, 160px"
+                      />
+                    ) : (
+                      <StoreIcon className="w-16 h-16 text-slate-200" />
+                    )}
+                  </div>
                 </div>
-                {store.verified && (
-                  <div className="flex items-center gap-1 bg-blue-50 text-blue-600 px-4 py-2 rounded-full text-sm font-semibold">
-                    <span className="text-blue-500">✓</span> Terverifikasi
-                  </div>
-                )}
-              </div>
 
-              {/* Store Info */}
-              <div className="md:col-span-2">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{store.name}</h1>
-                <p className="text-gray-600 leading-relaxed mb-6">{store.description}</p>
-
-                <div className="flex flex-wrap gap-3">
-                  <button className="border-2 border-gray-300 text-gray-600 hover:border-gray-400 px-8 py-3 rounded-lg font-semibold transition-all flex items-center gap-2">
-                    <Share2 size={18} />
-                    Bagikan
-                  </button>
-                </div>
-              </div>
-
-              {/* Stats Grid */}
-              <div className="md:col-span-2">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-linear-to-br from-blue-50 to-blue-100 p-5 rounded-xl border border-blue-200">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Star size={20} className="fill-yellow-400 text-yellow-400" />
-                      <span className="text-2xl font-bold text-gray-900">{store.rating || 0}</span>
-                    </div>
-                    <p className="text-sm text-gray-600 font-medium">{(store.reviews || 0).toLocaleString('id-ID')} Ulasan</p>
-                  </div>
-
-                  <div className="bg-linear-to-br from-green-50 to-green-100 p-5 rounded-xl border border-green-200">
-                    <p className="text-2xl font-bold text-green-600 mb-1">{((store.followers || 0) / 1000).toFixed(1)}K</p>
-                    <p className="text-sm text-gray-600 font-medium">Pengikut</p>
-                  </div>
-
-                  <div className="bg-linear-to-br from-orange-50 to-orange-100 p-5 rounded-xl border border-orange-200">
-                    <div className="flex items-center gap-2">
-                      <ShoppingBag size={18} className="text-orange-600" />
-                      <div>
-                        <p className="text-2xl font-bold text-orange-600">{((store.productSold || 0) / 1000).toFixed(1)}K</p>
-                        <p className="text-sm text-gray-600 font-medium">Terjual</p>
+                <div className="text-center md:text-left flex-1 py-2">
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-2">
+                    <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">{store.name}</h1>
+                    {store.verified && (
+                      <div className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold ring-1 ring-emerald-600/10">
+                        <span className="text-emerald-500">✓</span> Verifikasi
                       </div>
-                    </div>
+                    )}
                   </div>
 
-                  <div className="bg-linear-to-br from-purple-50 to-purple-100 p-5 rounded-xl border border-purple-200">
-                    <p className="text-2xl font-bold text-purple-600 mb-1">✓</p>
-                    <p className="text-sm text-gray-600 font-medium">Aktif</p>
+                  <p className="text-slate-500 leading-relaxed max-w-2xl text-sm md:text-base mb-6 font-medium">
+                    {store.description || 'Selamat datang di official store kami. Kami menyediakan berbagai macam produk berkualitas untuk Anda.'}
+                  </p>
+
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                    {store.phone && (
+                      <a
+                        href={`https://wa.me/${store.phone.startsWith('0') ? '62' + store.phone.substring(1) : store.phone.startsWith('62') ? store.phone : '62' + store.phone}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-[var(--store-primary,#10b981)] hover:opacity-90 text-white text-sm px-6 py-2 rounded-xl font-bold transition-all shadow-lg shadow-[var(--store-primary-soft)] flex items-center gap-2"
+                      >
+                        Hubungi Kami
+                      </a>
+                    )}
+                    <button
+                      onClick={() => {
+                        if (navigator.share) {
+                          navigator.share({
+                            title: store.name,
+                            text: store.description,
+                            url: window.location.href,
+                          });
+                        }
+                      }}
+                      className="bg-white border-2 border-slate-100 text-slate-600 hover:bg-slate-50 text-sm px-6 py-2 rounded-xl font-bold transition-all flex items-center gap-2"
+                    >
+                      <Share2 size={18} />
+                      Bagikan
+                    </button>
                   </div>
+                </div>
+              </div>
+
+              {/* Stats & Brief Grid */}
+              <div className="md:col-span-4 grid grid-cols-2 gap-3 w-full">
+                <div className="bg-slate-50/50 border border-slate-100 p-5 rounded-[2rem] flex flex-col justify-center group hover:bg-[var(--store-primary-soft)] transition-colors">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Star size={18} className="fill-amber-400 text-amber-400" />
+                    <span className="text-lg md:text-xl font-bold text-slate-900">{store.rating || 0}</span>
+                  </div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Penilaian Toko</p>
+                </div>
+
+                <div className="bg-slate-50/50 border border-slate-100 p-5 rounded-[2rem] flex flex-col justify-center group hover:bg-[var(--store-primary-soft)] transition-colors">
+                  <p className="text-lg md:text-xl font-bold text-slate-900 mb-1">{products.length || 0}</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Produk</p>
+                </div>
+
+                <div className="bg-slate-50/50 border border-slate-100 p-5 rounded-[2rem] flex flex-col justify-center group hover:bg-[var(--store-primary-soft)] transition-colors">
+                  <div className="flex items-center gap-2 mb-1">
+                    <ShoppingBag size={18} className="text-[var(--store-primary,#10b981)]" />
+                    <span className="text-lg md:text-xl font-bold text-slate-900">{(store.sold_count || 0).toLocaleString('id-ID')}</span>
+                  </div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Barang Terjual</p>
+                </div>
+
+                <div className="bg-slate-50/50 border border-slate-100 p-5 rounded-[2rem] flex flex-col justify-center group hover:bg-[var(--store-primary-soft)] transition-colors">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-lg md:text-xl font-bold text-slate-900">Online</span>
+                  </div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status Toko</p>
                 </div>
               </div>
             </div>
           </div>
 
+          <hr className="border-slate-100 mb-16" />
 
-
-          {/* All Products */}
-          <div>
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">📦 Produk {store.name}</h2>
-              <p className="text-gray-600">Jelajahi koleksi lengkap produk dari toko ini</p>
+          {/* Products Section */}
+          <div className="mb-20">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2 flex items-center gap-3">
+                  Katalog Produk
+                </h2>
+                <div className="h-1.5 w-20 bg-[var(--store-primary,#10b981)] rounded-full mb-3" />
+                <p className="text-slate-500 font-medium italic">Temukan koleksi produk pilihan terbaik khusus untuk Anda.</p>
+              </div>
+              <Link
+                href={`/store/${storeId}/product`}
+                className="text-[var(--store-primary,#10b981)] font-bold hover:underline flex items-center gap-2 group"
+              >
+                Lihat Semua Produk
+                <span className="group-hover:translate-x-1 transition-transform">→</span>
+              </Link>
             </div>
+
             {products.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                 {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <StoreProductCard key={product.id} product={product} />
                 ))}
               </div>
             ) : (
-              <div className="bg-white rounded-xl shadow-sm p-12 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 mb-12">
-                <Package className="w-16 h-16 text-gray-200" />
-                <h3 className="text-xl font-bold text-gray-500">Belum ada produk</h3>
-                <p className="text-gray-400">Toko ini belum memiliki produk aktif saat ini.</p>
+              <div className="bg-slate-50 rounded-[3rem] p-20 flex flex-col items-center justify-center text-center gap-5 border-2 border-dashed border-slate-100">
+                <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-sm">
+                  <Package className="w-12 h-12 text-slate-200" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-slate-700 mb-2">Belum ada produk</h3>
+                  <p className="text-slate-400 font-medium max-w-xs mx-auto">Toko ini sedang memperbarui katalog mereka. Silakan kembali lagi nanti.</p>
+                </div>
               </div>
             )}
 
-            {/* Pagination */}
-            <div className="flex items-center justify-center gap-2">
-              <button className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition font-medium">
-                ← Sebelumnya
-              </button>
-              <button className="px-4 py-2 rounded-lg bg-linear-to-r from-[#10b981] to-[#2F5755] text-white font-semibold shadow-md hover:shadow-lg transition">
-                1
-              </button>
-              <button className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition font-medium">
-                2
-              </button>
-              <span className="px-2 text-gray-400">...</span>
-              <button className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition font-medium">
-                4
-              </button>
-              <button className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition font-medium">
-                Selanjutnya →
-              </button>
-            </div>
-          </div>
-
-          {/* Store Description */}
-          <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 mb-12 border border-gray-100 mt-24">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              {/* Contact Section */}
-              <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-linear-to-br from-[#10b981] to-[#2F5755] rounded-lg flex items-center justify-center">
-                    <MapPin size={24} className="text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900">Informasi Toko</h3>
-                </div>
-
-                <div className="space-y-4">
-                  {store.address && (
-                    <div className="flex gap-4 p-4 bg-gray-50 rounded-lg hover:bg-linear-to-r hover:from-blue-50 hover:to-transparent transition">
-                      <MapPin size={20} className="text-[#10b981] shrink-0 mt-1" />
-                      <div>
-                        <p className="text-sm text-gray-500 font-medium mb-1">Alamat</p>
-                        <span className="text-gray-700">{store.address}</span>
-                      </div>
-                    </div>
-                  )}
-                  {store.phone_number && (
-                    <div className="flex gap-4 p-4 bg-gray-50 rounded-lg hover:bg-linear-to-r hover:from-green-50 hover:to-transparent transition">
-                      <Phone size={20} className="text-[#10b981] shrink-0" />
-                      <div>
-                        <p className="text-sm text-gray-500 font-medium mb-1">Telepon</p>
-                        <a href={`tel:${store.phone_number}`} className="text-gray-700 hover:text-[#10b981] transition">
-                          {store.phone_number}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                  {store.email && (
-                    <div className="flex gap-4 p-4 bg-gray-50 rounded-lg hover:bg-linear-to-r hover:from-orange-50 hover:to-transparent transition">
-                      <Mail size={20} className="text-[#10b981] shrink-0" />
-                      <div>
-                        <p className="text-sm text-gray-500 font-medium mb-1">Email</p>
-                        <a href={`mailto:${store.email}`} className="text-gray-700 hover:text-[#10b981] transition">
-                          {store.email}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                </div>
+            {/* Premium Pagination */}
+            {products.length > 0 && (
+              <div className="flex items-center justify-center gap-3 mt-16">
+                <button className="w-12 h-12 rounded-2xl bg-[var(--store-primary,#10b981)] text-white font-extrabold shadow-lg shadow-[var(--store-primary-soft)] transition-transform active:scale-95">1</button>
+                <button className="w-12 h-12 rounded-2xl bg-white border border-slate-100 text-slate-400 font-bold hover:bg-slate-50 transition-colors hover:text-slate-900">2</button>
+                <button className="w-12 h-12 rounded-2xl bg-white border border-slate-100 text-slate-400 font-bold hover:bg-slate-50 transition-colors hover:text-slate-900">3</button>
+                <div className="w-12 h-12 flex items-center justify-center text-slate-300">...</div>
+                <button className="px-6 h-12 rounded-2xl bg-white border border-slate-100 text-slate-600 font-bold hover:bg-slate-50 transition-colors flex items-center gap-2">
+                  Lanjut →
+                </button>
               </div>
-
-              {/* Social Media Section */}
-              <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-linear-to-br from-[#10b981] to-[#2F5755] rounded-lg flex items-center justify-center">
-                    <Share2 size={24} className="text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900">Ikuti Kami</h3>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {/* Since real store might not have social in current schema, we can fallback or hide */}
-                  <div className="col-span-full py-8 text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-                    <p className="text-sm text-gray-400 italic">Informasi sosial media belum tersedia</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </main>
 
-      <Footer />
+      <StoreFooter store={store} />
     </div>
   );
 }
