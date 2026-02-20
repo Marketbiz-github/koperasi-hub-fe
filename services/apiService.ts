@@ -9,10 +9,11 @@ interface ApiOptions {
     body?: any
     headers?: Record<string, string>
     token?: string
+    silent?: boolean
 }
 
 export async function apiRequest(endpoint: string, options: ApiOptions = {}) {
-    const { method = 'GET', body, headers = {}, token } = options
+    const { method = 'GET', body, headers = {}, token, silent = false } = options
 
     const config: RequestInit = {
         method,
@@ -48,11 +49,13 @@ export async function apiRequest(endpoint: string, options: ApiOptions = {}) {
     }
 
     if (!response.ok) {
-        // Log error response to console for server-side debugging
-        console.error(`API Error [${method} ${endpoint}]:`, {
-            status: response.status,
-            data: responseData
-        });
+        // Log error response to console for server-side debugging unless silent
+        if (!silent) {
+            console.error(`API Error [${method} ${endpoint}]:`, {
+                status: response.status,
+                data: responseData
+            });
+        }
 
         const errorMessage = responseData.data?.error || responseData.meta?.message || responseData.message || 'Something went wrong';
         const error: any = new Error(errorMessage);
@@ -128,6 +131,14 @@ export const userService = {
             method: 'POST',
             body: data,
             token
+        })
+    },
+
+    async search(token: string, params: { role?: string, store_name?: string, page?: number, limit?: number }) {
+        return apiRequest('/users/search', {
+            method: 'POST',
+            body: params,
+            token,
         })
     }
 }
@@ -458,6 +469,7 @@ export const affiliationService = {
             method: 'POST',
             body: data,
             token,
+            silent: true,
         })
     },
 

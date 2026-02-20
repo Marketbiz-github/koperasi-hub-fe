@@ -181,6 +181,7 @@ export default function IncomingAffiliationsPage() {
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 text-[10px] font-bold uppercase tracking-wider">
+                                        <th className="px-6 py-4 text-center w-16">No</th>
                                         <th className="px-6 py-4">Pemohon</th>
                                         <th className="px-6 py-4 text-center">Detail Toko</th>
                                         <th className="px-6 py-4 text-center">Tanggal</th>
@@ -189,8 +190,11 @@ export default function IncomingAffiliationsPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-200">
-                                    {filteredAffiliations.map((affiliation) => (
+                                    {filteredAffiliations.map((affiliation, index) => (
                                         <tr key={affiliation.id} className="hover:bg-slate-50/50 transition-colors text-sm">
+                                            <td className="px-6 py-4 text-center font-medium text-slate-400">
+                                                {index + 1}
+                                            </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold shrink-0 text-sm">
@@ -231,32 +235,36 @@ export default function IncomingAffiliationsPage() {
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex justify-end gap-2">
-                                                    <button
-                                                        onClick={() => handleApprove(affiliation.id)}
-                                                        disabled={processingId === affiliation.id}
-                                                        className={`p-2 rounded-lg transition-colors border ${affiliation.status === 'approved'
-                                                            ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
-                                                            : 'text-emerald-600 hover:bg-emerald-50 border-emerald-100'
-                                                            }`}
-                                                        title="Setujui"
-                                                    >
-                                                        {processingId === affiliation.id ? (
-                                                            <Loader2 className="w-5 h-5 animate-spin" />
-                                                        ) : (
-                                                            <UserCheck className="w-5 h-5" />
-                                                        )}
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleReject(affiliation.id)}
-                                                        disabled={processingId === affiliation.id}
-                                                        className={`p-2 rounded-lg transition-colors border ${affiliation.status === 'rejected'
-                                                            ? 'bg-red-100 text-red-700 border-red-200'
-                                                            : 'text-red-600 hover:bg-red-50 border-red-100'
-                                                            }`}
-                                                        title="Tolak"
-                                                    >
-                                                        <X className="w-5 h-5" />
-                                                    </button>
+                                                    {affiliation.status !== 'rejected' && (
+                                                        <button
+                                                            onClick={() => handleApprove(affiliation.id)}
+                                                            disabled={processingId === affiliation.id || affiliation.status === 'approved'}
+                                                            className={`p-2 rounded-lg transition-colors border ${affiliation.status === 'approved'
+                                                                ? 'bg-emerald-100 text-emerald-700 border-emerald-200 cursor-not-allowed'
+                                                                : 'text-emerald-600 hover:bg-emerald-50 border-emerald-100'
+                                                                }`}
+                                                            title="Setujui"
+                                                        >
+                                                            {processingId === affiliation.id ? (
+                                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                                            ) : (
+                                                                <UserCheck className="w-5 h-5" />
+                                                            )}
+                                                        </button>
+                                                    )}
+                                                    {affiliation.status !== 'approved' && (
+                                                        <button
+                                                            onClick={() => handleReject(affiliation.id)}
+                                                            disabled={processingId === affiliation.id || affiliation.status === 'rejected'}
+                                                            className={`p-2 rounded-lg transition-colors border ${affiliation.status === 'rejected'
+                                                                ? 'bg-red-100 text-red-700 border-red-200 cursor-not-allowed'
+                                                                : 'text-red-600 hover:bg-red-50 border-red-100'
+                                                                }`}
+                                                            title="Tolak"
+                                                        >
+                                                            <X className="w-5 h-5" />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
