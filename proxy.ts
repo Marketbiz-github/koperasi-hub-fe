@@ -57,6 +57,7 @@ export function proxy(request: NextRequest) {
     'koperasi-hub-fe.test',
     'localhost:3000',
     'koperasihub.com',
+    'koperasi-hub-fe.vercel.app'
   ];
 
   let subdomain = '';
