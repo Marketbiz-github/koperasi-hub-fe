@@ -57,12 +57,15 @@ export function proxy(request: NextRequest) {
     'koperasi-hub-fe.test',
     'localhost:3000',
     'koperasihub.com',
-    'koperasi-hub-fe.vercel.app'
+    'koperasi-hub-fe.vercel.app',
+    'appshub.my.id'
   ];
 
   let subdomain = '';
   if (hostname.endsWith('.koperasi-hub-fe.vercel.app')) {
     subdomain = hostname.replace('.koperasi-hub-fe.vercel.app', '');
+  } else if (hostname.endsWith('.appshub.my.id')) {
+    subdomain = hostname.replace('.appshub.my.id', '');
   } else if (hostname.endsWith('.koperasi-hub-fe.test')) {
     subdomain = hostname.replace('.koperasi-hub-fe.test', '');
   } else if (hostname.endsWith('.localhost:3000')) {
