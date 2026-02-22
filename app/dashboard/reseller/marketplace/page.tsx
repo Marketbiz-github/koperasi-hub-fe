@@ -25,6 +25,7 @@ import { useCartStore } from "@/store/cartStore"
 import { productService, storeService } from "@/services/apiService"
 import { getAccessToken } from "@/utils/auth"
 import { toast } from "sonner"
+import { getSafeImageSrc } from "@/utils/image"
 
 interface Product {
   id: number
@@ -49,7 +50,8 @@ function ProductCardComponent({ product }: { product: Product }) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    const primaryImage = product.images?.find(img => img.is_primary)?.image_url || product.images?.[0]?.image_url || "/images/placeholder.png"
+    const rawImage = product.images?.find(img => img.is_primary)?.image_url || product.images?.[0]?.image_url
+    const primaryImage = getSafeImageSrc(rawImage)
     addItem({
       id: product.id.toString(),
       name: product.name,
@@ -69,7 +71,8 @@ function ProductCardComponent({ product }: { product: Product }) {
     }).format(Number(amount));
   }
 
-  const primaryImage = product.images?.find(img => img.is_primary)?.image_url || product.images?.[0]?.image_url || "/images/placeholder.png"
+  const rawImage = product.images?.find(img => img.is_primary)?.image_url || product.images?.[0]?.image_url
+  const primaryImage = getSafeImageSrc(rawImage)
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow flex flex-col group">
@@ -268,7 +271,7 @@ export default function MarketplaceResellerPage() {
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 border flex-shrink-0 relative">
                       {selectedVendorData.logo ? (
-                        <Image src={selectedVendorData.logo} alt={selectedVendorData.name} fill className="object-cover" />
+                        <Image src={getSafeImageSrc(selectedVendorData.logo)} alt={selectedVendorData.name} fill className="object-cover" />
                       ) : (
                         <Package className="m-auto text-gray-300 mt-3" size={24} />
                       )}
