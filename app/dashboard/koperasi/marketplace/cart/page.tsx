@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import {
@@ -11,19 +11,295 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Trash2, ChevronLeft, ShoppingCart } from "lucide-react"
+import { Trash2, ChevronLeft, ShoppingCart, CreditCard, Clock, FileText, Loader2, CheckCircle2, Ticket, Gift, Edit2 } from "lucide-react"
 import { useCartStore } from "@/store/cartStore"
+import { productService, storeService } from "@/services/apiService"
+import { useEffect } from "react"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
+import ShippingForm from "@/components/ShippingForm"
+import { Badge } from "@/components/ui/badge"
+import { getAccessToken } from "@/utils/auth"
+import { useSearchParams } from "next/navigation"
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity } = useCartStore()
+  const router = useRouter()
+  const {
+    items,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    selectedItems,
+    toggleSelectItem,
+    selectAll,
+    selectedTotalPrice
+  } = useCartStore()
+
+  const searchParams = useSearchParams()
+  const storeIdParam = searchParams.get("store_id")
+
   const [coupon, setCoupon] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [cartDetails, setCartDetails] = useState<Record<string, any>>({})
+  const [storeDetail, setStoreDetail] = useState<any>(null)
+  const [storeInfoMap, setStoreInfoMap] = useState<Record<number, any>>({})
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false)
+  const [customerNotes, setCustomerNotes] = useState("")
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  // Filter items by store
+  const filteredItems = useMemo(() => {
+    if (!storeIdParam) return items
+    return items.filter(it => it.storeId === Number(storeIdParam))
+  }, [items, storeIdParam])
+
+  // Fetch store info for ALL unique stores (for multi-store picker)
+  useEffect(() => {
+    const uniqueStoreIds = [...new Set(items.map(it => it.storeId).filter(Boolean))] as number[]
+    if (uniqueStoreIds.length <= 1) return
+    const fetchStoreInfos = async () => {
+      const token = await getAccessToken()
+      const map: Record<number, any> = {}
+      await Promise.all(
+        uniqueStoreIds.map(async (sId) => {
+          try {
+            const res = await storeService.getDetail(token || "", sId)
+            map[sId] = res.data
+          } catch (e) {
+            console.error("Error fetching store:", e)
+          }
+        })
+      )
+      setStoreInfoMap(map)
+    }
+    fetchStoreInfos()
+  }, [items])
+
+  // Payment States
+  const [paymentCategory, setPaymentCategory] = useState<"instant" | "piutang">("instant")
+  const [debtType, setDebtType] = useState<"tenor" | "po">("tenor")
+  const [tenorMonths, setTenorMonths] = useState("3")
+
+  // Shipping States
+  const [selectedRate, setSelectedRate] = useState<any>(null)
+  const [warehouseId, setWarehouseId] = useState<number | null>(null)
+  const [shippingAddress, setShippingAddress] = useState<any>(null)
+  const [isAddressLocked, setIsAddressLocked] = useState(false)
+
+  // Fetch product details and store details
+  useEffect(() => {
+    const fetchData = async () => {
+      if (filteredItems.length === 0) return
+      setIsLoadingDetails(true)
+      const details: Record<string, any> = {}
+      try {
+        const token = await getAccessToken()
+
+        // Fetch Store Detail if we have a storeId
+        const activeStoreId = filteredItems[0]?.storeId;
+        if (activeStoreId) {
+          try {
+            const sRes = await storeService.getDetail(token || "", activeStoreId)
+            setStoreDetail(sRes.data)
+          } catch (err) {
+            console.error("Error fetching store detail:", err)
+          }
+        }
+
+        await Promise.all(
+          filteredItems.map(async (item) => {
+            try {
+              const res = await productService.getProductDetail(item.id, token || undefined)
+              details[item.id] = res.data
+            } catch (err) {
+              console.error(`Error fetching detail for product ${item.id}:`, err)
+            }
+          })
+        )
+        setCartDetails(details)
+      } finally {
+        setIsLoadingDetails(false)
+      }
+    }
+    fetchData()
+  }, [filteredItems])
+
+  const totalOriginalPrice = useMemo(() => {
+    return filteredItems
+      .filter((it) => selectedItems.has(it.id))
+      .reduce((sum, it) => {
+        const detail = cartDetails[it.id]
+        const price = detail?.price ? parseInt(detail.price) : (it.price || 0)
+        return sum + price * it.quantity
+      }, 0)
+  }, [items, selectedItems, cartDetails])
+
+  const totalDiscount = useMemo(() => {
+    return filteredItems
+      .filter((it) => selectedItems.has(it.id))
+      .reduce((sum, it) => {
+        const detail = cartDetails[it.id]
+        if (detail?.discount_price) {
+          const price = parseInt(detail.price)
+          const discountPrice = parseInt(detail.discount_price)
+          return sum + (price - discountPrice) * it.quantity
+        }
+        return sum
+      }, 0)
+  }, [filteredItems, selectedItems, cartDetails])
+
+  const subtotal = totalOriginalPrice - totalDiscount
+
+  const totalCashback = useMemo(() => {
+    return filteredItems
+      .filter((it) => selectedItems.has(it.id))
+      .reduce((sum, it) => {
+        const detail = cartDetails[it.id]
+        if (detail?.is_cashback) {
+          const val = parseInt(detail.cashback_value)
+          if (detail.cashback_unit === 'percent') {
+            const price = detail.discount_price ? parseInt(detail.discount_price) : parseInt(detail.price)
+            return sum + (price * (val / 100)) * it.quantity
+          } else {
+            return sum + val * it.quantity
+          }
+        }
+        return sum
+      }, 0)
+  }, [filteredItems, selectedItems, cartDetails])
+
   const tax = Math.round(subtotal * 0.1)
-  const total = subtotal + tax
+  const baseShippingCost = selectedRate?.price || 0
 
-  const formatCurrency = (value: number) => {
-    return `Rp${value.toLocaleString("id-ID")}`
+  const shippingDiscount = useMemo(() => {
+    // Find first selected item that has gratis_ongkir on the product itself
+    const freeShippingItem = filteredItems
+      .filter(it => selectedItems.has(it.id))
+      .find(it => cartDetails[it.id]?.is_gratis_ongkir)
+    if (!freeShippingItem || baseShippingCost <= 0) return 0
+    const detail = cartDetails[freeShippingItem.id]
+    // Use product's gratis_ongkir_value; fallback to store's if available
+    const discountVal = detail?.gratis_ongkir_value
+      ? parseInt(detail.gratis_ongkir_value)
+      : storeDetail?.gratis_ongkir_value
+        ? parseInt(storeDetail.gratis_ongkir_value)
+        : baseShippingCost // full free shipping if no value specified
+    return Math.min(baseShippingCost, discountVal || 0)
+  }, [filteredItems, selectedItems, cartDetails, storeDetail, baseShippingCost])
+
+  const shippingCost = Math.max(0, baseShippingCost - shippingDiscount)
+  const total = subtotal + tax + shippingCost
+
+  const isAllSelected = filteredItems.length > 0 && filteredItems.every(it => selectedItems.has(it.id))
+
+  const handleSelectRate = (rate: any, whId: number, addr: any, notes: string) => {
+    setSelectedRate(rate)
+    setWarehouseId(whId)
+    setShippingAddress(addr)
+    setCustomerNotes(notes)
+    setIsAddressLocked(true)
+  }
+
+  const handleResetAddress = () => {
+    setIsAddressLocked(false)
+    setSelectedRate(null)
+    setShippingAddress(null)
+  }
+
+  const handleCheckout = async () => {
+    if (selectedItems.size === 0) {
+      toast.error("Pilih minimal satu item untuk checkout")
+      return
+    }
+
+    if (!selectedRate || !shippingAddress) {
+      toast.error("Mohon lengkapi informasi pengiriman dan pilih kurir")
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const selectedCartItems = currentItems.filter(it => selectedItems.has(it.id))
+      const firstItemDetail = cartDetails[selectedCartItems[0]?.id]
+
+      const orderData = {
+        store_id: firstItemDetail?.store_id || selectedCartItems[0]?.storeId || 1,
+        shipping_address: {
+          name: shippingAddress.name || "User Koperasi",
+          email: shippingAddress.email || "user@example.com",
+          phone: shippingAddress.phone || "08123456789",
+          address: shippingAddress.address_detail || shippingAddress.address,
+          province: shippingAddress.province,
+          city: shippingAddress.city,
+          district: shippingAddress.district,
+          subdistrict: shippingAddress.subdistrict,
+          zipcode: shippingAddress.zipcode
+        },
+        items: selectedCartItems.map(item => {
+          const detail = cartDetails[item.id]
+          return {
+            product_id: parseInt(item.id),
+            product_variant_id: item.variantId || 0,
+            quantity: item.quantity
+          }
+        }),
+        shipping_cost: shippingCost,
+        courier_name: selectedRate.courier_name,
+        courier_code: selectedRate.courier_code,
+        courier_service: selectedRate.courier_service_name,
+        warehouse_id: warehouseId,
+        customer_notes: customerNotes,
+        payment_category: paymentCategory,
+        ...(paymentCategory === "piutang" && {
+          debt_type: debtType,
+          ...(debtType === "tenor" && { tenor_months: parseInt(tenorMonths) })
+        })
+      }
+
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.message || "Gagal membuat pesanan")
+      }
+
+      toast.success("Pesanan berhasil dibuat!")
+
+      // Remove only selected items from cart
+      selectedCartItems.forEach(it => removeItem(it.id))
+
+      if (result.data?.payment_url) {
+        window.location.href = result.data.payment_url
+      } else {
+        router.push("/dashboard/koperasi/marketplace/orders")
+      }
+    } catch (error: any) {
+      console.error("Checkout Error:", error)
+      toast.error(error.message || "Terjadi kesalahan saat checkout")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const formatCurrency = (value: number | string | undefined) => {
+    if (value === undefined || value === null) return "Rp0"
+    const numeric = typeof value === 'string' ? parseInt(value) : value
+    return `Rp${(numeric || 0).toLocaleString("id-ID")}`
   }
 
   if (items.length === 0) {
@@ -54,6 +330,62 @@ export default function CartPage() {
     )
   }
 
+  // Map items by store to show multiple "carts" if no store_id is selected
+  const storeGroups = useMemo(() => {
+    const groups: Record<number, any[]> = {}
+    items.forEach(it => {
+      const sId = it.storeId || 0
+      if (!groups[sId]) groups[sId] = []
+      groups[sId].push(it)
+    })
+    return groups
+  }, [items])
+
+  if (!storeIdParam && Object.keys(storeGroups).length > 1) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-semibold">Keranjang Belanja Koperasi</h1>
+        <p className="text-sm text-gray-500">Anda memiliki item dari beberapa toko. Pilih keranjang untuk checkout.</p>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {Object.entries(storeGroups).map(([sId, sItems]) => {
+            const info = storeInfoMap[Number(sId)]
+            const storeName = info?.name || info?.store_name || `Toko ${sId}`
+            const storeLogo = info?.logo || info?.image
+            return (
+              <Card key={sId} className="hover:border-emerald-500 transition-colors cursor-pointer" onClick={() => router.push(`/dashboard/koperasi/marketplace/cart?store_id=${sId}`)}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-3">
+                    <div className="relative h-10 w-10 rounded-full bg-gray-100 overflow-hidden shrink-0 border">
+                      {storeLogo ? (
+                        <Image src={storeLogo} alt={storeName} fill className="object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-emerald-600 font-bold text-sm">
+                          {storeName.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold truncate">{storeName}</p>
+                      <Badge variant="outline" className="text-xs mt-0.5">{sItems.length} Produk</Badge>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+
+                  <Button className="w-full" variant="outline">Lihat Keranjang</Button>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
+
+      </div>
+    )
+  }
+
+  const currentItems = filteredItems.length > 0 ? filteredItems : items
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
@@ -64,166 +396,314 @@ export default function CartPage() {
         </Link>
         <div>
           <h1 className="text-2xl font-semibold">Keranjang Belanja Koperasi</h1>
-          <p className="text-sm text-gray-500">Lihat dan kelola pesanan Anda</p>
+          <p className="text-sm text-gray-500">Pilih item yang ingin Anda bayar</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Items List */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Item Keranjang ({items.length})</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle>Item Keranjang ({currentItems.length})</CardTitle>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="select-all"
+                  checked={isAllSelected}
+                  onChange={(e) => selectAll(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-600 cursor-pointer"
+                />
+                <Label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
+                  Pilih Semua
+                </Label>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              {items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex gap-4 pb-4 border-b last:border-b-0 last:pb-0"
-                >
-                  {/* Product Image */}
-                  <div className="relative w-24 h-24 bg-gray-100 rounded-lg overflow-hidden shrink-0">
-                    {item.image ? (
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        className="object-cover"
+              {currentItems.map((item) => {
+                const detail = cartDetails[item.id]
+                return (
+                  <div
+                    key={item.id}
+                    className={`flex gap-4 pb-4 border-b last:border-b-0 last:pb-0 transition-opacity ${selectedItems.has(item.id) ? "opacity-100" : "opacity-60"
+                      }`}
+                  >
+                    <div className="flex items-center pt-1">
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.has(item.id)}
+                        onChange={() => toggleSelectItem(item.id)}
+                        className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-600 cursor-pointer"
                       />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        No Image
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Product Info */}
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-1">
-                      {item.name}
-                    </h3>
-                    <p className="text-sm text-gray-500 mb-2">{item.category}</p>
-                    <p className="font-bold text-emerald-600">
-                      {formatCurrency(item.price)}
-                    </p>
-                  </div>
-
-                  {/* Quantity & Actions */}
-                  <div className="flex flex-col justify-between items-end">
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className="text-red-600 hover:text-red-800 p-1"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-
-                    <div className="flex items-center border rounded-lg bg-gray-50">
-                      <button
-                        onClick={() =>
-                          updateQuantity(
-                            item.id,
-                            Math.max(1, item.quantity - 1)
-                          )
-                        }
-                        className="px-3 py-1 text-gray-600 hover:bg-gray-100"
-                      >
-                        −
-                      </button>
-                      <span className="px-3 py-1 text-sm font-semibold">
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() =>
-                          updateQuantity(item.id, item.quantity + 1)
-                        }
-                        className="px-3 py-1 text-gray-600 hover:bg-gray-100"
-                      >
-                        +
-                      </button>
                     </div>
 
-                    <p className="font-semibold text-gray-900">
-                      {formatCurrency(item.price * item.quantity)}
-                    </p>
+                    {/* Product Image */}
+                    <div className="relative w-24 h-24 bg-gray-100 rounded-lg overflow-hidden shrink-0">
+                      {(() => {
+                        const primaryImg = detail?.images?.find((img: any) => img.is_primary)?.image_url || detail?.image || item.image;
+                        return primaryImg ? (
+                          <Image
+                            src={primaryImg}
+                            alt={detail?.name || item.name || "Product"}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            {isLoadingDetails ? <Loader2 className="animate-spin" /> : "No Image"}
+                          </div>
+                        )
+                      })()}
+                    </div>
+
+                    {/* Product Info */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 mb-0.5 truncate">
+                        {detail?.name || item.name || (isLoadingDetails ? "Memuat..." : "Produk")}
+                      </h3>
+                      <p className="text-xs text-gray-500 mb-1.5">
+                        {detail?.product_category?.name || detail?.category_name || detail?.category || item.category || ""}
+                      </p>
+
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {detail?.is_gratis_ongkir && (
+                          <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-emerald-100 text-[10px] px-1.5 py-0">
+                            Free Shipping
+                          </Badge>
+                        )}
+                        {detail?.is_cashback && (
+                          <Badge variant="secondary" className="bg-amber-50 text-amber-700 hover:bg-amber-50 border-amber-100 text-[10px] px-1.5 py-0">
+                            Cashback {detail.cashback_value}{detail.cashback_unit === 'percent' ? '%' : ''}
+                          </Badge>
+                        )}
+                      </div>
+
+                      <div className="space-y-0.5">
+                        {detail?.discount_price && (
+                          <p className="text-xs text-gray-400 line-through">
+                            {formatCurrency(detail.price)}
+                          </p>
+                        )}
+                        <p className="font-bold text-emerald-600">
+                          {formatCurrency(detail?.discount_price || detail?.price || item.price)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Quantity & Actions */}
+                    <div className="flex flex-col justify-between items-end">
+                      <button
+                        onClick={() => removeItem(item.id)}
+                        className="text-gray-400 hover:text-red-600 transition-colors p-1"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+
+                      <div className="flex items-center border rounded-lg bg-gray-50">
+                        <button
+                          onClick={() =>
+                            updateQuantity(
+                              item.id,
+                              Math.max(1, item.quantity - 1)
+                            )
+                          }
+                          className="px-2 py-1 text-gray-600 hover:bg-gray-200 transition-colors"
+                        >
+                          −
+                        </button>
+                        <span className="px-3 py-1 text-sm font-semibold min-w-[30px] text-center">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity + 1)
+                          }
+                          className="px-2 py-1 text-gray-600 hover:bg-gray-200 transition-colors"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <p className="font-semibold text-gray-900">
+                        {formatCurrency((detail?.discount_price ? parseInt(detail.discount_price) : (detail?.price ? parseInt(detail.price) : (item.price || 0))) * item.quantity)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </CardContent>
           </Card>
+
+          <ShippingForm
+            onSelectRate={handleSelectRate}
+            onAddressLocked={setIsAddressLocked}
+            items={currentItems.filter(it => selectedItems.has(it.id))}
+            storeId={cartDetails[currentItems.filter(it => selectedItems.has(it.id))[0]?.id]?.store_id || currentItems[0]?.storeId || 1}
+          />
         </div>
 
         {/* Summary */}
         <div className="space-y-4">
-          <Card>
+          <Card className="sticky top-6">
             <CardHeader>
               <CardTitle>Ringkasan Pesanan</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Subtotal */}
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600">Subtotal</span>
-                <span className="font-semibold">{formatCurrency(subtotal)}</span>
+                <span className="text-gray-600">Total Harga ({selectedItems.size} barang)</span>
+                <span className="font-semibold">{formatCurrency(totalOriginalPrice)}</span>
               </div>
 
-              {/* Tax */}
+              {totalDiscount > 0 && (
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600">Total Diskon Produk</span>
+                  <span className="font-semibold text-red-600">-{formatCurrency(totalDiscount)}</span>
+                </div>
+              )}
+
+              <div className="flex justify-between items-center text-sm font-medium pt-1 border-t border-dashed">
+                <span className="text-gray-900">Subtotal</span>
+                <span className="text-gray-900">{formatCurrency(subtotal)}</span>
+              </div>
+
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600">Pajak (10%)</span>
                 <span className="font-semibold">{formatCurrency(tax)}</span>
               </div>
 
-              {/* Coupon Section */}
-              <div className="border-t pt-4">
-                <label className="text-sm font-medium mb-2 block">
-                  Kode Promo
-                </label>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Masukkan kode promo"
-                    value={coupon}
-                    onChange={(e) => setCoupon(e.target.value)}
-                  />
-                  <Button variant="outline" size="sm">
-                    Terapkan
-                  </Button>
-                </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-600">Total Ongkos Kirim</span>
+                <span className="font-semibold">{formatCurrency(baseShippingCost)}</span>
               </div>
 
-              {/* Total */}
+              {shippingDiscount > 0 && (
+                <div className="flex justify-between items-center text-sm text-emerald-600 font-medium">
+                  <span className="flex items-center gap-1">
+                    <Ticket size={14} /> Potongan Ongkir
+                  </span>
+                  <span>-{formatCurrency(shippingDiscount)}</span>
+                </div>
+              )}
+              {totalCashback > 0 && (
+                <div className="flex items-center justify-between p-2 bg-amber-50 rounded border border-amber-100 text-xs mt-2">
+                  <div className="flex items-center gap-2">
+                    <Gift size={14} className="text-amber-600" />
+                    <span className="text-amber-700 font-medium">Estimasi Cashback</span>
+                  </div>
+                  <span className="text-amber-700 font-bold">{formatCurrency(totalCashback)}</span>
+                </div>
+              )}
+
+              <div className="border-t pt-4 space-y-4">
+                <label className="text-sm font-bold block">Metode Pembayaran</label>
+
+                <RadioGroup
+                  value={paymentCategory}
+                  onValueChange={(v) => setPaymentCategory(v as any)}
+                  className="grid gap-2"
+                >
+                  <div className={`flex items-start space-x-3 border p-3 rounded-lg cursor-pointer transition-all ${paymentCategory === "instant" ? "border-emerald-600 bg-emerald-50" : "hover:bg-gray-50"}`}>
+                    <RadioGroupItem value="instant" id="instant" className="mt-1" />
+                    <Label htmlFor="instant" className="flex-1 cursor-pointer font-medium">
+                      <div className="flex items-center gap-2 mb-1">
+                        <CreditCard size={16} className="text-emerald-600" />
+                        <span>Pembayaran Instan</span>
+                      </div>
+                      <p className="text-xs text-gray-500 font-normal">Bayar langsung menggunakan iPaymu</p>
+                    </Label>
+                  </div>
+
+                  <div className={`flex items-start space-x-3 border p-3 rounded-lg cursor-pointer transition-all ${paymentCategory === "piutang" ? "border-emerald-600 bg-emerald-50" : "hover:bg-gray-50"}`}>
+                    <RadioGroupItem value="piutang" id="piutang" className="mt-1" />
+                    <Label htmlFor="piutang" className="flex-1 cursor-pointer font-medium">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Clock size={16} className="text-amber-600" />
+                        <span>Sistem Piutang</span>
+                      </div>
+                      <p className="text-xs text-gray-500 font-normal">Plafon kredit koperasi</p>
+                    </Label>
+                  </div>
+                </RadioGroup>
+
+                {paymentCategory === "piutang" && (
+                  <div className="pl-4 pt-2 space-y-4 border-l-2 border-emerald-100">
+                    <div className="space-y-2">
+                      <Label className="text-xs text-gray-500 uppercase tracking-wider font-bold">Jenis Piutang</Label>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant={debtType === "tenor" ? "default" : "outline"}
+                          size="sm"
+                          className="flex-1 gap-2 h-9"
+                          onClick={() => setDebtType("tenor")}
+                        >
+                          <Clock size={14} /> Tenor
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={debtType === "po" ? "default" : "outline"}
+                          size="sm"
+                          className="flex-1 gap-2 h-9"
+                          onClick={() => setDebtType("po")}
+                        >
+                          <FileText size={14} /> PO
+                        </Button>
+                      </div>
+                    </div>
+
+                    {debtType === "tenor" && (
+                      <div className="space-y-2">
+                        <Label className="text-xs text-gray-500 uppercase tracking-wider font-bold">Jangka Waktu</Label>
+                        <Select value={tenorMonths} onValueChange={setTenorMonths}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Pilih tenor" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">1 Bulan</SelectItem>
+                            <SelectItem value="3">3 Bulan</SelectItem>
+                            <SelectItem value="6">6 Bulan</SelectItem>
+                            <SelectItem value="12">12 Bulan</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <div className="border-t pt-4 flex justify-between items-center">
-                <span className="font-bold text-lg">Total</span>
+                <span className="font-bold text-lg">Total Tagihan</span>
                 <span className="font-bold text-xl text-emerald-600">
                   {formatCurrency(total)}
                 </span>
               </div>
 
-              {/* Checkout Button */}
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-base py-6">
-                Lanjut ke Pembayaran
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  onClick={handleCheckout}
+                  disabled={isSubmitting || selectedItems.size === 0 || !selectedRate}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-base py-6 gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Memproses...
+                    </>
+                  ) : (
+                    paymentCategory === "instant" ? "Bayar Sekarang" : "Ajukan Pesanan"
+                  )}
+                </Button>
 
-              {/* Continue Shopping */}
+                <p className="text-[10px] text-center text-gray-400">
+                  Dengan mengklik tombol di atas, Anda menyetujui syarat dan ketentuan yang berlaku.
+                </p>
+              </div>
+
               <Link href="/dashboard/koperasi/marketplace" className="block">
                 <Button variant="outline" className="w-full">
                   Lanjut Belanja
                 </Button>
               </Link>
-            </CardContent>
-          </Card>
-
-          {/* Shipping Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Pengiriman</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div>
-                <p className="text-gray-600 mb-1">Estimasi Tiba</p>
-                <p className="font-semibold">2-3 hari kerja</p>
-              </div>
-              <div>
-                <p className="text-gray-600 mb-1">Biaya Ongkos</p>
-                <p className="font-semibold text-emerald-600">Gratis Ongkir</p>
-              </div>
             </CardContent>
           </Card>
         </div>

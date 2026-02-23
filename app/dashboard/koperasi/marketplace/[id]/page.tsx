@@ -49,6 +49,10 @@ interface ProductDetail {
         logo: string | null
         description: string | null
     } | null
+    is_gratis_ongkir?: boolean
+    is_cashback?: boolean
+    cashback_unit?: string
+    cashback_value?: number
 }
 
 export default function ProductDetailPage() {
@@ -97,6 +101,8 @@ export default function ProductDetailPage() {
             image: selectedImage,
             category: product.product_category?.name || "Uncategorized",
             quantity: quantity,
+            storeId: product.store?.id,
+            variantId: 0,
         })
         toast.success(`${product.name} ditambahkan ke keranjang`)
     }
@@ -195,6 +201,18 @@ export default function ProductDetailPage() {
                         <p className="text-gray-500 text-sm font-medium">Harga Koperasi</p>
                         <div className="flex items-baseline gap-2">
                             <span className="text-4xl font-extrabold text-emerald-600">{formatCurrency(product.price)}</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            {product.is_gratis_ongkir && (
+                                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none px-2 py-0.5 text-xs font-semibold">
+                                    <Truck size={12} className="mr-1 inline" /> Free Shipping
+                                </Badge>
+                            )}
+                            {product.is_cashback && (
+                                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-none px-2 py-0.5 text-xs font-semibold">
+                                    Cashback {product.cashback_value}{product.cashback_unit === 'percent' ? '%' : ''}
+                                </Badge>
+                            )}
                         </div>
                     </div>
 

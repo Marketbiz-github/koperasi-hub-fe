@@ -173,7 +173,30 @@ export const shippingService = {
             method: 'POST',
             body: { input },
             token,
-        })
+        });
+    },
+
+    async getRates(data: {
+        store_id: number;
+        shipping_address: {
+            address: string;
+            province: string;
+            city: string;
+            district: string;
+            subdistrict: string;
+            zipcode: string;
+        };
+        items: Array<{
+            product_id: number;
+            product_variant_id: number;
+            quantity: number;
+        }>;
+    }, token?: string) {
+        return apiRequest('/orders/rates', {
+            method: 'POST',
+            body: data,
+            token,
+        });
     }
 }
 
@@ -520,6 +543,12 @@ export const storeService = {
         })
     },
 
+    async getDetail(token: string, id: string | number) {
+        return apiRequest(`/stores/${id}`, {
+            token,
+        })
+    },
+
     async getStores(token: string, params: { page?: number, limit?: number, search?: string } = {}) {
         let query = new URLSearchParams();
         if (params.page) query.append('page', params.page.toString());
@@ -536,6 +565,33 @@ export const storeService = {
         return apiRequest(`/stores/lookup?subdomain=${search}`, {
             token,
         });
+    }
+}
+
+export const orderService = {
+    async createOrder(data: any, token: string) {
+        return apiRequest('/orders', {
+            method: 'POST',
+            body: data,
+            token,
+        });
+    },
+
+    async getOrders(params: { user_id?: number, buyer_id?: number, store_id?: number, status?: string, payment_status?: string, search?: string, page?: number, limit?: number }, token: string) {
+        let query = new URLSearchParams();
+        if (params.user_id) query.append('user_id', params.user_id.toString());
+        if (params.buyer_id) query.append('buyer_id', params.buyer_id.toString());
+        if (params.store_id) query.append('store_id', params.store_id.toString());
+        if (params.status) query.append('status', params.status);
+        if (params.payment_status) query.append('payment_status', params.payment_status);
+        if (params.search) query.append('search', params.search);
+        if (params.page) query.append('page', params.page.toString());
+        if (params.limit) query.append('limit', params.limit.toString());
+
+        const queryString = query.toString();
+        const endpoint = `/orders${queryString ? `?${queryString}` : ''}`;
+
+        return apiRequest(endpoint, { token });
     }
 }
 

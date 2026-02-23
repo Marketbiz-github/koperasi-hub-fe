@@ -26,6 +26,8 @@ import { productService, storeService } from "@/services/apiService"
 import { getAccessToken } from "@/utils/auth"
 import { toast } from "sonner"
 
+import { useRouter } from "next/navigation"
+
 interface Product {
   id: number
   name: string
@@ -34,6 +36,7 @@ interface Product {
   status: string
   images?: { image_url: string; is_primary: boolean }[] | null
   product_category?: { name: string } | null
+  product_variants?: any[] | null
 }
 
 interface Vendor {
@@ -44,12 +47,22 @@ interface Vendor {
 }
 
 function ProductCardComponent({ product }: { product: Product }) {
+  const router = useRouter()
   const addItem = useCartStore((s) => s.addItem)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+
+    const hasVariants = product.product_variants && product.product_variants.length > 0
+
+    if (hasVariants) {
+      router.push(`/dashboard/koperasi/marketplace/${product.id}`)
+      return
+    }
+
     const primaryImage = product.images?.find(img => img.is_primary)?.image_url || product.images?.[0]?.image_url || "/images/placeholder.png"
+
     addItem({
       id: product.id.toString(),
       name: product.name,
@@ -57,6 +70,8 @@ function ProductCardComponent({ product }: { product: Product }) {
       image: primaryImage,
       category: product.product_category?.name || "Uncategorized",
       quantity: 1,
+      storeId: (product as any).store_id || (product as any).store?.id || 1,
+      variantId: 0,
     })
     toast.success(`${product.name} ditambahkan ke keranjang`)
   }
@@ -100,8 +115,11 @@ function ProductCardComponent({ product }: { product: Product }) {
             onClick={handleAddToCart}
             className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg flex items-center justify-center gap-2 transition text-sm"
           >
-            <ShoppingCart size={14} />
-            Tambah
+            {product.product_variants && product.product_variants.length > 0 ? (
+              <>Lihat Detail</>
+            ) : (
+              <><ShoppingCart size={14} /> Tambah</>
+            )}
           </button>
         </div>
       </div>

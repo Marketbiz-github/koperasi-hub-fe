@@ -4,9 +4,18 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { apiRequest, shippingService } from '@/services/apiService';
 import { getAccessToken } from '@/utils/auth';
+import { getLatLong } from '@/utils/geocoding';
 import { useDebounce } from '@/hooks/useDebounce';
-import { Loader2, Save, MapPin, Truck, Store, Upload, AlertTriangle, Palette, Phone, Search, Image as ImageIcon } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { HelpCircle, Info, ExternalLink, Loader2, Save, MapPin, Truck, Store, Upload, AlertTriangle, Palette, Phone, Search, Image as ImageIcon } from 'lucide-react';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Image from 'next/image';
 import { validateImage } from '@/utils/image-validation';
 
@@ -76,12 +85,16 @@ export default function StoreSettingsForm() {
         gratis_ongkir_value: '',
         logo: '',
         cover: '',
+        latitude: '',
+        longitude: '',
     });
 
     const [areaSearchInput, setAreaSearchInput] = useState('');
     const debouncedAreaSearch = useDebounce(areaSearchInput, 500);
     const [areaResults, setAreaResults] = useState<Location[]>([]);
     const [isSearchingArea, setIsSearchingArea] = useState(false);
+    const [isGeocoding, setIsGeocoding] = useState(false);
+    const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false);
     const [showAreaResults, setShowAreaResults] = useState(false);
 
     useEffect(() => {
@@ -126,6 +139,8 @@ export default function StoreSettingsForm() {
                         gratis_ongkir_value: data.gratis_ongkir_value || '',
                         logo: data.logo || '',
                         cover: data.cover || '',
+                        latitude: data.latitude || '',
+                        longitude: data.longitude || '',
                     });
 
                     // Set initial area search input
@@ -152,63 +167,57 @@ export default function StoreSettingsForm() {
     // Handlers
     const [uploadLoading, setUploadLoading] = useState<{ logo: boolean, cover: boolean }>({ logo: false, cover: false });
 
-    useEffect(() => {
-        const searchArea = async () => {
-            if (debouncedAreaSearch.length < 3) {
-                setAreaResults([]);
-                setShowAreaResults(false);
-                return;
-            }
+    const searchArea = async () => {
+        if (areaSearchInput.length < 3) {
+            setAreaResults([]);
+            setShowAreaResults(false);
+            return;
+        }
 
-            setIsSearchingArea(true);
-            try {
-                const token = await getAccessToken();
-                const res = await shippingService.searchArea(debouncedAreaSearch, token || undefined);
-                if (res.data?.success && res.data.areas) {
-                    setAreaResults(res.data.areas.map((area: any) => {
-                        let postalCode = area.postal_code;
-                        if (!postalCode || postalCode === 0) {
-                            // Try to parse from name
-                            const parts = area.name.split(' ');
-                            const potentialZip = parts[parts.length - 1];
-                            if (/^\d{5}$/.test(potentialZip)) {
-                                postalCode = potentialZip;
-                            }
+        setIsSearchingArea(true);
+        try {
+            const token = await getAccessToken();
+            const res = await shippingService.searchArea(areaSearchInput, token || undefined);
+            if (res.data?.success && res.data.areas) {
+                setAreaResults(res.data.areas.map((area: any) => {
+                    let postalCode = area.postal_code;
+                    if (!postalCode || postalCode === 0) {
+                        const parts = area.name.split(' ');
+                        const potentialZip = parts[parts.length - 1];
+                        if (/^\d{5}$/.test(potentialZip)) {
+                            postalCode = potentialZip;
                         }
+                    }
 
-                        return {
-                            id: area.id,
-                            name: area.name,
-                            province: area.administrative_division_level_1_name,
-                            city: area.administrative_division_level_2_name,
-                            district: area.administrative_division_level_3_name,
-                            area: area.name.split(',')[0],
-                            postal_code: postalCode,
-                        };
-                    }));
-                } else {
-                    setAreaResults([]);
-                }
-            } catch (error) {
-                console.error('Error searching area:', error);
-            } finally {
-                setIsSearchingArea(false);
+                    return {
+                        id: area.id,
+                        name: area.name,
+                        province: area.administrative_division_level_1_name,
+                        city: area.administrative_division_level_2_name,
+                        district: area.administrative_division_level_3_name,
+                        area: area.name.split(',')[0],
+                        postal_code: postalCode,
+                    };
+                }));
+                setShowAreaResults(true);
+            } else {
+                setAreaResults([]);
             }
-        };
+        } catch (error) {
+            console.error('Error searching area:', error);
+        } finally {
+            setIsSearchingArea(false);
+        }
+    };
 
-        searchArea();
-    }, [debouncedAreaSearch]);
-
-    const handleSearchArea = (val: string) => {
+    const handleSearchAreaChange = (val: string) => {
         setAreaSearchInput(val);
-        if (val.length >= 3) {
-            setShowAreaResults(true);
-        } else {
+        if (val.length < 3) {
             setShowAreaResults(false);
         }
     };
 
-    const handleSelectArea = (area: any) => {
+    const handleSelectArea = async (area: any) => {
         setFormData(prev => ({
             ...prev,
             province: area.province,
@@ -223,6 +232,28 @@ export default function StoreSettingsForm() {
         }));
         setAreaSearchInput(area.name);
         setShowAreaResults(false);
+
+        // Auto-fetch Lat/Lon
+        setIsGeocoding(true);
+        try {
+            const coords = await getLatLong({
+                street: formData.alamat,
+                city: area.city,
+                county: area.district,
+                state: area.province,
+                postalcode: area.postal_code?.toString()
+            });
+
+            if (coords) {
+                setFormData(prev => ({
+                    ...prev,
+                    latitude: coords.lat,
+                    longitude: coords.lon
+                }));
+            }
+        } finally {
+            setIsGeocoding(false);
+        }
     };
 
     const handleCourierToggle = (courierId: string) => {
@@ -317,6 +348,8 @@ export default function StoreSettingsForm() {
                 zipcode: String(formData.zipcode || ''),
                 courier: formData.courier, // Send as array
                 is_gratis_ongkir: formData.is_gratis_ongkir,
+                latitude: formData.latitude,
+                longitude: formData.longitude,
             };
 
             const token = await getAccessToken();
@@ -556,7 +589,12 @@ export default function StoreSettingsForm() {
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Alamat Lengkap <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Alamat Lengkap <span className="text-red-500">*</span>
+                                <span className="block text-sm font-normal text-slate-400 mt-1 italic">
+                                    Tips: Masukkan nama jalan dan nomor saja (tanpa &quot;Jl.&quot; atau &quot;Gg.&quot;) untuk hasil koordinat yang lebih akurat melalui sistem.
+                                </span>
+                            </label>
                             <textarea
                                 value={formData.alamat}
                                 onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
@@ -569,22 +607,28 @@ export default function StoreSettingsForm() {
 
                         <div className="md:col-span-2 relative">
                             <Label htmlFor="area-search" className="block text-sm font-medium text-slate-700 mb-2">Cari Area (Kecamatan, Kota, atau Provinsi) <span className="text-red-500">*</span></Label>
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                <input
-                                    id="area-search"
-                                    type="text"
-                                    placeholder="Masukkan minimal 3 karakter untuk mencari..."
-                                    value={areaSearchInput}
-                                    onChange={(e) => handleSearchArea(e.target.value)}
-                                    className="w-full pl-10 px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
-                                    onFocus={() => areaSearchInput.length >= 3 && setShowAreaResults(true)}
-                                />
-                                {isSearchingArea && (
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                        <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
-                                    </div>
-                                )}
+                            <div className="relative flex gap-2">
+                                <div className="relative flex-1">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <input
+                                        id="area-search"
+                                        type="text"
+                                        placeholder="Masukkan minimal 3 karakter..."
+                                        value={areaSearchInput}
+                                        onChange={(e) => handleSearchAreaChange(e.target.value)}
+                                        className="w-full pl-10 px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), searchArea())}
+                                    />
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={searchArea}
+                                    disabled={isSearchingArea || areaSearchInput.length < 3}
+                                    className="px-6 py-2 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-700 disabled:bg-slate-300 flex items-center gap-2"
+                                >
+                                    {isSearchingArea ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                                    Cari
+                                </button>
                             </div>
 
                             {showAreaResults && areaResults.length > 0 && (
@@ -608,14 +652,63 @@ export default function StoreSettingsForm() {
                             )}
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Kode Pos</label>
-                            <input
-                                type="text"
-                                value={formData.zipcode}
-                                readOnly
-                                className="w-full px-4 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-500 outline-none cursor-not-allowed"
-                            />
+                        <div className="md:col-span-2">
+                            <div className="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Kode Pos</label>
+                                    <input
+                                        type="text"
+                                        value={formData.zipcode}
+                                        readOnly
+                                        className="w-full px-4 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-500 outline-none cursor-not-allowed"
+                                    />
+                                </div>
+
+                                <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <label className="block text-sm font-medium text-slate-700">Latitude</label>
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsHelpDialogOpen(true)}
+                                            className="text-[10px] text-emerald-600 hover:text-emerald-700 flex items-center gap-1 font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 transition-colors"
+                                        >
+                                            <HelpCircle className="w-3 h-3" /> Google Maps
+                                        </button>
+                                    </div>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            value={formData.latitude}
+                                            onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+                                            className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                                            placeholder="Otomatis / Manual"
+                                        />
+                                        {isGeocoding && (
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                                <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Longitude</label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            value={formData.longitude}
+                                            onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
+                                            className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                                            placeholder="Otomatis / Manual"
+                                        />
+                                        {isGeocoding && (
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                                <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -742,7 +835,7 @@ export default function StoreSettingsForm() {
                 <div className="flex justify-end pt-4">
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || isGeocoding}
                         className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-bold rounded-xl transition-all shadow-lg shadow-emerald-600/20 active:scale-[0.98] flex items-center gap-2"
                     >
                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
@@ -750,6 +843,75 @@ export default function StoreSettingsForm() {
                     </button>
                 </div>
             </form>
-        </div >
+
+            {/* Manual Geocoding Help Dialog */}
+            <Dialog open={isHelpDialogOpen} onOpenChange={setIsHelpDialogOpen}>
+                <DialogContent className="sm:max-w-[500px] border-none shadow-2xl p-0 rounded-3xl max-h-[90vh] overflow-y-auto">
+                    <div className="bg-emerald-600 p-8 text-white">
+                        <DialogHeader>
+                            <div className="bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
+                                <HelpCircle className="w-6 h-6 text-white" />
+                            </div>
+                            <DialogTitle className="text-2xl font-bold text-white leading-tight">Bantuan Koordinat Manual</DialogTitle>
+                            <DialogDescription className="text-emerald-100 text-lg mt-2">
+                                Jika alamat tidak ditemukan atau kurang akurat, Anda bisa mengambil titik koordinat langsung dari Google Maps.
+                            </DialogDescription>
+                        </DialogHeader>
+                    </div>
+
+                    <div className="p-8 space-y-6">
+                        <div className="space-y-4">
+                            <div className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                                <div className="bg-emerald-100 text-emerald-700 w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">1</div>
+                                <div>
+                                    <p className="font-semibold text-slate-800">Cari Alamat</p>
+                                    <p className="text-sm text-slate-500">Buka Google Maps dan cari lokasi toko Anda.</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                                <div className="bg-emerald-100 text-emerald-700 w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">2</div>
+                                <div>
+                                    <p className="font-semibold text-slate-800">Klik Kanan</p>
+                                    <p className="text-sm text-slate-500">Klik kanan pada titik lokasi yang tepat di peta.</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                                <div className="bg-emerald-100 text-emerald-700 w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">3</div>
+                                <div>
+                                    <p className="font-semibold text-slate-800">Salin Koordinat</p>
+                                    <p className="text-sm text-slate-500">Klik pada angka koordinat yang muncul (misal: -8.123, 115.123). Angka akan otomatis tersalin.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <Alert className="bg-blue-50 border-blue-100 rounded-2xl">
+                            <Info className="h-5 w-5 text-blue-600" />
+                            <AlertTitle className="text-blue-800 font-bold ml-2">Penting!</AlertTitle>
+                            <AlertDescription className="text-blue-700 text-xs ml-2 mt-1">
+                                <p className="font-medium">• Nilai depan (dengan tanda minus jika ada) adalah <b>Latitude</b>.</p>
+                                <p className="font-medium">• Nilai belakang setelah koma adalah <b>Longitude</b>.</p>
+                            </AlertDescription>
+                        </Alert>
+
+                        <div className="flex flex-col gap-3">
+                            <button
+                                onClick={() => window.open('https://maps.google.com', '_blank')}
+                                className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-200"
+                            >
+                                <ExternalLink className="w-5 h-5" /> Buka Google Maps
+                            </button>
+                            <button
+                                onClick={() => setIsHelpDialogOpen(false)}
+                                className="w-full py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-all"
+                            >
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </div>
     );
 }

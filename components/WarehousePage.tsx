@@ -12,7 +12,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Plus, Edit, Trash2, Search, MapPin, Mail, Warehouse } from 'lucide-react';
+import { Loader2, Plus, Edit, Trash2, Search, MapPin, Mail, Warehouse, HelpCircle, Info, ExternalLink } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
     Dialog,
     DialogContent,
@@ -34,6 +35,7 @@ import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import { apiRequest, shippingService } from '@/services/apiService';
 import { getAccessToken } from '@/utils/auth';
+import { getLatLong } from '@/utils/geocoding';
 import { useDebounce } from '@/hooks/useDebounce';
 
 interface WarehouseData {
@@ -83,6 +85,8 @@ export default function WarehousePageShared({ title, description }: WarehousePag
     const debouncedAreaSearch = useDebounce(areaSearchInput, 500);
     const [areaResults, setAreaResults] = useState<any[]>([]);
     const [isSearchingArea, setIsSearchingArea] = useState(false);
+    const [isGeocoding, setIsGeocoding] = useState(false);
+    const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false);
     const [showAreaResults, setShowAreaResults] = useState(false);
 
     // Form states
@@ -216,63 +220,57 @@ export default function WarehousePageShared({ title, description }: WarehousePag
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isStoreLoading, store]);
 
-    useEffect(() => {
-        const searchArea = async () => {
-            if (debouncedAreaSearch.length < 3) {
-                setAreaResults([]);
-                setShowAreaResults(false);
-                return;
-            }
+    const searchArea = async () => {
+        if (areaSearchInput.length < 3) {
+            setAreaResults([]);
+            setShowAreaResults(false);
+            return;
+        }
 
-            setIsSearchingArea(true);
-            try {
-                const token = await getAccessToken();
-                const res = await shippingService.searchArea(debouncedAreaSearch, token || undefined);
-                if (res.data?.success && res.data.areas) {
-                    setAreaResults(res.data.areas.map((area: any) => {
-                        let postalCode = area.postal_code;
-                        if (!postalCode || postalCode === 0) {
-                            // Try to parse from name
-                            const parts = area.name.split(' ');
-                            const potentialZip = parts[parts.length - 1];
-                            if (/^\d{5}$/.test(potentialZip)) {
-                                postalCode = potentialZip;
-                            }
+        setIsSearchingArea(true);
+        try {
+            const token = await getAccessToken();
+            const res = await shippingService.searchArea(areaSearchInput, token || undefined);
+            if (res.data?.success && res.data.areas) {
+                setAreaResults(res.data.areas.map((area: any) => {
+                    let postalCode = area.postal_code;
+                    if (!postalCode || postalCode === 0) {
+                        const parts = area.name.split(' ');
+                        const potentialZip = parts[parts.length - 1];
+                        if (/^\d{5}$/.test(potentialZip)) {
+                            postalCode = potentialZip;
                         }
+                    }
 
-                        return {
-                            id: area.id,
-                            name: area.name,
-                            province: area.administrative_division_level_1_name,
-                            city: area.administrative_division_level_2_name,
-                            district: area.administrative_division_level_3_name,
-                            subdistrict: area.name.split(',')[0],
-                            postal_code: postalCode,
-                        };
-                    }));
-                } else {
-                    setAreaResults([]);
-                }
-            } catch (error) {
-                console.error('Error searching area:', error);
-            } finally {
-                setIsSearchingArea(false);
+                    return {
+                        id: area.id,
+                        name: area.name,
+                        province: area.administrative_division_level_1_name,
+                        city: area.administrative_division_level_2_name,
+                        district: area.administrative_division_level_3_name,
+                        subdistrict: area.name.split(',')[0],
+                        postal_code: postalCode,
+                    };
+                }));
+                setShowAreaResults(true);
+            } else {
+                setAreaResults([]);
             }
-        };
+        } catch (error) {
+            console.error('Error searching area:', error);
+        } finally {
+            setIsSearchingArea(false);
+        }
+    };
 
-        searchArea();
-    }, [debouncedAreaSearch]);
-
-    const handleSearchArea = (val: string) => {
+    const handleSearchAreaChange = (val: string) => {
         setAreaSearchInput(val);
-        if (val.length >= 3) {
-            setShowAreaResults(true);
-        } else {
+        if (val.length < 3) {
             setShowAreaResults(false);
         }
     };
 
-    const handleSelectArea = (area: any) => {
+    const handleSelectArea = async (area: any) => {
         setFormData(prev => ({
             ...prev,
             province: area.province,
@@ -288,6 +286,28 @@ export default function WarehousePageShared({ title, description }: WarehousePag
         }));
         setAreaSearchInput(area.name);
         setShowAreaResults(false);
+
+        // Auto-fetch Lat/Lon
+        setIsGeocoding(true);
+        try {
+            const coords = await getLatLong({
+                street: formData.alamat,
+                city: area.city,
+                county: area.district,
+                state: area.province,
+                postalcode: area.postal_code?.toString()
+            });
+
+            if (coords) {
+                setFormData(prev => ({
+                    ...prev,
+                    latitude: Number(coords.lat),
+                    longitude: Number(coords.lon)
+                }));
+            }
+        } finally {
+            setIsGeocoding(false);
+        }
     };
 
     const handleOpenCreate = () => {
@@ -691,33 +711,44 @@ export default function WarehousePageShared({ title, description }: WarehousePag
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="alamat">Alamat Lengkap</Label>
+                            <Label htmlFor="alamat">
+                                Alamat Lengkap <span className="text-red-500">*</span>
+                                <span className="block text-sm font-normal text-muted-foreground mt-1 italic">
+                                    Tips: Masukkan nama jalan dan nomor saja (tanpa &quot;Jl.&quot; atau &quot;Gg.&quot;) untuk hasil koordinat yang lebih akurat melalui sistem.
+                                </span>
+                            </Label>
                             <Input
                                 id="alamat"
                                 value={formData.alamat}
                                 onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
-                                placeholder="Jl. Raya No. 123"
+                                placeholder="Nama jalan, nomor rumah, RT/RW..."
                                 required
                             />
                         </div>
 
                         <div className="grid gap-2 relative">
-                            <Label htmlFor="area-search">Cari Area (Kecamatan, Kota, atau Provinsi)</Label>
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    id="area-search"
-                                    placeholder="Masukkan minimal 3 karakter untuk mencari..."
-                                    value={areaSearchInput}
-                                    onChange={(e) => handleSearchArea(e.target.value)}
-                                    className="pl-9"
-                                    onFocus={() => areaSearchInput.length >= 3 && setShowAreaResults(true)}
-                                />
-                                {isSearchingArea && (
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                                    </div>
-                                )}
+                            <Label htmlFor="area-search">Cari Area <span className="text-red-500">*</span></Label>
+                            <div className="flex gap-2">
+                                <div className="relative flex-1">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="area-search"
+                                        placeholder="Masukkan minimal 3 karakter..."
+                                        value={areaSearchInput}
+                                        onChange={(e) => handleSearchAreaChange(e.target.value)}
+                                        className="pl-9"
+                                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), searchArea())}
+                                    />
+                                </div>
+                                <Button
+                                    type="button"
+                                    onClick={searchArea}
+                                    disabled={isSearchingArea || areaSearchInput.length < 3}
+                                    className="bg-emerald-600 hover:bg-emerald-700"
+                                >
+                                    {isSearchingArea ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                                    <span className="ml-2">Cari</span>
+                                </Button>
                             </div>
 
                             {showAreaResults && areaResults.length > 0 && (
@@ -741,7 +772,7 @@ export default function WarehousePageShared({ title, description }: WarehousePag
                             )}
                         </div>
 
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-5 gap-3">
                             <div className="grid gap-2">
                                 <Label htmlFor="id_wms">ID WMS (Opsional)</Label>
                                 <Input
@@ -775,13 +806,56 @@ export default function WarehousePageShared({ title, description }: WarehousePag
                                     </SelectContent>
                                 </Select>
                             </div>
+                            <div className="grid gap-2">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="latitude">Latitude</Label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsHelpDialogOpen(true)}
+                                        className="text-[10px] text-emerald-600 hover:text-emerald-700 flex items-center gap-1 font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 transition-colors"
+                                    >
+                                        <HelpCircle className="w-3 h-3" /> Maps
+                                    </button>
+                                </div>
+                                <div className="relative">
+                                    <Input
+                                        id="latitude"
+                                        type="text"
+                                        value={formData.latitude}
+                                        onChange={(e) => setFormData({ ...formData, latitude: Number(e.target.value) || 0 })}
+                                        placeholder="Otomatis"
+                                    />
+                                    {isGeocoding && (
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                            <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="longitude">Longitude</Label>
+                                <div className="relative">
+                                    <Input
+                                        id="longitude"
+                                        type="text"
+                                        value={formData.longitude}
+                                        onChange={(e) => setFormData({ ...formData, longitude: Number(e.target.value) || 0 })}
+                                        placeholder="Otomatis"
+                                    />
+                                    {isGeocoding && (
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                            <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
                         <DialogFooter className="pt-4">
                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                                 Batal
                             </Button>
-                            <Button type="submit" disabled={isSaving} className="bg-green-600 hover:bg-green-700">
+                            <Button type="submit" disabled={isSaving || isGeocoding} className="bg-green-600 hover:bg-green-700">
                                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                                 {editingWarehouse ? 'Update' : 'Simpan'}
                             </Button>
@@ -810,6 +884,76 @@ export default function WarehousePageShared({ title, description }: WarehousePag
                             Hapus
                         </Button>
                     </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Manual Geocoding Help Dialog */}
+            <Dialog open={isHelpDialogOpen} onOpenChange={setIsHelpDialogOpen}>
+                <DialogContent className="sm:max-w-[500px] p-0 border-none shadow-2xl max-h-[90vh] overflow-y-auto">
+                    <div className="bg-emerald-600 p-8 text-white">
+                        <DialogHeader>
+                            <div className="bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
+                                <HelpCircle className="w-6 h-6 text-white" />
+                            </div>
+                            <DialogTitle className="text-2xl font-bold text-white tracking-tight">Bantuan Koordinat Manual</DialogTitle>
+                            <DialogDescription className="text-emerald-50 text-base mt-2">
+                                Jika alamat tidak ditemukan atau kurang akurat, Anda bisa mengambil titik koordinat langsung dari Google Maps.
+                            </DialogDescription>
+                        </DialogHeader>
+                    </div>
+
+                    <div className="p-8 space-y-6">
+                        <div className="space-y-4">
+                            <div className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                                <div className="bg-emerald-100 text-emerald-700 w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">1</div>
+                                <div>
+                                    <p className="font-semibold text-slate-800">Cari Alamat</p>
+                                    <p className="text-sm text-slate-500 text-balance">Buka Google Maps dan cari lokasi gudang Anda.</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                                <div className="bg-emerald-100 text-emerald-700 w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">2</div>
+                                <div>
+                                    <p className="font-semibold text-slate-800">Klik Kanan</p>
+                                    <p className="text-sm text-slate-500 text-balance">Klik kanan pada titik lokasi yang tepat di peta.</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                                <div className="bg-emerald-100 text-emerald-700 w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">3</div>
+                                <div>
+                                    <p className="font-semibold text-slate-800">Salin Koordinat</p>
+                                    <p className="text-sm text-slate-500 text-balance">Klik pada angka koordinat yang muncul. Angka akan otomatis tersalin ke keyboard Anda.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <Alert className="bg-blue-50 border-blue-100 rounded-2xl">
+                            <Info className="h-5 w-5 text-blue-600" />
+                            <AlertTitle className="text-blue-800 font-bold ml-2">Penting!</AlertTitle>
+                            <AlertDescription className="text-blue-700 text-xs ml-2 mt-1">
+                                <p className="font-medium">• Nilai depan (dengan tanda minus jika ada) adalah <b>Latitude</b>.</p>
+                                <p className="font-medium">• Nilai belakang setelah koma adalah <b>Longitude</b>.</p>
+                            </AlertDescription>
+                        </Alert>
+
+                        <div className="flex flex-col gap-3">
+                            <Button
+                                onClick={() => window.open('https://maps.google.com', '_blank')}
+                                className="w-full py-6 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-200"
+                            >
+                                <ExternalLink className="w-5 h-5" /> Buka Google Maps
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                onClick={() => setIsHelpDialogOpen(false)}
+                                className="w-full py-6 text-slate-500 rounded-2xl font-bold hover:bg-slate-50 transition-all"
+                            >
+                                Tutup
+                            </Button>
+                        </div>
+                    </div>
                 </DialogContent>
             </Dialog>
         </div>
