@@ -18,7 +18,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\" : \"janestore1@gmail.com\",\n    \"password\" : \"password123\"\n}",
+              "raw": "{\n    \"email\" : \"pisogow580@example.com\",\n    \"password\" : \"password123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -4496,7 +4496,8 @@
               "path": [
                 "stores"
               ]
-            }
+            },
+            "description": "**Parameters for Gratis Ongkir:**\n\n- `is_gratis_ongkir` (string): \"true\" atau \"false\".\n    \n- `gratis_ongkir_unit` (string): `\"nominal\"`, `\"percentage\"`, atau `\"full\"`.\n    \n- `gratis_ongkir_value` (string): Nilai diskon (jumlah nominal jika unit nominal, atau persentase jika unit percentage).\n    \n- `gratis_ongkir_min_order` (string): Ambang batas minimal belanja (subtotal) agar gratis ongkir aktif."
           },
           "response": [
             {
@@ -10582,7 +10583,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzAyNzYwNjcsInVzZXJfaWQiOjF9.B3JAsOl44MYhzDMo4aw8JQWi59yXFNruXlM0dJMh9Mc",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE5NDYxOTYsInVzZXJfaWQiOjExfQ.MofI4QzvArAn6goZKcgTCJntUzASUKWKYq4Gs5rmemo",
                   "type": "string"
                 }
               ]
@@ -10970,7 +10971,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA5NDcxMDgsInVzZXJfaWQiOjF9.PHFyI5s9OJy-Yt6ubLK2Q_UFHux2kgf1qowAeG5ppVc",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzIwMjA1NzUsInVzZXJfaWQiOjJ9.2yqHL77I7Hn3Hc94aPL0nE9B9c0h5pms_s-W9Knb6FY",
                   "type": "string"
                 }
               ]
@@ -10979,7 +10980,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"instant\"\n}",
+              "raw": "{\n    \"store_id\": 9,\n    \"shipping_address\": {\n        \"name\": \"kop\",\n        \"email\": \"pranatayeye18@gmail.com\",\n        \"phone\": \"543545135781\",\n        \"address\": \"jl letda reta\",\n        \"province\": \"Bali\",\n        \"city\": \"Denpasar\",\n        \"district\": \"Denpasar Utara\",\n        \"subdistrict\": \"\",\n        \"zipcode\": \"80111\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 5,\n            \"product_variant_id\": 0,\n            \"quantity\": 1\n        }\n    ],\n    \"shipping_cost\": 10800,\n    \"courier_name\": \"GRAB\",\n    \"courier_code\": \"grab\",\n    \"courier_service\": \"Instant\",\n    \"warehouse_id\": 3,\n    \"customer_notes\": \"da\",\n    \"payment_category\": \"instant\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -12154,7 +12155,7 @@
           ]
         }
       ],
-      "description": "Menejemen order\n\n**Order Status**\n\n| **Status** | **Deskripsi** |\n| --- | --- |\n| pending | Pesanan baru dibuat, menunggu pembayaran. Stok sudah di-reserve |\n| paid | Pembayaran berhasil dikonfirmasi (via iPaymu) |\n| processing | Pesanan sedang disiapkan/dipacking di gudang |\n| shipped | Barang telah diserahkan ke kurir dan nomor resi telah di-update |\n| delivered | Barang telah sampai di tujuan |\n| completed | Transaksi selesai (barang diterima dan dikonfirmasi pembeli) |\n| cancelled | Pesanan dibatalkan (oleh admin/pembeli). Reservasi stok dilepaskan |\n| refunded | Dana dikembalikan ke pembeli |\n| failed | Terjadi kesalahan pada proses pembayaran atau sistem |\n| expired | Waktu pembayaran habis. Reservasi stok dilepaskan otomatis |\n\n**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category` (string, required): \"instant\" or \"piutang\"\n    \n- `debt_type` (string, optional): \"tenor\" or \"po\" (if category is piutang)\n    \n- `tenor_months` (int, optional): number of months for tenor\n    \n- `buyer_id` (int, optional): Manuel override for Buyer ID (defaults to authenticated user)\n    \n- `shared_product_id` (int, optional): ID dari `shared_product` (didapat dari param sh di URL) untuk pelacakan komisi.\n    \n\n**NOTE!!**\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login."
+      "description": "Menejemen order\n\n**Order Status**\n\n| **Status** | **Deskripsi** |\n| --- | --- |\n| pending | Pesanan baru dibuat, menunggu pembayaran. Stok sudah di-reserve |\n| paid | Pembayaran berhasil dikonfirmasi (via iPaymu) |\n| processing | Pesanan sedang disiapkan/dipacking di gudang |\n| shipped | Barang telah diserahkan ke kurir dan nomor resi telah di-update |\n| delivered | Barang telah sampai di tujuan |\n| completed | Transaksi selesai (barang diterima dan dikonfirmasi pembeli) |\n| cancelled | Pesanan dibatalkan (oleh admin/pembeli). Reservasi stok dilepaskan |\n| refunded | Dana dikembalikan ke pembeli |\n| failed | Terjadi kesalahan pada proses pembayaran atau sistem |\n| expired | Waktu pembayaran habis. Reservasi stok dilepaskan otomatis |\n\n**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category` (string, required): \"instant\" or \"piutang\"\n    \n- `debt_type` (string, optional): \"tenor\" or \"po\" (if category is piutang)\n    \n- `tenor_months` (int, optional): number of months for tenor\n    \n- `buyer_id` (int, optional): Manuel override for Buyer ID (defaults to authenticated user)\n    \n- `shared_product_id` (int, optional): ID dari `shared_product` (didapat dari param sh di URL) untuk pelacakan komisi.\n    \n\n**NOTE!!**\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login.\n    \n\n**Request Body (Input dari Frontend):**\n\n- `shipping_cost` (number): Harga ongkir yang didapat dari cek tarif kurir.\n    \n- `is_gratis_ongkir` (boolean): `true` jika customer mengklaim gratis ongkir."
     },
     {
       "name": "Piutang",

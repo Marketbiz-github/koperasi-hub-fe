@@ -7,8 +7,9 @@ import { Star, Heart, Share2, ShoppingCart, ArrowLeft, Store as StoreIcon, Loade
 import { useCartStore } from '@/store/cartStore';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { productService } from '@/services/apiService';
+import { productService, inventoryService, productVariantService } from '@/services/apiService';
 import { getPublicAccessToken } from '@/utils/auth';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
 type PageProps = {
@@ -36,6 +37,14 @@ interface ProductDetail {
     address: string;
     is_verified: boolean;
   };
+  is_gratis_ongkir?: boolean;
+  is_cashback?: boolean;
+  cashback_unit?: string;
+  cashback_value?: number;
+  is_discount?: boolean;
+  discount_type?: string;
+  discount_value?: number;
+  discount_price?: string | number;
 }
 
 export default function ProductDetailPage({ params }: PageProps) {
@@ -43,6 +52,7 @@ export default function ProductDetailPage({ params }: PageProps) {
   const addItem = useCartStore((s) => s.addItem);
   const [product, setProduct] = React.useState<ProductDetail | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [totalStock, setTotalStock] = React.useState<number | null>(null);
   const [quantity, setQuantity] = React.useState(1);
   const [isWishlisted, setIsWishlisted] = React.useState(false);
 
@@ -53,6 +63,24 @@ export default function ProductDetailPage({ params }: PageProps) {
       const res = await productService.getProductDetail(productId, token || '');
       if (res.data) {
         setProduct(res.data);
+
+        // Fetch Stock
+        try {
+          const vRes = await productVariantService.getList(token || "", productId);
+          if (vRes.data && vRes.data.length > 0) {
+            const sumStock = vRes.data.reduce((acc: number, curr: any) => acc + (curr.total_stock || 0), 0);
+            setTotalStock(sumStock);
+          } else {
+            const sRes = await inventoryService.getStockByProduct(token || "", productId);
+            if (Array.isArray(sRes.data)) {
+              setTotalStock(sRes.data.reduce((acc: number, curr: any) => acc + (curr.stock || 0), 0));
+            } else {
+              setTotalStock(typeof sRes.data === 'number' ? sRes.data : (sRes.data?.total_stock ?? 0));
+            }
+          }
+        } catch (stockErr) {
+          console.error('Error fetching stock:', stockErr);
+        }
       }
     } catch (err) {
       console.error('Error fetching product detail:', err);
@@ -191,9 +219,46 @@ export default function ProductDetailPage({ params }: PageProps) {
                     </span>
                   </div>
 
-                  <p className="text-4xl font-extrabold text-[#10b981] mb-2">
-                    {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.price)}
-                  </p>
+                  <div className="flex items-baseline gap-2 mb-2">
+                    {product.is_discount ? (
+                      <>
+                        <p className="text-4xl font-extrabold text-[#10b981]">
+                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(Number(product.discount_price || 0))}
+                        </p>
+                        <p className="text-lg text-gray-400 line-through decoration-gray-300">
+                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.price)}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-4xl font-extrabold text-[#10b981]">
+                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.price)}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {totalStock !== null && (
+                      <Badge variant="outline" className={`px-2 py-0.5 text-xs font-semibold ${totalStock > 0 ? 'text-blue-700 bg-blue-50 border-blue-200' : 'text-red-700 bg-red-50 border-red-200'}`}>
+                        Stok: {totalStock > 0 ? totalStock : 'Habis'}
+                      </Badge>
+                    )}
+                    {product.is_discount && (
+                      <Badge className="bg-rose-100 text-rose-700 hover:bg-rose-100 border-none px-2 py-0.5 text-xs font-semibold">
+                        Diskon {product.discount_type === 'percent' ? `${product.discount_value}%` : new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.discount_value || 0)}
+                      </Badge>
+                    )}
+                    {product.is_gratis_ongkir && (
+                      <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none px-2 py-0.5 text-xs font-semibold">
+                        Gratis Ongkir
+                      </Badge>
+                    )}
+                    {product.is_cashback && (
+                      <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-none px-2 py-0.5 text-xs font-semibold">
+                        Cashback {product.cashback_unit === 'percent' ? `${product.cashback_value}%` : new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.cashback_value || 0)}
+                      </Badge>
+                    )}
+                  </div>
+
                   <div className="prose prose-sm max-w-none text-gray-600 leading-relaxed mb-6">
                     {product.description || 'Tidak ada deskripsi produk.'}
                   </div>
@@ -247,7 +312,13 @@ export default function ProductDetailPage({ params }: PageProps) {
                         className="w-16 text-center border-x border-gray-300 outline-none py-3 font-bold text-emerald-600"
                       />
                       <button
-                        onClick={() => setQuantity(quantity + 1)}
+                        onClick={() => {
+                          if (totalStock !== null && quantity >= totalStock) {
+                            toast.error(`Kuantitas melebihi stok yang tersedia (${totalStock})`);
+                            return;
+                          }
+                          setQuantity(quantity + 1);
+                        }}
                         className="px-4 py-3 text-gray-600 hover:bg-gray-50 transition font-bold"
                       >
                         +
@@ -256,10 +327,11 @@ export default function ProductDetailPage({ params }: PageProps) {
 
                     <button
                       onClick={handleAddToCart}
-                      className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 shadow-lg shadow-emerald-600/20 active:scale-[0.98] transition-all"
+                      disabled={totalStock !== null && totalStock === 0}
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 shadow-lg shadow-emerald-600/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ShoppingCart size={20} />
-                      Tambah ke Keranjang
+                      {totalStock !== null && totalStock === 0 ? 'Stok Habis' : 'Tambah ke Keranjang'}
                     </button>
                   </div>
                 </div>

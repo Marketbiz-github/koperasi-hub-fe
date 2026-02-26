@@ -7,12 +7,26 @@ import { useCartStore, CartItem as CI } from '@/store/cartStore';
 export default function CartItem({ item }: { item: CI }) {
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
+  const toggleSelectItem = useCartStore((s) => s.toggleSelectItem);
+  const selectedItems = useCartStore((s) => s.selectedItems);
+
+  const imgSrc = (item.image as string) || '';
+  const isSelected = selectedItems.has(item.id);
 
   return (
-    <div className="flex items-center gap-4 bg-white p-4 rounded-lg shadow-sm">
+    <div className={`flex items-center gap-4 bg-white p-4 rounded-lg shadow-sm transition-opacity ${isSelected ? 'opacity-100' : 'opacity-60'}`}>
+      <div className="flex items-center">
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={() => toggleSelectItem(item.id)}
+          className="h-4 w-4 rounded border-gray-300 text-[#10b981] focus:ring-[#10b981] cursor-pointer"
+        />
+      </div>
+
       <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0">
         {item.image ? (
-          <Image src={item.image} alt={item.name} width={80} height={80} className="object-cover" />
+          <Image src={imgSrc} alt={item.name || 'Produk'} width={80} height={80} className="object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
         )}
@@ -24,7 +38,7 @@ export default function CartItem({ item }: { item: CI }) {
             <h4 className="font-semibold text-gray-900">{item.name}</h4>
             <p className="text-sm text-gray-500">{item.category}</p>
           </div>
-          <div className="text-[#10b981] font-bold">Rp {item.price.toLocaleString('id-ID')}</div>
+          <div className="text-[#10b981] font-bold">Rp {(item.price || 0).toLocaleString('id-ID')}</div>
         </div>
 
         <div className="mt-3 flex items-center justify-between">

@@ -592,6 +592,77 @@ export const orderService = {
         const endpoint = `/orders${queryString ? `?${queryString}` : ''}`;
 
         return apiRequest(endpoint, { token });
+    },
+
+    async getOrderDetail(id: string | number, token: string) {
+        return apiRequest(`/orders/${id}`, { token });
+    },
+
+    async updateOrderStatus(id: string | number, data: { status: string, admin_notes?: string }, token: string) {
+        return apiRequest(`/orders/${id}/status`, {
+            method: 'PUT',
+            body: data,
+            token,
+        });
+    },
+
+    async updateOrderTracking(id: string | number, data: { tracking_number: string }, token: string) {
+        return apiRequest(`/orders/${id}/tracking`, {
+            method: 'PUT',
+            body: data,
+            token,
+        });
+    },
+
+    async cancelOrder(id: string | number, token: string) {
+        return apiRequest(`/orders/${id}/cancel`, {
+            method: 'POST',
+            token,
+        });
+    },
+
+    async approvePiutang(orderId: string | number, token: string) {
+        return apiRequest(`/orders/${orderId}/approve-piutang`, {
+            method: 'POST',
+            token,
+        });
+    },
+
+    async rejectPiutang(orderId: string | number, data: { reason: string }, token: string) {
+        return apiRequest(`/orders/${orderId}/reject-piutang`, {
+            method: 'POST',
+            body: data,
+            token,
+        });
+    },
+
+    async getOrderDebt(orderId: string | number, token: string) {
+        return apiRequest(`/orders/${orderId}/debt`, {
+            token,
+        });
+    }
+}
+
+export const debtService = {
+    async getDebts(params: { user_id?: number, buyer_id?: number, store_id?: number, status?: string, page?: number, limit?: number }, token: string) {
+        let query = new URLSearchParams();
+        if (params.user_id) query.append('user_id', params.user_id.toString());
+        if (params.buyer_id) query.append('buyer_id', params.buyer_id.toString());
+        if (params.store_id) query.append('store_id', params.store_id.toString());
+        if (params.status) query.append('status', params.status);
+        if (params.page) query.append('page', params.page.toString());
+        if (params.limit) query.append('limit', params.limit.toString());
+
+        const queryString = query.toString();
+        const endpoint = `/debts${queryString ? `?${queryString}` : ''}`;
+
+        return apiRequest(endpoint, { token });
+    },
+
+    async getPaymentUrl(debtId: string | number, type: 'installment' | 'PO', token: string) {
+        return apiRequest(`/debts/${debtId}/pay?type=${type}`, {
+            token,
+        });
     }
 }
 

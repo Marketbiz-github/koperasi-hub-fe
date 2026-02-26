@@ -23,7 +23,7 @@ import {
     AlertCircle
 } from "lucide-react"
 import { useCartStore } from "@/store/cartStore"
-import { productService } from "@/services/apiService"
+import { productService, inventoryService, productVariantService } from "@/services/apiService"
 import { getAccessToken } from "@/utils/auth"
 import { toast } from "sonner"
 
@@ -53,6 +53,10 @@ interface ProductDetail {
     is_cashback?: boolean
     cashback_unit?: string
     cashback_value?: number
+    is_discount?: boolean
+    discount_type?: string
+    discount_value?: number
+    discount_price?: string | number
 }
 
 export default function ProductDetailPage() {
@@ -60,6 +64,7 @@ export default function ProductDetailPage() {
     const router = useRouter()
     const [product, setProduct] = useState<ProductDetail | null>(null)
     const [isLoading, setIsLoading] = useState(true)
+    const [totalStock, setTotalStock] = useState<number | null>(null)
     const [selectedImage, setSelectedImage] = useState<string>("")
     const [quantity, setQuantity] = useState(1)
 
@@ -74,6 +79,25 @@ export default function ProductDetailPage() {
                 setProduct(res.data)
                 const primaryImg = res.data.images?.find((img: ProductImage) => img.is_primary)?.image_url || res.data.images?.[0]?.image_url || "/images/placeholder.png"
                 setSelectedImage(primaryImg)
+
+                // Fetch Stock
+                try {
+                    const vRes = await productVariantService.getList(token || "", id as string)
+                    if (vRes.data && vRes.data.length > 0) {
+                        const sumStock = vRes.data.reduce((acc: number, curr: any) => acc + (curr.total_stock || 0), 0)
+                        setTotalStock(sumStock)
+                    } else {
+                        const sRes = await inventoryService.getStockByProduct(token || "", id as string)
+                        if (Array.isArray(sRes.data)) {
+                            setTotalStock(sRes.data.reduce((acc: number, curr: any) => acc + (curr.stock || 0), 0))
+                        } else {
+                            setTotalStock(typeof sRes.data === 'number' ? sRes.data : (sRes.data?.total_stock ?? 0))
+                        }
+                    }
+                } catch (stockErr) {
+                    console.error('Error fetching stock:', stockErr)
+                }
+
             } else {
                 toast.error("Produk tidak ditemukan")
             }
@@ -101,7 +125,7 @@ export default function ProductDetailPage() {
             image: selectedImage,
             category: product.product_category?.name || "Uncategorized",
             quantity: quantity,
-            storeId: product.store?.id,
+            storeId: product.store?.id || 0,
             variantId: 0,
         })
         toast.success(`${product.name} ditambahkan ke keranjang`)
@@ -200,17 +224,34 @@ export default function ProductDetailPage() {
                     <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 space-y-1">
                         <p className="text-gray-500 text-sm font-medium">Harga Koperasi</p>
                         <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-extrabold text-emerald-600">{formatCurrency(product.price)}</span>
+                            {product.is_discount ? (
+                                <>
+                                    <span className="text-4xl font-extrabold text-emerald-600">{formatCurrency(product.discount_price || 0)}</span>
+                                    <span className="text-lg text-gray-400 line-through decoration-gray-300">{formatCurrency(product.price)}</span>
+                                </>
+                            ) : (
+                                <span className="text-4xl font-extrabold text-emerald-600">{formatCurrency(product.price)}</span>
+                            )}
                         </div>
-                        <div className="flex flex-wrap gap-2 mt-2">
+                        <div className="flex flex-wrap gap-2 mt-4">
+                            {totalStock !== null && (
+                                <Badge variant="outline" className={`px-2 py-0.5 text-xs font-semibold ${totalStock > 0 ? 'text-blue-700 bg-blue-50 border-blue-200' : 'text-red-700 bg-red-50 border-red-200'}`}>
+                                    Stok: {totalStock > 0 ? totalStock : 'Habis'}
+                                </Badge>
+                            )}
+                            {product.is_discount && (
+                                <Badge className="bg-rose-100 text-rose-700 hover:bg-rose-100 border-none px-2 py-0.5 text-xs font-semibold">
+                                    Diskon {product.discount_type === 'percent' ? `${product.discount_value}%` : formatCurrency(product.discount_value || 0)}
+                                </Badge>
+                            )}
                             {product.is_gratis_ongkir && (
                                 <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none px-2 py-0.5 text-xs font-semibold">
-                                    <Truck size={12} className="mr-1 inline" /> Free Shipping
+                                    <Truck size={12} className="mr-1 inline" /> Gratis Ongkir
                                 </Badge>
                             )}
                             {product.is_cashback && (
                                 <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-none px-2 py-0.5 text-xs font-semibold">
-                                    Cashback {product.cashback_value}{product.cashback_unit === 'percent' ? '%' : ''}
+                                    Cashback {product.cashback_unit === 'percent' ? `${product.cashback_value}%` : formatCurrency(product.cashback_value || 0)}
                                 </Badge>
                             )}
                         </div>
@@ -225,16 +266,23 @@ export default function ProductDetailPage() {
                                 >-</button>
                                 <div className="px-6 py-2 font-semibold min-w-[60px] text-center">{quantity}</div>
                                 <button
-                                    onClick={() => setQuantity(quantity + 1)}
+                                    onClick={() => {
+                                        if (totalStock !== null && quantity >= totalStock) {
+                                            toast.error(`Kuantitas melebihi stok yang tersedia (${totalStock})`)
+                                            return
+                                        }
+                                        setQuantity(quantity + 1)
+                                    }}
                                     className="px-4 py-2 hover:bg-gray-50 transition border-l font-bold text-gray-600"
                                 >+</button>
                             </div>
                             <Button
                                 onClick={handleAddToCart}
-                                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 text-lg gap-2 shadow-md shadow-emerald-100 transition-all hover:-translate-y-0.5"
+                                disabled={totalStock !== null && totalStock === 0}
+                                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 text-lg gap-2 shadow-md shadow-emerald-100 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <ShoppingCart size={20} />
-                                Tambah ke Keranjang
+                                {totalStock !== null && totalStock === 0 ? 'Stok Habis' : 'Tambah ke Keranjang'}
                             </Button>
                         </div>
                     </div>

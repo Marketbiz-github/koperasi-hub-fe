@@ -62,6 +62,21 @@ const vendorNav = [
       },
     ],
   },
+  {
+    title: "Pesanan",
+    url: "#",
+    icon: IconCashRegister,
+    items: [
+      {
+        title: "Semua Pesanan",
+        url: "/dashboard/vendor/pesanan",
+      },
+      {
+        title: "Daftar Piutang",
+        url: "/dashboard/vendor/piutang",
+      },
+    ],
+  },
   // {
   //   title: "Penjualan",
   //   url: "/dashboard/vendor/penjualan",

@@ -4,6 +4,7 @@ export type CartItem = {
   id: string;
   quantity: number;
   variantId?: number;
+  selected?: boolean;
   // Use optional fields for runtime UI display while loading/fallback
   name?: string;
   price?: number;
@@ -17,6 +18,7 @@ type CartState = {
   selectedItems: Set<string>;
   addItem: (item: CartItem) => void;
   removeItem: (id: string) => void;
+  removeItems: (ids: string[]) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
   toggleSelectItem: (id: string) => void;
@@ -28,6 +30,19 @@ type CartState = {
 
 const STORAGE_KEY = 'kh_cart_v1';
 
+const persist = (items: CartItem[]) => {
+  try {
+    const persistedItems = items.map(({ id, quantity, variantId, storeId, selected }) => ({
+      id,
+      quantity,
+      variantId,
+      storeId,
+      selected
+    }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(persistedItems));
+  } catch { }
+};
+
 const load = (): CartItem[] => {
   try {
     const raw = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
@@ -37,88 +52,106 @@ const load = (): CartItem[] => {
   }
 };
 
-export const useCartStore = create<CartState>((set, get) => ({
-  items: load(),
-  selectedItems: new Set(),
+export const useCartStore = create<CartState>((set, get) => {
+  const initialItems = load();
+  const initialSelected = new Set(
+    initialItems.filter(i => i.selected).map(i => i.id)
+  );
 
-  addItem: (item) => {
-    const items = get().items.slice();
-    const idx = items.findIndex((i) => i.id === item.id);
-    if (idx > -1) {
-      items[idx].quantity += item.quantity;
-    } else {
-      items.push({ ...item });
-    }
-    set({ items });
+  return {
+    items: initialItems,
+    selectedItems: initialSelected,
 
-    // Automatically select newly added items
-    const nextSelected = new Set(get().selectedItems);
-    nextSelected.add(item.id);
-    set({ selectedItems: nextSelected });
+    addItem: (item) => {
+      const items = get().items.slice();
+      const idx = items.findIndex((i) => i.id === item.id);
 
-    try {
-      const persistedItems = items.map(({ id, quantity, variantId, storeId }) => ({ id, quantity, variantId, storeId }));
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(persistedItems));
-    } catch { }
-  },
+      // Default to selected when newly added if not specified
+      const newItem = { ...item, selected: item.selected ?? true };
 
-  removeItem: (id) => {
-    const items = get().items.filter((i) => i.id !== id);
-    const nextSelected = new Set(get().selectedItems);
-    nextSelected.delete(id);
-    set({ items, selectedItems: nextSelected });
-    try {
-      const persistedItems = items.map(({ id, quantity, variantId, storeId }) => ({ id, quantity, variantId, storeId }));
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(persistedItems));
-    } catch { }
-  },
+      if (idx > -1) {
+        items[idx].quantity += item.quantity;
+      } else {
+        items.push(newItem);
+      }
 
-  updateQuantity: (id, quantity) => {
-    const items = get().items.map((i) => (i.id === id ? { ...i, quantity: Math.max(1, quantity) } : i));
-    set({ items });
-    try {
-      const persistedItems = items.map(({ id, quantity, variantId, storeId }) => ({ id, quantity, variantId, storeId }));
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(persistedItems));
-    } catch { }
-  },
+      const nextSelected = new Set(get().selectedItems);
+      if (newItem.selected) {
+        nextSelected.add(newItem.id);
+      }
 
-  clearCart: () => {
-    set({ items: [], selectedItems: new Set() });
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch { }
-  },
+      set({ items, selectedItems: nextSelected });
+      persist(items);
+    },
 
-  toggleSelectItem: (id) => {
-    const next = new Set(get().selectedItems);
-    if (next.has(id)) {
-      next.delete(id);
-    } else {
-      next.add(id);
-    }
-    set({ selectedItems: next });
-  },
+    removeItem: (id) => {
+      const items = get().items.filter((i) => i.id !== id);
+      const nextSelected = new Set(get().selectedItems);
+      nextSelected.delete(id);
+      set({ items, selectedItems: nextSelected });
+      persist(items);
+    },
 
-  selectAll: (select) => {
-    if (select) {
-      set({ selectedItems: new Set(get().items.map((i) => i.id)) });
-    } else {
-      set({ selectedItems: new Set() });
-    }
-  },
+    removeItems: (ids) => {
+      const items = get().items.filter((i) => !ids.includes(i.id));
+      const nextSelected = new Set(get().selectedItems);
+      ids.forEach((id) => nextSelected.delete(id));
+      set({ items, selectedItems: nextSelected });
+      persist(items);
+    },
 
-  totalPrice: () => {
-    return get().items.reduce((sum, it) => sum + (it.price || 0) * it.quantity, 0);
-  },
+    updateQuantity: (id, quantity) => {
+      const items = get().items.map((i) => (i.id === id ? { ...i, quantity: Math.max(1, quantity) } : i));
+      set({ items });
+      persist(items);
+    },
 
-  selectedTotalPrice: () => {
-    const { items, selectedItems } = get();
-    return items
-      .filter((it) => selectedItems.has(it.id))
-      .reduce((sum, it) => sum + (it.price || 0) * it.quantity, 0);
-  },
+    clearCart: () => {
+      set({ items: [], selectedItems: new Set() });
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch { }
+    },
 
-  totalCount: () => {
-    return get().items.reduce((sum, it) => sum + it.quantity, 0);
-  },
-}));
+    toggleSelectItem: (id) => {
+      const nextSelected = new Set(get().selectedItems);
+      let isSelected = false;
+      if (nextSelected.has(id)) {
+        nextSelected.delete(id);
+        isSelected = false;
+      } else {
+        nextSelected.add(id);
+        isSelected = true;
+      }
+
+      const items = get().items.map(i => i.id === id ? { ...i, selected: isSelected } : i);
+      set({ items, selectedItems: nextSelected });
+      persist(items);
+    },
+
+    selectAll: (select) => {
+      const items = get().items.map(i => ({ ...i, selected: select }));
+      if (select) {
+        set({ items, selectedItems: new Set(items.map((i) => i.id)) });
+      } else {
+        set({ items, selectedItems: new Set() });
+      }
+      persist(items);
+    },
+
+    totalPrice: () => {
+      return get().items.reduce((sum, it) => sum + (it.price || 0) * it.quantity, 0);
+    },
+
+    selectedTotalPrice: () => {
+      const { items, selectedItems } = get();
+      return items
+        .filter((it) => selectedItems.has(it.id))
+        .reduce((sum, it) => sum + (it.price || 0) * it.quantity, 0);
+    },
+
+    totalCount: () => {
+      return get().items.reduce((sum, it) => sum + it.quantity, 0);
+    },
+  };
+});

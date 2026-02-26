@@ -281,7 +281,14 @@ export default function ShippingForm({ onSelectRate, onAddressLocked, items, sto
                         </div>
                     )}
 
-                    {rates.length > 0 && (
+                    {isLoadingRates && (
+                        <div className="flex flex-col items-center justify-center py-8 space-y-2 border-2 border-dashed rounded-lg">
+                            <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+                            <p className="text-sm text-gray-500 font-medium">Mencari pilihan kurir...</p>
+                        </div>
+                    )}
+
+                    {!isLoadingRates && rates.length > 0 && (
                         <div className="space-y-3 pt-2">
                             <Label>Pilih Layanan Kurir</Label>
                             <div className="grid gap-2">

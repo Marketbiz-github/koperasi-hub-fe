@@ -13,6 +13,9 @@ import {
   IconBuildingStore,
   IconUsersGroup,
   IconBuildingCommunity,
+  IconShoppingCart,
+  IconFileInvoice,
+  IconCash,
 } from "@tabler/icons-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -42,31 +45,24 @@ const data = {
     },
     {
       title: "Marketplace",
-      url: "#",
+      url: "/dashboard/reseller/marketplace",
       icon: IconBuildingStore,
-      items: [
-        {
-          title: "Marketplace",
-          url: "/dashboard/reseller/marketplace",
-        },
-        // {
-        //   title: "Pembelian",
-        //   url: "/dashboard/reseller/marketplace/pembelian",
-        // },
-        // {
-        //   title: "Pembayaran",
-        //   url: "/dashboard/reseller/marketplace/pembayaran",
-        // },
-        // {
-        //   title: "Piutang",
-        //   url: "/dashboard/reseller/marketplace/piutang",
-        // },
-        // {
-        //   title: "Pengiriman",
-        //   url: "/dashboard/reseller/marketplace/pengiriman",
-        // },
-      ],
     },
+    {
+      title: "Pembelian",
+      url: "/dashboard/reseller/marketplace/pembelian",
+      icon: IconShoppingCart,
+    },
+    {
+      title: "Pesanan",
+      url: "/dashboard/reseller/marketplace/pesanan",
+      icon: IconFileInvoice,
+    },
+    // {
+    //   title: "Piutang",
+    //   url: "/dashboard/reseller/marketplace/piutang",
+    //   icon: IconCash,
+    // },
     {
       title: "Afiliasi",
       url: "#",

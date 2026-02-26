@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -19,122 +19,161 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
   ShoppingCart,
   Eye,
-  FileText,
-  TrendingUp,
+  Search,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  XCircle
 } from 'lucide-react';
 import { IconBuildingStore } from '@tabler/icons-react';
+import { useAuthStore } from '@/store/authStore';
+import { getAccessToken } from '@/utils/auth';
+import { orderService, storeService } from '@/services/apiService';
+import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
-interface OrderItem {
-  id: string;
-  productName: string;
-  quantity: number;
-  price: number;
-  total: number;
-}
-
-interface Order {
-  id: string;
-  orderNo: string;
-  vendorName: string;
-  vendorImage: string;
-  status: 'pending' | 'confirmed' | 'shipped' | 'delivered';
-  items: OrderItem[];
-  subtotal: number;
-  tax: number;
-  total: number;
-  paymentMethod: 'cash' | 'credit';
-  createdAt: string;
-}
-
-const mockOrders: Order[] = [
-  {
-    id: '1',
-    orderNo: 'ORD-2025-001',
-    vendorName: 'Vendor Beras Premium',
-    vendorImage: '/images/products/beras.png',
-    status: 'confirmed',
-    items: [
-      {
-        id: '1',
-        productName: 'Beras Premium 5kg',
-        quantity: 10,
-        price: 150000,
-        total: 1500000,
-      },
-      {
-        id: '2',
-        productName: 'Beras Organik 10kg',
-        quantity: 5,
-        price: 250000,
-        total: 1250000,
-      },
-    ],
-    subtotal: 2750000,
-    tax: 275000,
-    total: 3025000,
-    paymentMethod: 'credit',
-    createdAt: '2025-01-24',
-  },
-  {
-    id: '2',
-    orderNo: 'ORD-2025-002',
-    vendorName: 'Vendor Sayuran Segar',
-    vendorImage: '/images/products/beras.png',
-    status: 'pending',
-    items: [
-      {
-        id: '3',
-        productName: 'Kangkung Segar 1kg',
-        quantity: 20,
-        price: 15000,
-        total: 300000,
-      },
-    ],
-    subtotal: 300000,
-    tax: 30000,
-    total: 330000,
-    paymentMethod: 'cash',
-    createdAt: '2025-01-25',
-  },
-];
-
-const statusConfig = {
+// Status color mapping
+const statusConfig: Record<string, { label: string, color: string }> = {
   pending: { label: 'Menunggu Konfirmasi', color: 'bg-yellow-100 text-yellow-800' },
-  confirmed: { label: 'Dikonfirmasi', color: 'bg-blue-100 text-blue-800' },
+  waiting_approval: { label: 'Menunggu Persetujuan', color: 'bg-orange-100 text-orange-800' },
+  paid: { label: 'Dibayar', color: 'bg-emerald-100 text-emerald-800' },
+  processing: { label: 'Diproses', color: 'bg-blue-100 text-blue-800' },
   shipped: { label: 'Dikirim', color: 'bg-purple-100 text-purple-800' },
-  delivered: { label: 'Diterima', color: 'bg-green-100 text-green-800' },
+  delivered: { label: 'Terkirim', color: 'bg-indigo-100 text-indigo-800' },
+  completed: { label: 'Selesai', color: 'bg-green-100 text-green-800' },
+  cancelled: { label: 'Dibatalkan', color: 'bg-red-100 text-red-800' },
+  refunded: { label: 'Dikembalikan', color: 'bg-rose-100 text-rose-800' },
+  failed: { label: 'Gagal', color: 'bg-red-100 text-red-800' },
+  expired: { label: 'Kedaluwarsa', color: 'bg-gray-100 text-gray-800' },
+};
+
+const formatCurrency = (value: number | string) => {
+  const num = typeof value === 'string' ? parseInt(value) : value;
+  return `Rp${(num || 0).toLocaleString('id-ID')}`;
 };
 
 export default function PembelianPage() {
-  const [orders] = useState<Order[]>(mockOrders);
+  const { user } = useAuthStore();
+
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [inputValue, setInputValue] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [storeNames, setStoreNames] = useState<Record<string, string>>({});
+  const [cancelling, setCancelling] = useState<string | null>(null);
 
-  const filteredOrders =
-    statusFilter === 'all'
-      ? orders
-      : orders.filter((order) => order.status === statusFilter);
+  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+  const [orderToCancel, setOrderToCancel] = useState<any | null>(null);
 
-  const totalOrders = orders.length;
-  const totalSpent = orders.reduce((sum, order) => sum + order.total, 0);
-  const pendingOrders = orders.filter((o) => o.status === 'pending').length;
+  const fetchOrders = async () => {
+    if (!user?.id) return;
+    setLoading(true);
+    try {
+      const token = await getAccessToken();
+      const params: any = {
+        buyer_id: user.id, // Fetch orders where user is the buyer
+        page,
+        limit: 10,
+      };
+      if (statusFilter !== 'all') params.status = statusFilter;
+      if (searchQuery) params.search = searchQuery;
 
-  const formatCurrency = (value: number) => {
-    return `Rp${value.toLocaleString('id-ID')}`;
+      const res = await orderService.getOrders(params, token || '');
+      if (res.data) {
+        const fetchedOrders = res.data.orders || [];
+        setOrders(fetchedOrders);
+        setTotalPages(Math.ceil((res.data.total || 0) / (res.data.limit || 10)));
+        setTotalOrders(res.data.total || 0);
+
+        // Fetch store details for unique store IDs
+        const storeIds = Array.from(new Set(fetchedOrders.map((o: any) => o.store_id).filter(Boolean)));
+        const storeMap: Record<string, string> = {};
+
+        await Promise.all(
+          storeIds.map(async (storeId) => {
+            try {
+              const storeRes = await storeService.getDetail(token || '', storeId as string);
+              if (storeRes.data) {
+                storeMap[storeId as string] = storeRes.data.name;
+              }
+            } catch (e) {
+              console.error(`Failed to fetch store ${storeId}`, e);
+            }
+          })
+        );
+
+        setStoreNames(prev => ({ ...prev, ...storeMap }));
+      }
+    } catch (err) {
+      console.error('Failed to fetch orders', err);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleCancelOrder = async () => {
+    if (!orderToCancel) return;
+    const orderId = orderToCancel.id;
+    setCancelling(orderId);
+    try {
+      const token = await getAccessToken();
+      await orderService.cancelOrder(orderId, token || ''); // Use dedicated cancel order API
+      fetchOrders();
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder(null);
+      }
+      setOrderToCancel(null);
+    } catch (err: any) {
+      console.error('Failed to cancel order', err);
+      alert(err.message || 'Gagal membatalkan pesanan');
+    } finally {
+      setCancelling(null);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => setSearchQuery(inputValue), 500);
+    return () => clearTimeout(timer);
+  }, [inputValue]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, statusFilter]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [user?.id, statusFilter, searchQuery, page]);
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Pembelian</h1>
+          <h1 className="text-2xl font-semibold">Pembelian Reseller</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Kelola pesanan pembelian produk dari vendor
+            Riwayat belanja dan pesanan Anda dari Vendor
           </p>
         </div>
-        <Link href="/dashboard/koperasi/marketplace">
+        <Link href="/dashboard/reseller/marketplace">
           <Button className="gradient-green text-white">
             <IconBuildingStore className="w-4 h-4 mr-2" />
             Ke Marketplace
@@ -142,73 +181,32 @@ export default function PembelianPage() {
         </Link>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Total Pesanan</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
-                  {totalOrders}
-                </p>
-              </div>
-              <div className="w-12 h-12 gradient-green rounded-lg flex items-center justify-center">
-                <ShoppingCart className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Total Pengeluaran</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">
-                  {formatCurrency(totalSpent)}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Pesanan Menunggu</p>
-                <p className="text-3xl font-bold text-yellow-600 mt-2">
-                  {pendingOrders}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <FileText className="w-6 h-6 text-yellow-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filter */}
+      {/* Filters */}
       <Card>
-        <CardHeader>
-          <CardTitle>Filter Pesanan</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center">
+          <div className="relative flex-1 w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Cari nomor pesanan..."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              className="pl-9"
+            />
+          </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-full md:w-48">
               <SelectValue placeholder="Pilih status" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Status</SelectItem>
               <SelectItem value="pending">Menunggu Konfirmasi</SelectItem>
-              <SelectItem value="confirmed">Dikonfirmasi</SelectItem>
+              <SelectItem value="waiting_approval">Menunggu Persetujuan</SelectItem>
+              <SelectItem value="paid">Dibayar</SelectItem>
+              <SelectItem value="processing">Diproses</SelectItem>
               <SelectItem value="shipped">Dikirim</SelectItem>
-              <SelectItem value="delivered">Diterima</SelectItem>
+              <SelectItem value="delivered">Terkirim</SelectItem>
+              <SelectItem value="completed">Selesai</SelectItem>
+              <SelectItem value="cancelled">Dibatalkan</SelectItem>
             </SelectContent>
           </Select>
         </CardContent>
@@ -216,131 +214,319 @@ export default function PembelianPage() {
 
       {/* Orders List */}
       <div className="space-y-4">
-        {filteredOrders.length > 0 ? (
-          filteredOrders.map((order) => (
-            <Card key={order.id} className="hover:shadow-lg transition">
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  {/* Header Row */}
-                  <div className="flex items-center justify-between pb-4 border-b">
-                    <div className="flex items-center gap-4 flex-1">
-                      <Image
-                        src={order.vendorImage}
-                        alt={order.vendorName}
-                        width={60}
-                        height={60}
-                        className="w-14 h-14 rounded-lg object-cover"
-                      />
-                      <div>
-                        <p className="font-semibold text-gray-900">
-                          {order.orderNo}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {order.vendorName}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {order.createdAt}
-                        </p>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+          </div>
+        ) : orders.length > 0 ? (
+          <Card className="overflow-hidden">
+            <Table>
+              <TableHeader className="bg-gray-50/50">
+                <TableRow>
+                  <TableHead>No.</TableHead>
+                  <TableHead className="w-[180px]">No. Pesanan</TableHead>
+                  <TableHead>Toko</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Pembayaran</TableHead>
+                  <TableHead>Total Belanja</TableHead>
+                  <TableHead className="text-right">Aksi</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {orders.map((order, index) => (
+                  <TableRow key={order.id} className="hover:bg-gray-50/50">
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>
+                      <div className="font-semibold text-gray-900">{order.invoice_number || order.order_number || `ORD-${order.id}`}</div>
+                      <div className="text-xs text-gray-500 mt-0.5">
+                        {order.created_at ? new Date(order.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <Badge
-                        className={`${
-                          statusConfig[order.status].color
-                        } border-0`}
-                      >
-                        {statusConfig[order.status].label}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  {/* Items */}
-                  <div className="space-y-2">
-                    {order.items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between text-sm"
-                      >
-                        <span className="text-gray-700">
-                          {item.productName} x {item.quantity}
-                        </span>
-                        <span className="font-semibold text-gray-900">
-                          {formatCurrency(item.total)}
-                        </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <IconBuildingStore size={16} className="text-gray-400" />
+                        <span className="text-sm">{storeNames[order.store_id] || order.store?.name || 'Toko Vendor'}</span>
                       </div>
-                    ))}
-                  </div>
-
-                  {/* Summary */}
-                  <div className="pt-4 border-t space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Subtotal</span>
-                      <span className="font-semibold">
-                        {formatCurrency(order.subtotal)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Pajak</span>
-                      <span className="font-semibold">
-                        {formatCurrency(order.tax)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between pt-2 border-t">
-                      <span className="font-bold">Total</span>
-                      <span className="font-bold text-green-600 text-lg">
-                        {formatCurrency(order.total)}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Payment & Actions */}
-                  <div className="flex items-center justify-between pt-4 border-t">
-                    <div>
+                    </TableCell>
+                    <TableCell>
                       <Badge
-                        variant="outline"
-                        className={
-                          order.paymentMethod === 'cash'
-                            ? 'bg-green-50 border-green-300'
-                            : 'bg-blue-50 border-blue-300'
-                        }
+                        className={`${statusConfig[order.status]?.color || 'bg-gray-100 text-gray-800'} border-0 shadow-none pointer-events-none`}
                       >
-                        {order.paymentMethod === 'cash'
-                          ? '💰 Tunai'
-                          : '🏦 Kredit'}
+                        {statusConfig[order.status]?.label || order.status}
                       </Badge>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-2"
-                      >
-                        <Eye className="w-4 h-4" />
-                        Detail
-                      </Button>
-                      {order.status === 'pending' && (
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <Badge variant="outline" className={`w-fit shadow-none border ${order.payment_status === 'paid' ? 'border-emerald-200 text-emerald-700 bg-emerald-50' : 'border-amber-200 text-amber-700 bg-amber-50'}`}>
+                          {order.payment_status === 'paid' ? 'LUNAS' : 'BELUM LUNAS'}
+                        </Badge>
+                        <span className="text-[10px] text-gray-500 uppercase font-medium mt-0.5">{order.payment_category || '-'}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-bold text-emerald-600">
+                        {formatCurrency(order.total_amount)}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {order.payment_category === 'instant' && order.payment_status === 'unpaid' && (order.payment_url || order.ipaymu_payment_url) && (
+                          <Button
+                            size="sm"
+                            className="bg-emerald-600 hover:bg-emerald-700 h-8 text-xs font-semibold px-3"
+                            onClick={() => window.open(order.payment_url || order.ipaymu_payment_url, '_blank')}
+                            disabled={order.status === 'cancelled'}
+                          >
+                            Bayar
+                          </Button>
+                        )}
+                        {order.payment_status !== 'paid' && order.status !== 'cancelled' && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 px-3 text-red-600 border-red-200 hover:bg-red-50 gap-1.5"
+                            onClick={() => setOrderToCancel(order)}
+                            disabled={cancelling === order.id}
+                          >
+                            {cancelling === order.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <XCircle className="w-3.5 h-3.5" />}
+                            <span className="text-[10px] font-bold uppercase">Batalkan</span>
+                          </Button>
+                        )}
                         <Button
+                          variant="outline"
                           size="sm"
-                          className="gradient-green text-white"
+                          className="h-8 px-3 gap-1.5 border-gray-200 text-gray-600 hover:text-gray-900"
+                          onClick={() => setSelectedOrder(order)}
                         >
-                          Konfirmasi
+                          <Eye className="w-3.5 h-3.5" />
+                          <span className="text-[10px] font-bold uppercase">Detail</span>
                         </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
         ) : (
           <Card>
             <CardContent className="py-12 text-center">
               <ShoppingCart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">Tidak ada pesanan</p>
+              <p className="text-gray-500 mb-2">Tidak ada pesanan ditemukan</p>
+              {statusFilter !== 'all' || searchQuery ? (
+                <Button variant="outline" onClick={() => { setStatusFilter('all'); setInputValue(''); }}>Reset Filter</Button>
+              ) : (
+                <Link href="/dashboard/reseller/marketplace"><Button>Mulai Belanja</Button></Link>
+              )}
             </CardContent>
           </Card>
         )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm font-medium">Halaman {page} dari {totalPages}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
+
+      {/* Order Detail Modal */}
+      <Dialog open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detail Pesanan</DialogTitle>
+          </DialogHeader>
+          {selectedOrder && (
+            <div className="space-y-6 pt-4">
+              <div className="flex justify-between items-start border-b pb-4">
+                <div>
+                  <h3 className="font-bold text-lg">{selectedOrder.invoice_number || selectedOrder.order_number || `ORD-${selectedOrder.id}`}</h3>
+                  <p className="text-sm text-gray-500">{new Date(selectedOrder.created_at).toLocaleString('id-ID')}</p>
+                  <p className="text-sm text-gray-600 mt-2 flex items-center gap-1">
+                    <IconBuildingStore size={14} /> {storeNames[selectedOrder.store_id] || selectedOrder.store?.name || 'Toko Vendor'}
+                  </p>
+                </div>
+                <div className="text-right space-y-2">
+                  <Badge className={selectedOrder.payment_status === 'paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}>
+                    {selectedOrder.payment_status === 'paid' ? 'LUNAS' : 'BELUM LUNAS'}
+                  </Badge>
+                  <div className="block mt-2">
+                    <Badge className={`${statusConfig[selectedOrder.status]?.color || 'bg-gray-100 text-gray-800'} border-0`}>
+                      {statusConfig[selectedOrder.status]?.label || selectedOrder.status}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-3">Daftar Produk</h4>
+                <div className="space-y-3">
+                  {selectedOrder.items?.map((item: any) => (
+                    <div key={item.id} className="flex gap-3">
+                      <div className="relative w-12 h-12 bg-gray-100 rounded border overflow-hidden shrink-0">
+                        {(() => {
+                          const img = item.product?.image ||
+                            item.product?.images?.find((i: any) => i.is_primary)?.image_url ||
+                            item.product?.images?.[0]?.image_url ||
+                            item.product_image ||
+                            item.image;
+                          return img ? (
+                            <Image src={img} alt="Img" fill className="object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-400">No Img</div>
+                          );
+                        })()}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">{item.product_name || item.product?.name}</p>
+                        <p className="text-xs text-gray-500">{item.quantity} x {formatCurrency(item.price)}</p>
+                      </div>
+                      <div className="font-semibold text-sm">
+                        {formatCurrency(item.quantity * item.price)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t pt-4 space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Subtotal</span>
+                  <span>{formatCurrency(selectedOrder.total_amount - (selectedOrder.shipping_cost || 0))}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Ongkos Kirim {selectedOrder.courier_name ? `(${selectedOrder.courier_name} - ${selectedOrder.courier_service})` : ''}</span>
+                  <span>{formatCurrency(selectedOrder.shipping_cost || 0)}</span>
+                </div>
+                <div className="flex justify-between font-bold text-lg pt-2 border-t mt-2">
+                  <span>Total Keseluruhan</span>
+                  <span className="text-emerald-600">{formatCurrency(selectedOrder.total_amount)}</span>
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <h4 className="font-semibold mb-2">Informasi Pengiriman</h4>
+                <div className="text-sm space-y-1">
+                  {selectedOrder.customer_name ? (
+                    <>
+                      <p className="font-medium">{selectedOrder.customer_name} ({selectedOrder.customer_phone})</p>
+                      <p className="text-gray-600">{selectedOrder.customer_address}</p>
+                      <p className="text-gray-600">
+                        {selectedOrder.customer_subdistrict && `${selectedOrder.customer_subdistrict}, `}{selectedOrder.customer_district}, {selectedOrder.customer_city}, {selectedOrder.customer_province} {selectedOrder.customer_zipcode}
+                      </p>
+                    </>
+                  ) : selectedOrder.shipping_address ? (
+                    <>
+                      <p className="font-medium">{selectedOrder.shipping_address.name} ({selectedOrder.shipping_address.phone})</p>
+                      <p className="text-gray-600">{selectedOrder.shipping_address.address}</p>
+                      <p className="text-gray-600">
+                        {selectedOrder.shipping_address.subdistrict && `${selectedOrder.shipping_address.subdistrict}, `}{selectedOrder.shipping_address.district}, {selectedOrder.shipping_address.city}, {selectedOrder.shipping_address.province} {selectedOrder.shipping_address.zipcode}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-gray-500 italic">Informasi pengiriman tidak tersedia</p>
+                  )}
+                  {selectedOrder.tracking_number && (
+                    <p className="mt-2 text-blue-600 font-medium tracking-wide">
+                      Resi: {selectedOrder.tracking_number}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {selectedOrder.payment_category === 'instant' && selectedOrder.payment_status === 'unpaid' && (selectedOrder.payment_url || selectedOrder.ipaymu_payment_url) && (
+                <div className="border-t pt-4 flex gap-3">
+                  <Button
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                    onClick={() => window.open(selectedOrder.payment_url || selectedOrder.ipaymu_payment_url, '_blank')}
+                    disabled={selectedOrder.status === 'cancelled'}
+                  >
+                    Lanjut Pembayaran Instan
+                  </Button>
+                  {selectedOrder.status !== 'cancelled' && (
+                    <Button
+                      variant="outline"
+                      className="text-red-600 border-red-200 hover:bg-red-50"
+                      onClick={() => setOrderToCancel(selectedOrder)}
+                      disabled={cancelling === selectedOrder.id}
+                    >
+                      {cancelling === selectedOrder.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <XCircle className="h-4 w-4 mr-2" />}
+                      Batalkan Pesanan
+                    </Button>
+                  )}
+                </div>
+              )}
+              {selectedOrder.payment_status === 'unpaid' && selectedOrder.status !== 'cancelled' && selectedOrder.payment_category !== 'instant' && (
+                <div className="border-t pt-4">
+                  <Button
+                    variant="outline"
+                    className="w-full text-red-600 border-red-200 hover:bg-red-50"
+                    onClick={() => setOrderToCancel(selectedOrder)}
+                    disabled={cancelling === selectedOrder.id}
+                  >
+                    {cancelling === selectedOrder.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <XCircle className="h-4 w-4 mr-2" />}
+                    Batalkan Pesanan
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancellation Confirmation Modal */}
+      <Dialog open={!!orderToCancel} onOpenChange={(open) => !open && setOrderToCancel(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <XCircle className="h-5 w-5" />
+              Konfirmasi Pembatalan
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-3">
+            <p className="text-gray-600">
+              Apakah Anda yakin ingin membatalkan pesanan <span className="font-bold text-gray-900">{orderToCancel?.invoice_number || orderToCancel?.order_number || `ORD-${orderToCancel?.id}`}</span>?
+            </p>
+            <p className="text-sm text-gray-500 bg-red-50 p-3 rounded-md border border-red-100 italic">
+              Tindakan ini tidak dapat dibatalkan setelah diproses.
+            </p>
+          </div>
+          <div className="flex gap-3 mt-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => setOrderToCancel(null)}
+              disabled={cancelling === orderToCancel?.id}
+            >
+              Kembali
+            </Button>
+            <Button
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+              onClick={handleCancelOrder}
+              disabled={cancelling === orderToCancel?.id}
+            >
+              {cancelling === orderToCancel?.id && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              Ya, Batalkan
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

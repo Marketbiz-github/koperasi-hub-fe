@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Trash2, ChevronLeft, ShoppingCart, CreditCard, Clock, FileText, Loader2, CheckCircle2, Ticket, Gift, Edit2 } from "lucide-react"
 import { useCartStore } from "@/store/cartStore"
-import { productService, storeService } from "@/services/apiService"
+import { productService, storeService, productVariantService, inventoryService } from "@/services/apiService"
 import { useEffect } from "react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
@@ -30,12 +30,21 @@ import ShippingForm from "@/components/ShippingForm"
 import { Badge } from "@/components/ui/badge"
 import { getAccessToken } from "@/utils/auth"
 import { useSearchParams } from "next/navigation"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 export default function CartPage() {
   const router = useRouter()
   const {
     items,
     removeItem,
+    removeItems,
     updateQuantity,
     clearCart,
     selectedItems,
@@ -54,6 +63,9 @@ export default function CartPage() {
   const [storeInfoMap, setStoreInfoMap] = useState<Record<number, any>>({})
   const [isLoadingDetails, setIsLoadingDetails] = useState(false)
   const [customerNotes, setCustomerNotes] = useState("")
+  const [variantDetailMap, setVariantDetailMap] = useState<Record<string, any[]>>({})
+  const [productStockMap, setProductStockMap] = useState<Record<string, number>>({})
+  const [checkoutSuccessData, setCheckoutSuccessData] = useState<{ orderId: number, paymentUrl: string | null } | null>(null)
 
   // Filter items by store
   const filteredItems = useMemo(() => {
@@ -94,12 +106,16 @@ export default function CartPage() {
   const [shippingAddress, setShippingAddress] = useState<any>(null)
   const [isAddressLocked, setIsAddressLocked] = useState(false)
 
+  const [itemToRemove, setItemToRemove] = useState<string | null>(null)
+
   // Fetch product details and store details
   useEffect(() => {
     const fetchData = async () => {
       if (filteredItems.length === 0) return
       setIsLoadingDetails(true)
       const details: Record<string, any> = {}
+      const vDetails: Record<string, any[]> = {}
+      const pStocks: Record<string, number> = {}
       try {
         const token = await getAccessToken()
 
@@ -119,12 +135,32 @@ export default function CartPage() {
             try {
               const res = await productService.getProductDetail(item.id, token || undefined)
               details[item.id] = res.data
+
+              if (!vDetails[item.id]) {
+                const vRes = await productVariantService.getList(token || "", item.id)
+                vDetails[item.id] = vRes.data
+              }
+
+              if (!pStocks[item.id]) {
+                try {
+                  const sRes = await inventoryService.getStockByProduct(token || "", item.id)
+                  if (Array.isArray(sRes.data)) {
+                    pStocks[item.id] = sRes.data.reduce((acc: number, curr: any) => acc + (curr.stock || 0), 0)
+                  } else {
+                    pStocks[item.id] = typeof sRes.data === 'number' ? sRes.data : (sRes.data?.total_stock ?? 0)
+                  }
+                } catch (e) {
+                  console.error(`Error fetching product stock ${item.id}:`, e)
+                }
+              }
             } catch (err) {
               console.error(`Error fetching detail for product ${item.id}:`, err)
             }
           })
         )
         setCartDetails(details)
+        setVariantDetailMap(vDetails)
+        setProductStockMap(pStocks)
       } finally {
         setIsLoadingDetails(false)
       }
@@ -229,6 +265,7 @@ export default function CartPage() {
     try {
       const selectedCartItems = currentItems.filter(it => selectedItems.has(it.id))
       const firstItemDetail = cartDetails[selectedCartItems[0]?.id]
+      const hasFreeShipping = selectedCartItems.some(it => cartDetails[it.id]?.is_gratis_ongkir)
 
       const orderData = {
         store_id: firstItemDetail?.store_id || selectedCartItems[0]?.storeId || 1,
@@ -258,6 +295,7 @@ export default function CartPage() {
         warehouse_id: warehouseId,
         customer_notes: customerNotes,
         payment_category: paymentCategory,
+        is_gratis_ongkir: hasFreeShipping,
         ...(paymentCategory === "piutang" && {
           debt_type: debtType,
           ...(debtType === "tenor" && { tenor_months: parseInt(tenorMonths) })
@@ -281,12 +319,16 @@ export default function CartPage() {
       toast.success("Pesanan berhasil dibuat!")
 
       // Remove only selected items from cart
-      selectedCartItems.forEach(it => removeItem(it.id))
+      removeItems(selectedCartItems.map(it => it.id))
 
-      if (result.data?.payment_url) {
-        window.location.href = result.data.payment_url
+      if (paymentCategory === "instant" && result.data?.payment_url) {
+        window.open(result.data.payment_url, '_blank')
+        setCheckoutSuccessData({
+          orderId: result.data?.order?.id || 0,
+          paymentUrl: result.data.payment_url
+        })
       } else {
-        router.push("/dashboard/koperasi/marketplace/orders")
+        router.push("/dashboard/koperasi/marketplace/pembelian")
       }
     } catch (error: any) {
       console.error("Checkout Error:", error)
@@ -301,6 +343,19 @@ export default function CartPage() {
     const numeric = typeof value === 'string' ? parseInt(value) : value
     return `Rp${(numeric || 0).toLocaleString("id-ID")}`
   }
+
+  // Map items by store to show multiple "carts" if no store_id is selected
+  const storeGroups = useMemo(() => {
+    const groups: Record<number, any[]> = {}
+    items.forEach(it => {
+      const sId = it.storeId || 0
+      if (!groups[sId]) groups[sId] = []
+      groups[sId].push(it)
+    })
+    return groups
+  }, [items])
+
+  const currentItems = filteredItems.length > 0 ? filteredItems : items
 
   if (items.length === 0) {
     return (
@@ -329,17 +384,6 @@ export default function CartPage() {
       </div>
     )
   }
-
-  // Map items by store to show multiple "carts" if no store_id is selected
-  const storeGroups = useMemo(() => {
-    const groups: Record<number, any[]> = {}
-    items.forEach(it => {
-      const sId = it.storeId || 0
-      if (!groups[sId]) groups[sId] = []
-      groups[sId].push(it)
-    })
-    return groups
-  }, [items])
 
   if (!storeIdParam && Object.keys(storeGroups).length > 1) {
     return (
@@ -384,7 +428,6 @@ export default function CartPage() {
     )
   }
 
-  const currentItems = filteredItems.length > 0 ? filteredItems : items
 
   return (
     <div className="space-y-6">
@@ -422,25 +465,41 @@ export default function CartPage() {
             <CardContent className="space-y-4">
               {currentItems.map((item) => {
                 const detail = cartDetails[item.id]
+                const variants = variantDetailMap[item.id] || []
+
+                let totalStock: number | undefined = undefined;
+                if (item.variantId) {
+                  const matchedVariant = variants.find((v: any) => v.id === item.variantId)
+                  totalStock = matchedVariant ? matchedVariant.total_stock : undefined
+                } else {
+                  totalStock = productStockMap[item.id]
+                }
+
+                const isInsufficientStock = totalStock !== undefined && totalStock < item.quantity
+
                 return (
                   <div
                     key={item.id}
                     className={`flex gap-4 pb-4 border-b last:border-b-0 last:pb-0 transition-opacity ${selectedItems.has(item.id) ? "opacity-100" : "opacity-60"
                       }`}
                   >
-                    <div className="flex items-center pt-1">
+                    <div className="flex flex-col items-center pt-1 gap-2">
                       <input
                         type="checkbox"
                         checked={selectedItems.has(item.id)}
                         onChange={() => toggleSelectItem(item.id)}
-                        className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-600 cursor-pointer"
+                        disabled={isInsufficientStock}
+                        className={`h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-600 cursor-pointer ${isInsufficientStock ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
                     </div>
 
                     {/* Product Image */}
                     <div className="relative w-24 h-24 bg-gray-100 rounded-lg overflow-hidden shrink-0">
                       {(() => {
-                        const primaryImg = detail?.images?.find((img: any) => img.is_primary)?.image_url || detail?.image || item.image;
+                        const primaryImg = detail?.images?.find((img: any) => img.is_primary)?.image_url ||
+                          detail?.images?.[0]?.image_url ||
+                          detail?.image ||
+                          item.image;
                         return primaryImg ? (
                           <Image
                             src={primaryImg}
@@ -493,7 +552,7 @@ export default function CartPage() {
                     {/* Quantity & Actions */}
                     <div className="flex flex-col justify-between items-end">
                       <button
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => setItemToRemove(item.id)}
                         className="text-gray-400 hover:text-red-600 transition-colors p-1"
                       >
                         <Trash2 size={18} />
@@ -518,15 +577,24 @@ export default function CartPage() {
                           onClick={() =>
                             updateQuantity(item.id, item.quantity + 1)
                           }
-                          className="px-2 py-1 text-gray-600 hover:bg-gray-200 transition-colors"
+                          disabled={totalStock !== undefined && item.quantity >= totalStock}
+                          className="px-2 py-1 text-gray-600 hover:bg-gray-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                           +
                         </button>
                       </div>
 
-                      <p className="font-semibold text-gray-900">
-                        {formatCurrency((detail?.discount_price ? parseInt(detail.discount_price) : (detail?.price ? parseInt(detail.price) : (item.price || 0))) * item.quantity)}
-                      </p>
+                      <div className="flex flex-col gap-1 items-end mt-1 shrink-0">
+                        <p className="font-semibold text-gray-900">
+                          {formatCurrency((detail?.discount_price ? parseInt(detail.discount_price) : (detail?.price ? parseInt(detail.price) : (item.price || 0))) * item.quantity)}
+                        </p>
+                        {totalStock !== undefined ? (
+                          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${isInsufficientStock ? 'border-red-200 text-red-600 bg-red-50' : 'border-gray-200 text-gray-500'}`}>
+                            Stok: {totalStock}
+                          </Badge>
+                        ) : null}
+                        {isInsufficientStock && <span className="text-[10px] text-red-500 font-medium">Stok tidak cukup</span>}
+                      </div>
                     </div>
                   </div>
                 )
@@ -609,7 +677,6 @@ export default function CartPage() {
                         <CreditCard size={16} className="text-emerald-600" />
                         <span>Pembayaran Instan</span>
                       </div>
-                      <p className="text-xs text-gray-500 font-normal">Bayar langsung menggunakan iPaymu</p>
                     </Label>
                   </div>
 
@@ -620,7 +687,6 @@ export default function CartPage() {
                         <Clock size={16} className="text-amber-600" />
                         <span>Sistem Piutang</span>
                       </div>
-                      <p className="text-xs text-gray-500 font-normal">Plafon kredit koperasi</p>
                     </Label>
                   </div>
                 </RadioGroup>
@@ -708,6 +774,79 @@ export default function CartPage() {
           </Card>
         </div>
       </div>
+
+      {/* Success Modal */}
+      {checkoutSuccessData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <Card className="w-full max-w-md bg-white shadow-xl animate-in zoom-in-95 fade-in-0">
+            <CardHeader className="text-center pb-2">
+              <div className="mx-auto w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
+                <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+              </div>
+              <CardTitle className="text-xl">Pesanan Berhasil!</CardTitle>
+              <p className="text-sm text-gray-500 mt-2 hover:underline">
+                Silahkan selesaikan pembayaran Instan Anda.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-3 pt-4">
+              <Button
+                onClick={() => {
+                  if (checkoutSuccessData.paymentUrl) {
+                    window.open(checkoutSuccessData.paymentUrl, '_blank')
+                  }
+                }}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 h-11"
+              >
+                Lanjut Bayar
+              </Button>
+              <Link href="/dashboard/koperasi/marketplace/pembelian" className="block w-full">
+                <Button variant="outline" className="w-full h-11" onClick={() => setCheckoutSuccessData(null)}>
+                  Lihat Pesanan
+                </Button>
+              </Link>
+              <Link href="/dashboard/koperasi/marketplace" className="block w-full text-center mt-2">
+                <button onClick={() => setCheckoutSuccessData(null)} className="text-sm text-gray-500 hover:text-gray-700 underline underline-offset-4">
+                  Kembali ke Belanja
+                </button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Item Removal Confirmation */}
+      <Dialog open={!!itemToRemove} onOpenChange={(open) => !open && setItemToRemove(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Hapus dari Keranjang?</DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin menghapus produk ini dari keranjang belanja?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setItemToRemove(null)}
+              className="flex-1 sm:flex-none"
+            >
+              Batal
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (itemToRemove) {
+                  removeItem(itemToRemove)
+                  setItemToRemove(null)
+                  toast.success("Produk dihapus dari keranjang")
+                }
+              }}
+              className="flex-1 sm:flex-none"
+            >
+              Hapus Produk
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
