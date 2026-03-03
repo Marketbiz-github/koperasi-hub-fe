@@ -577,13 +577,14 @@ export const orderService = {
         });
     },
 
-    async getOrders(params: { user_id?: number, buyer_id?: number, store_id?: number, status?: string, payment_status?: string, search?: string, page?: number, limit?: number }, token: string) {
+    async getOrders(params: { user_id?: number, buyer_id?: number, store_id?: number, status?: string, payment_status?: string, payment_category?: string, search?: string, page?: number, limit?: number }, token: string) {
         let query = new URLSearchParams();
         if (params.user_id) query.append('user_id', params.user_id.toString());
         if (params.buyer_id) query.append('buyer_id', params.buyer_id.toString());
         if (params.store_id) query.append('store_id', params.store_id.toString());
         if (params.status) query.append('status', params.status);
         if (params.payment_status) query.append('payment_status', params.payment_status);
+        if (params.payment_category) query.append('payment_category', params.payment_category);
         if (params.search) query.append('search', params.search);
         if (params.page) query.append('page', params.page.toString());
         if (params.limit) query.append('limit', params.limit.toString());
@@ -659,7 +660,7 @@ export const debtService = {
         return apiRequest(endpoint, { token });
     },
 
-    async getPaymentUrl(debtId: string | number, type: 'installment' | 'PO', token: string) {
+    async getPaymentUrl(debtId: string | number, type: 'installment' | 'po', token: string) {
         return apiRequest(`/debts/${debtId}/pay?type=${type}`, {
             token,
         });

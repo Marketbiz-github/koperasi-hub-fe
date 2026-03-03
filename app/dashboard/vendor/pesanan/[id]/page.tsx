@@ -54,6 +54,30 @@ const formatCurrency = (value: number | string) => {
     return `Rp${(num || 0).toLocaleString('id-ID')}`;
 };
 
+const getStatusLabel = (status: string, paymentCategory: string, paidAt?: string | null) => {
+    if (status === 'paid' && paymentCategory === 'piutang') {
+        if (!paidAt) return 'Disetujui';
+        return 'Piutang';
+    }
+    return statusConfig[status]?.label || status;
+};
+
+const getSettlementStatus = (order: any, debt: any) => {
+    if (order.payment_category === 'piutang') {
+        const d = debt || order.debt;
+        const installments = d?.installments || [];
+        if (installments.length > 0) {
+            const allPaid = installments.every((i: any) => i.status === 'paid');
+            const somePaid = installments.some((i: any) => i.status === 'paid');
+            if (allPaid) return 'LUNAS';
+            if (somePaid) return 'DIBAYAR SEBAGIAN';
+            return 'BELUM LUNAS';
+        }
+        return d?.status === 'paid' ? 'LUNAS' : 'BELUM LUNAS';
+    }
+    return order.payment_status === 'paid' ? 'LUNAS' : 'BELUM LUNAS';
+};
+
 export default function VendorPesananDetailPage() {
     const params = useParams();
     const router = useRouter();
@@ -268,11 +292,16 @@ export default function VendorPesananDetailPage() {
                                     </CardTitle>
                                 </div>
                                 <div className="flex gap-2">
-                                    <Badge className={order.payment_status === 'paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}>
-                                        {order.payment_status === 'paid' ? 'LUNAS' : 'BELUM LUNAS'}
+                                    <Badge variant="outline" className={`shadow-none border ${getSettlementStatus(order, debt) === 'LUNAS'
+                                        ? 'border-emerald-200 text-emerald-700 bg-emerald-50'
+                                        : getSettlementStatus(order, debt) === 'DIBAYAR SEBAGIAN'
+                                            ? 'border-blue-200 text-blue-700 bg-blue-50'
+                                            : 'border-amber-200 text-amber-700 bg-amber-50'
+                                        }`}>
+                                        {getSettlementStatus(order, debt)}
                                     </Badge>
                                     <Badge className={`${statusConfig[order.status]?.color || 'bg-gray-100 text-gray-800'} border-0`}>
-                                        {statusConfig[order.status]?.label || order.status}
+                                        {getStatusLabel(order.status, order.payment_category, order.paid_at)}
                                     </Badge>
                                 </div>
                             </div>
@@ -293,7 +322,7 @@ export default function VendorPesananDetailPage() {
                                     </p>
                                 </div>
                                 <div>
-                                    <p className="text-gray-500 mb-1">Tipe Pembayaran</p>
+                                    <p className="text-gray-500 mb-1">Metode Pembayaran</p>
                                     <p className="font-medium text-gray-900 uppercase">{order.payment_category || '-'}</p>
                                 </div>
                                 <div>

@@ -67,6 +67,29 @@ const formatCurrency = (value: number | string) => {
   return `Rp${(num || 0).toLocaleString('id-ID')}`;
 };
 
+const getStatusLabel = (status: string, paymentCategory: string, paidAt?: string | null) => {
+  if (status === 'paid' && paymentCategory === 'piutang') {
+    if (!paidAt) return 'Disetujui';
+    return 'Piutang';
+  }
+  return statusConfig[status]?.label || status;
+};
+
+const getSettlementStatus = (order: any) => {
+  if (order.payment_category === 'piutang') {
+    const installments = order.debt?.installments || [];
+    if (installments.length > 0) {
+      const allPaid = installments.every((i: any) => i.status === 'paid');
+      const somePaid = installments.some((i: any) => i.status === 'paid');
+      if (allPaid) return 'LUNAS';
+      if (somePaid) return 'DIBAYAR SEBAGIAN';
+      return 'BELUM LUNAS';
+    }
+    return order.debt?.status === 'paid' ? 'LUNAS' : 'BELUM LUNAS';
+  }
+  return order.payment_status === 'paid' ? 'LUNAS' : 'BELUM LUNAS';
+};
+
 export default function PembelianPage() {
   const { user } = useAuthStore();
 
@@ -80,10 +103,49 @@ export default function PembelianPage() {
   const [totalOrders, setTotalOrders] = useState(0);
   const [storeNames, setStoreNames] = useState<Record<string, string>>({});
   const [cancelling, setCancelling] = useState<string | null>(null);
+  const [paying, setPaying] = useState<string | null>(null);
 
-  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
   const [orderToCancel, setOrderToCancel] = useState<any | null>(null);
 
+  const handlePay = async (order: any) => {
+    if (order.payment_category === 'instant') {
+      const url = order.payment_url || order.ipaymu_payment_url;
+      if (url) window.open(url, '_blank');
+      return;
+    }
+
+    if (order.payment_category === 'piutang') {
+      setPaying(order.id);
+      try {
+        const token = await getAccessToken();
+        let targetId = order.debt?.id;
+        let type: 'po' | 'installment' = 'po';
+
+        if (order.debt?.type === 'tenor') {
+          const firstUnpaid = order.debt.installments?.find((i: any) => i.status === 'unpaid');
+          if (firstUnpaid) {
+            targetId = firstUnpaid.id;
+            type = 'installment';
+          }
+        }
+
+        if (!targetId) throw new Error('Debt ID tidak ditemukan');
+
+        const { debtService } = await import('@/services/apiService');
+        const res = await debtService.getPaymentUrl(targetId, type, token || '');
+        if (res.data?.payment_url) {
+          window.open(res.data.payment_url, '_blank');
+        } else {
+          throw new Error('Gagal mendapatkan URL pembayaran');
+        }
+      } catch (err: any) {
+        console.error('Payment failed', err);
+        alert(err.message || 'Gagal memproses pembayaran');
+      } finally {
+        setPaying(null);
+      }
+    }
+  };
   const fetchOrders = async () => {
     if (!user?.id) return;
     setLoading(true);
@@ -138,9 +200,6 @@ export default function PembelianPage() {
       const token = await getAccessToken();
       await orderService.cancelOrder(orderId, token || ''); // Use dedicated cancel order API
       fetchOrders();
-      if (selectedOrder && selectedOrder.id === orderId) {
-        setSelectedOrder(null);
-      }
       setOrderToCancel(null);
     } catch (err: any) {
       console.error('Failed to cancel order', err);
@@ -183,7 +242,7 @@ export default function PembelianPage() {
 
       {/* Filters */}
       <Card>
-        <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center">
+        <CardContent className="px-4 flex flex-col md:flex-row gap-4 items-center">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
@@ -219,15 +278,15 @@ export default function PembelianPage() {
             <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
           </div>
         ) : orders.length > 0 ? (
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden px-4">
             <Table>
               <TableHeader className="bg-gray-50/50">
                 <TableRow>
                   <TableHead>No.</TableHead>
                   <TableHead className="w-[180px]">No. Pesanan</TableHead>
                   <TableHead>Toko</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Pembayaran</TableHead>
+                  <TableHead>Status Pesanan</TableHead>
+                  <TableHead>Status Tagihan</TableHead>
                   <TableHead>Total Belanja</TableHead>
                   <TableHead className="text-right">Aksi</TableHead>
                 </TableRow>
@@ -252,15 +311,24 @@ export default function PembelianPage() {
                       <Badge
                         className={`${statusConfig[order.status]?.color || 'bg-gray-100 text-gray-800'} border-0 shadow-none pointer-events-none`}
                       >
-                        {statusConfig[order.status]?.label || order.status}
+                        {getStatusLabel(order.status, order.payment_category, order.paid_at)}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1">
-                        <Badge variant="outline" className={`w-fit shadow-none border ${order.payment_status === 'paid' ? 'border-emerald-200 text-emerald-700 bg-emerald-50' : 'border-amber-200 text-amber-700 bg-amber-50'}`}>
-                          {order.payment_status === 'paid' ? 'LUNAS' : 'BELUM LUNAS'}
+                        <Badge variant="outline" className={`w-fit shadow-none border ${getSettlementStatus(order) === 'LUNAS'
+                          ? 'border-emerald-200 text-emerald-700 bg-emerald-50'
+                          : getSettlementStatus(order) === 'DIBAYAR SEBAGIAN'
+                            ? 'border-blue-200 text-blue-700 bg-blue-50'
+                            : 'border-amber-200 text-amber-700 bg-amber-50'
+                          }`}>
+                          {getSettlementStatus(order)}
                         </Badge>
-                        <span className="text-[10px] text-gray-500 uppercase font-medium mt-0.5">{order.payment_category || '-'}</span>
+                        <span className="text-[10px] text-gray-500 uppercase font-medium mt-0.5">
+                          {order.payment_category === 'piutang' && order.debt?.type
+                            ? `PIUTANG (${order.debt.type})`
+                            : order.payment_category || '-'}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -270,13 +338,14 @@ export default function PembelianPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        {order.payment_category === 'instant' && order.payment_status === 'unpaid' && (order.payment_url || order.ipaymu_payment_url) && (
+                        {(order.payment_category === 'instant' && order.payment_status === 'unpaid') && (
                           <Button
                             size="sm"
                             className="bg-emerald-600 hover:bg-emerald-700 h-8 text-xs font-semibold px-3"
-                            onClick={() => window.open(order.payment_url || order.ipaymu_payment_url, '_blank')}
-                            disabled={order.status === 'cancelled'}
+                            onClick={() => handlePay(order)}
+                            disabled={order.status === 'cancelled' || paying === order.id}
                           >
+                            {paying === order.id ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}
                             Bayar
                           </Button>
                         )}
@@ -292,15 +361,16 @@ export default function PembelianPage() {
                             <span className="text-[10px] font-bold uppercase">Batalkan</span>
                           </Button>
                         )}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 px-3 gap-1.5 border-gray-200 text-gray-600 hover:text-gray-900"
-                          onClick={() => setSelectedOrder(order)}
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span className="text-[10px] font-bold uppercase">Detail</span>
-                        </Button>
+                        <Link href={`/dashboard/koperasi/marketplace/pembelian/${order.id}`}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 px-3 gap-1.5 border-gray-200 text-gray-600 hover:text-gray-900"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            <span className="text-[10px] font-bold uppercase">Detail</span>
+                          </Button>
+                        </Link>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -328,7 +398,7 @@ export default function PembelianPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage(p => Math.max(1, p - 1))}
+              onClick={() => setPage((p: number) => Math.max(1, p - 1))}
               disabled={page === 1}
             >
               <ChevronLeft className="h-4 w-4" />
@@ -337,7 +407,7 @@ export default function PembelianPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              onClick={() => setPage((p: number) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
             >
               <ChevronRight className="h-4 w-4" />
@@ -345,150 +415,6 @@ export default function PembelianPage() {
           </div>
         )}
       </div>
-
-      {/* Order Detail Modal */}
-      <Dialog open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Detail Pesanan</DialogTitle>
-          </DialogHeader>
-          {selectedOrder && (
-            <div className="space-y-6 pt-4">
-              <div className="flex justify-between items-start border-b pb-4">
-                <div>
-                  <h3 className="font-bold text-lg">{selectedOrder.invoice_number || selectedOrder.order_number || `ORD-${selectedOrder.id}`}</h3>
-                  <p className="text-sm text-gray-500">{new Date(selectedOrder.created_at).toLocaleString('id-ID')}</p>
-                  <p className="text-sm text-gray-600 mt-2 flex items-center gap-1">
-                    <IconBuildingStore size={14} /> {storeNames[selectedOrder.store_id] || selectedOrder.store?.name || 'Toko Vendor'}
-                  </p>
-                </div>
-                <div className="text-right space-y-2">
-                  <Badge className={selectedOrder.payment_status === 'paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}>
-                    {selectedOrder.payment_status === 'paid' ? 'LUNAS' : 'BELUM LUNAS'}
-                  </Badge>
-                  <div className="block mt-2">
-                    <Badge className={`${statusConfig[selectedOrder.status]?.color || 'bg-gray-100 text-gray-800'} border-0`}>
-                      {statusConfig[selectedOrder.status]?.label || selectedOrder.status}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-3">Daftar Produk</h4>
-                <div className="space-y-3">
-                  {selectedOrder.items?.map((item: any) => (
-                    <div key={item.id} className="flex gap-3">
-                      <div className="relative w-12 h-12 bg-gray-100 rounded border overflow-hidden shrink-0">
-                        {(() => {
-                          const img = item.product?.image ||
-                            item.product?.images?.find((i: any) => i.is_primary)?.image_url ||
-                            item.product?.images?.[0]?.image_url ||
-                            item.product_image ||
-                            item.image;
-                          return img ? (
-                            <Image src={img} alt="Img" fill className="object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-400">No Img</div>
-                          );
-                        })()}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-sm">{item.product_name || item.product?.name}</p>
-                        <p className="text-xs text-gray-500">{item.quantity} x {formatCurrency(item.price)}</p>
-                      </div>
-                      <div className="font-semibold text-sm">
-                        {formatCurrency(item.quantity * item.price)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="border-t pt-4 space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Subtotal</span>
-                  <span>{formatCurrency(selectedOrder.total_amount - (selectedOrder.shipping_cost || 0))}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Ongkos Kirim {selectedOrder.courier_name ? `(${selectedOrder.courier_name} - ${selectedOrder.courier_service})` : ''}</span>
-                  <span>{formatCurrency(selectedOrder.shipping_cost || 0)}</span>
-                </div>
-                <div className="flex justify-between font-bold text-lg pt-2 border-t mt-2">
-                  <span>Total Keseluruhan</span>
-                  <span className="text-emerald-600">{formatCurrency(selectedOrder.total_amount)}</span>
-                </div>
-              </div>
-
-              <div className="border-t pt-4">
-                <h4 className="font-semibold mb-2">Informasi Pengiriman</h4>
-                <div className="text-sm space-y-1">
-                  {selectedOrder.customer_name ? (
-                    <>
-                      <p className="font-medium">{selectedOrder.customer_name} ({selectedOrder.customer_phone})</p>
-                      <p className="text-gray-600">{selectedOrder.customer_address}</p>
-                      <p className="text-gray-600">
-                        {selectedOrder.customer_subdistrict && `${selectedOrder.customer_subdistrict}, `}{selectedOrder.customer_district}, {selectedOrder.customer_city}, {selectedOrder.customer_province} {selectedOrder.customer_zipcode}
-                      </p>
-                    </>
-                  ) : selectedOrder.shipping_address ? (
-                    <>
-                      <p className="font-medium">{selectedOrder.shipping_address.name} ({selectedOrder.shipping_address.phone})</p>
-                      <p className="text-gray-600">{selectedOrder.shipping_address.address}</p>
-                      <p className="text-gray-600">
-                        {selectedOrder.shipping_address.subdistrict && `${selectedOrder.shipping_address.subdistrict}, `}{selectedOrder.shipping_address.district}, {selectedOrder.shipping_address.city}, {selectedOrder.shipping_address.province} {selectedOrder.shipping_address.zipcode}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="text-gray-500 italic">Informasi pengiriman tidak tersedia</p>
-                  )}
-                  {selectedOrder.tracking_number && (
-                    <p className="mt-2 text-blue-600 font-medium tracking-wide">
-                      Resi: {selectedOrder.tracking_number}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {selectedOrder.payment_category === 'instant' && selectedOrder.payment_status === 'unpaid' && (selectedOrder.payment_url || selectedOrder.ipaymu_payment_url) && (
-                <div className="border-t pt-4 flex gap-3">
-                  <Button
-                    className="flex-1 bg-emerald-600 hover:bg-emerald-700"
-                    onClick={() => window.open(selectedOrder.payment_url || selectedOrder.ipaymu_payment_url, '_blank')}
-                    disabled={selectedOrder.status === 'cancelled'}
-                  >
-                    Lanjut Pembayaran Instan
-                  </Button>
-                  {selectedOrder.status !== 'cancelled' && (
-                    <Button
-                      variant="outline"
-                      className="text-red-600 border-red-200 hover:bg-red-50"
-                      onClick={() => setOrderToCancel(selectedOrder)}
-                      disabled={cancelling === selectedOrder.id}
-                    >
-                      {cancelling === selectedOrder.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <XCircle className="h-4 w-4 mr-2" />}
-                      Batalkan Pesanan
-                    </Button>
-                  )}
-                </div>
-              )}
-              {selectedOrder.payment_status === 'unpaid' && selectedOrder.status !== 'cancelled' && selectedOrder.payment_category !== 'instant' && (
-                <div className="border-t pt-4">
-                  <Button
-                    variant="outline"
-                    className="w-full text-red-600 border-red-200 hover:bg-red-50"
-                    onClick={() => setOrderToCancel(selectedOrder)}
-                    disabled={cancelling === selectedOrder.id}
-                  >
-                    {cancelling === selectedOrder.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <XCircle className="h-4 w-4 mr-2" />}
-                    Batalkan Pesanan
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
 
       {/* Cancellation Confirmation Modal */}
       <Dialog open={!!orderToCancel} onOpenChange={(open) => !open && setOrderToCancel(null)}>

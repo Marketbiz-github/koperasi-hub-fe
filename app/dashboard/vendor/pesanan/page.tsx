@@ -57,6 +57,29 @@ const formatCurrency = (value: number | string) => {
     return `Rp${(num || 0).toLocaleString('id-ID')}`;
 };
 
+const getStatusLabel = (status: string, paymentCategory: string, paidAt?: string | null) => {
+    if (status === 'paid' && paymentCategory === 'piutang') {
+        if (!paidAt) return 'Disetujui';
+        return 'Piutang';
+    }
+    return statusConfig[status]?.label || status;
+};
+
+const getSettlementStatus = (order: any) => {
+    if (order.payment_category === 'piutang') {
+        const installments = order.debt?.installments || [];
+        if (installments.length > 0) {
+            const allPaid = installments.every((i: any) => i.status === 'paid');
+            const somePaid = installments.some((i: any) => i.status === 'paid');
+            if (allPaid) return 'LUNAS';
+            if (somePaid) return 'DIBAYAR SEBAGIAN';
+            return 'BELUM LUNAS';
+        }
+        return order.debt?.status === 'paid' ? 'LUNAS' : 'BELUM LUNAS';
+    }
+    return order.payment_status === 'paid' ? 'LUNAS' : 'BELUM LUNAS';
+};
+
 export default function VendorPesananPage() {
     const { user } = useAuthStore();
 
@@ -120,7 +143,7 @@ export default function VendorPesananPage() {
 
             {/* Filters */}
             <Card>
-                <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center">
+                <CardContent className="px-4 flex flex-col md:flex-row gap-4 items-center">
                     <div className="relative flex-1 w-full">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
@@ -156,7 +179,7 @@ export default function VendorPesananPage() {
                         <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
                     </div>
                 ) : orders.length > 0 ? (
-                    <Card className="shadow-sm border-gray-200 overflow-hidden">
+                    <Card className="shadow-sm border-gray-200 overflow-hidden px-4">
                         <div className="rounded-md border-x border-t overflow-hidden">
                             <Table>
                                 <TableHeader className="bg-muted/50">
@@ -165,8 +188,8 @@ export default function VendorPesananPage() {
                                         <TableHead>No.</TableHead>
                                         <TableHead className="w-[180px]">No. Pesanan</TableHead>
                                         <TableHead>Pembeli</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Info Pembayaran</TableHead>
+                                        <TableHead>Status Pesanan</TableHead>
+                                        <TableHead>Status Tagihan</TableHead>
                                         <TableHead>Total Transaksi</TableHead>
                                         <TableHead className="text-right">Aksi</TableHead>
                                     </TableRow>
@@ -195,15 +218,24 @@ export default function VendorPesananPage() {
                                                 <Badge
                                                     className={`${statusConfig[order.status]?.color || 'bg-gray-100 text-gray-800'} border-0 shadow-none pointer-events-none`}
                                                 >
-                                                    {statusConfig[order.status]?.label || order.status}
+                                                    {getStatusLabel(order.status, order.payment_category, order.paid_at)}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex flex-col gap-1">
-                                                    <Badge variant="outline" className={`w-fit shadow-none border ${order.payment_status === 'paid' ? 'border-emerald-200 text-emerald-700 bg-emerald-50' : 'border-amber-200 text-amber-700 bg-amber-50'}`}>
-                                                        {order.payment_status === 'paid' ? 'LUNAS' : 'BELUM LUNAS'}
+                                                    <Badge variant="outline" className={`w-fit shadow-none border ${getSettlementStatus(order) === 'LUNAS'
+                                                        ? 'border-emerald-200 text-emerald-700 bg-emerald-50'
+                                                        : getSettlementStatus(order) === 'DIBAYAR SEBAGIAN'
+                                                            ? 'border-blue-200 text-blue-700 bg-blue-50'
+                                                            : 'border-amber-200 text-amber-700 bg-amber-50'
+                                                        }`}>
+                                                        {getSettlementStatus(order)}
                                                     </Badge>
-                                                    <span className="text-[10px] text-gray-500 uppercase font-medium mt-0.5">{order.payment_category || '-'}</span>
+                                                    <span className="text-[10px] text-gray-500 uppercase font-medium mt-0.5">
+                                                        {order.payment_category === 'piutang' && order.debt?.type
+                                                            ? `PIUTANG (${order.debt.type})`
+                                                            : order.payment_category || '-'}
+                                                    </span>
                                                 </div>
                                             </TableCell>
                                             <TableCell>

@@ -50,11 +50,21 @@ const data = {
     },
     {
       title: "Pembelian",
-      url: "/dashboard/koperasi/marketplace/pembelian",
+      url: "#",
       icon: IconShoppingCart,
+      items: [
+        {
+          title: "Daftar Pembelian",
+          url: "/dashboard/koperasi/marketplace/pembelian",
+        },
+        {
+          title: "Daftar Piutang",
+          url: "/dashboard/koperasi/marketplace/piutang",
+        },
+      ]
     },
     {
-      title: "Pesanan",
+      title: "Pesanan Masuk",
       url: "/dashboard/koperasi/marketplace/pesanan",
       icon: IconFileInvoice,
     },

@@ -1,468 +1,345 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import {
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  FileText,
-  DollarSign,
-  AlertCircle,
+  Eye,
+  Search,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  XCircle,
+  CreditCard
 } from 'lucide-react';
+import { IconBuildingStore, IconCash } from '@tabler/icons-react';
+import { useAuthStore } from '@/store/authStore';
+import { getAccessToken } from '@/utils/auth';
+import { orderService, storeService, debtService } from '@/services/apiService';
+import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
-interface PaymentTerm {
-  termNo: number;
-  dueDate: string;
-  amount: number;
-  status: 'pending' | 'paid' | 'overdue';
-  paidDate?: string;
-}
+// Status color mapping
+const statusConfig: Record<string, { label: string, color: string }> = {
+  pending: { label: 'Menunggu Konfirmasi', color: 'bg-yellow-100 text-yellow-800' },
+  waiting_approval: { label: 'Menunggu Persetujuan', color: 'bg-orange-100 text-orange-800' },
+  paid: { label: 'Dibayar', color: 'bg-emerald-100 text-emerald-800' },
+  processing: { label: 'Diproses', color: 'bg-blue-100 text-blue-800' },
+  shipped: { label: 'Dikirim', color: 'bg-purple-100 text-purple-800' },
+  delivered: { label: 'Terkirim', color: 'bg-indigo-100 text-indigo-800' },
+  completed: { label: 'Selesai', color: 'bg-green-100 text-green-800' },
+  cancelled: { label: 'Dibatalkan', color: 'bg-red-100 text-red-800' },
+  refunded: { label: 'Dikembalikan', color: 'bg-rose-100 text-rose-800' },
+  failed: { label: 'Gagal', color: 'bg-red-100 text-red-800' },
+  expired: { label: 'Kedaluwarsa', color: 'bg-gray-100 text-gray-800' },
+};
 
-interface Receivable {
-  id: string;
-  contractNo: string;
-  vendorName: string;
-  vendorImage: string;
-  totalAmount: number;
-  totalTerms: number;
-  completedTerms: number;
-  status: 'active' | 'settled' | 'overdue' | 'macet';
-  terms: PaymentTerm[];
-  startDate: string;
-  lastPaymentDate?: string;
-}
+const formatCurrency = (value: number | string) => {
+  const num = typeof value === 'string' ? parseInt(value) : value;
+  return `Rp${(num || 0).toLocaleString('id-ID')}`;
+};
 
-const mockReceivables: Receivable[] = [
-  {
-    id: '1',
-    contractNo: 'KRD-2025-001',
-    vendorName: 'Vendor Beras Premium',
-    vendorImage: '/images/products/beras.png',
-    totalAmount: 3000000,
-    totalTerms: 3,
-    completedTerms: 1,
-    status: 'active',
-    startDate: '2025-01-01',
-    lastPaymentDate: '2025-01-25',
-    terms: [
-      {
-        termNo: 1,
-        dueDate: '2025-01-25',
-        amount: 1000000,
-        status: 'paid',
-        paidDate: '2025-01-25',
-      },
-      {
-        termNo: 2,
-        dueDate: '2025-02-24',
-        amount: 1000000,
-        status: 'pending',
-      },
-      {
-        termNo: 3,
-        dueDate: '2025-03-24',
-        amount: 1000000,
-        status: 'pending',
-      },
-    ],
-  },
-  {
-    id: '2',
-    contractNo: 'KRD-2025-002',
-    vendorName: 'Vendor Buah Organik',
-    vendorImage: '/images/products/beras.png',
-    totalAmount: 5000000,
-    totalTerms: 4,
-    completedTerms: 2,
-    status: 'overdue',
-    startDate: '2024-12-15',
-    lastPaymentDate: '2025-01-10',
-    terms: [
-      {
-        termNo: 1,
-        dueDate: '2024-12-15',
-        amount: 1250000,
-        status: 'paid',
-        paidDate: '2024-12-15',
-      },
-      {
-        termNo: 2,
-        dueDate: '2025-01-10',
-        amount: 1250000,
-        status: 'paid',
-        paidDate: '2025-01-10',
-      },
-      {
-        termNo: 3,
-        dueDate: '2025-01-20',
-        amount: 1250000,
-        status: 'overdue',
-      },
-      {
-        termNo: 4,
-        dueDate: '2025-02-20',
-        amount: 1250000,
-        status: 'pending',
-      },
-    ],
-  },
-  {
-    id: '3',
-    contractNo: 'KRD-2025-003',
-    vendorName: 'Vendor Sayuran Segar',
-    vendorImage: '/images/products/beras.png',
-    totalAmount: 2000000,
-    totalTerms: 2,
-    completedTerms: 2,
-    status: 'settled',
-    startDate: '2024-11-01',
-    lastPaymentDate: '2025-01-15',
-    terms: [
-      {
-        termNo: 1,
-        dueDate: '2024-12-01',
-        amount: 1000000,
-        status: 'paid',
-        paidDate: '2024-12-01',
-      },
-      {
-        termNo: 2,
-        dueDate: '2025-01-15',
-        amount: 1000000,
-        status: 'paid',
-        paidDate: '2025-01-15',
-      },
-    ],
-  },
-];
+const getStatusLabel = (status: string, paymentCategory: string, paidAt?: string | null) => {
+  if (status === 'paid' && paymentCategory === 'piutang') {
+    if (!paidAt) return 'Disetujui';
+    return 'Piutang';
+  }
+  return statusConfig[status]?.label || status;
+};
 
-const statusConfig = {
-  active: {
-    label: 'Aktif',
-    color: 'bg-blue-100 text-blue-800',
-    icon: Clock,
-  },
-  settled: {
-    label: 'Lunas',
-    color: 'bg-green-100 text-green-800',
-    icon: CheckCircle,
-  },
-  overdue: {
-    label: 'Ada Tunggakan',
-    color: 'bg-orange-100 text-orange-800',
-    icon: AlertCircle,
-  },
-  macet: {
-    label: 'Macet',
-    color: 'bg-red-100 text-red-800',
-    icon: AlertTriangle,
-  },
+const getSettlementStatus = (order: any) => {
+  if (order.payment_category === 'piutang') {
+    const installments = order.debt?.installments || [];
+    if (installments.length > 0) {
+      const allPaid = installments.every((i: any) => i.status === 'paid');
+      const somePaid = installments.some((i: any) => i.status === 'paid');
+      if (allPaid) return 'LUNAS';
+      if (somePaid) return 'DIBAYAR SEBAGIAN';
+      return 'BELUM LUNAS';
+    }
+    return order.debt?.status === 'paid' ? 'LUNAS' : 'BELUM LUNAS';
+  }
+  return order.payment_status === 'paid' ? 'LUNAS' : 'BELUM LUNAS';
 };
 
 export default function PiutangPage() {
-  const [receivables] = useState<Receivable[]>(mockReceivables);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const { user } = useAuthStore();
 
-  const filteredReceivables =
-    statusFilter === 'all'
-      ? receivables
-      : receivables.filter((r) => r.status === statusFilter);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [inputValue, setInputValue] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [storeNames, setStoreNames] = useState<Record<string, string>>({});
+  const [paying, setPaying] = useState<string | null>(null);
 
-  const totalReceivable = receivables.reduce((sum, r) => sum + r.totalAmount, 0);
-  const overdueAmount = receivables
-    .filter((r) => r.status === 'overdue')
-    .reduce(
-      (sum, r) => sum + r.terms.filter((t) => t.status === 'overdue').reduce((s, t) => s + t.amount, 0),
-      0
-    );
-  const paidAmount = receivables.reduce(
-    (sum, r) =>
-      sum + r.terms.filter((t) => t.status === 'paid').reduce((s, t) => s + t.amount, 0),
-    0
-  );
 
-  const formatCurrency = (value: number) => {
-    return `Rp${value.toLocaleString('id-ID')}`;
+
+  const fetchOrders = async () => {
+    if (!user?.id) return;
+    setLoading(true);
+    try {
+      const token = await getAccessToken();
+      const params: any = {
+        buyer_id: user.id,
+        payment_category: 'piutang', // Explicitly filter for piutang
+        page,
+        limit: 10,
+      };
+      if (searchQuery) params.search = searchQuery;
+
+      const res = await orderService.getOrders(params, token || '');
+      if (res.data) {
+        // Double filter just in case the backend doesn't support payment_category param yet
+        const fetchedOrders = (res.data.orders || []).filter((o: any) => o.payment_category === 'piutang');
+        setOrders(fetchedOrders);
+        setTotalPages(Math.ceil((res.data.total || 0) / (res.data.limit || 10)));
+        setTotalOrders(res.data.total || 0);
+
+        const storeIds = Array.from(new Set(fetchedOrders.map((o: any) => o.store_id).filter(Boolean)));
+        const storeMap: Record<string, string> = {};
+
+        await Promise.all(
+          storeIds.map(async (storeId) => {
+            try {
+              const storeRes = await storeService.getDetail(token || '', storeId as string);
+              if (storeRes.data) {
+                storeMap[storeId as string] = storeRes.data.name;
+              }
+            } catch (e) {
+              console.error(`Failed to fetch store ${storeId}`, e);
+            }
+          })
+        );
+
+        setStoreNames(prev => ({ ...prev, ...storeMap }));
+      }
+    } catch (err) {
+      console.error('Failed to fetch orders', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
+  const handlePay = async (order: any) => {
+    setPaying(order.id);
+    try {
+      const token = await getAccessToken();
+      let targetId = order.debt?.id;
+      let type: 'po' | 'installment' = 'po';
+
+      if (order.debt?.type === 'tenor') {
+        const firstUnpaid = order.debt.installments?.find((i: any) => i.status === 'unpaid');
+        if (firstUnpaid) {
+          targetId = firstUnpaid.id;
+          type = 'installment';
+        }
+      }
+
+      if (!targetId) throw new Error('Debt ID tidak ditemukan');
+
+      const res = await debtService.getPaymentUrl(targetId, type, token || '');
+      if (res.data?.payment_url) {
+        window.open(res.data.payment_url, '_blank');
+      } else {
+        throw new Error('Gagal mendapatkan URL pembayaran');
+      }
+    } catch (err: any) {
+      console.error('Payment failed', err);
+      alert(err.message || 'Gagal memproses pembayaran');
+    } finally {
+      setPaying(null);
+    }
   };
 
-  const getDaysOverdue = (dueDate: string) => {
-    const due = new Date(dueDate);
-    const today = new Date();
-    const days = Math.ceil(
-      (today.getTime() - due.getTime()) / (1000 * 60 * 60 * 24)
-    );
-    return days > 0 ? days : 0;
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => setSearchQuery(inputValue), 500);
+    return () => clearTimeout(timer);
+  }, [inputValue]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [user?.id, searchQuery, page]);
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold">Piutang (Kredit)</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Kelola kontrak kredit dan jadwal pembayaran dengan vendor
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">Daftar Piutang Koperasi</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Pantau saldo dan status pelunasan transaksi piutang Anda
+          </p>
+        </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Total Piutang</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">
-                  {formatCurrency(totalReceivable)}
-                </p>
-              </div>
-              <div className="w-12 h-12 gradient-green rounded-lg flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Sudah Dibayar</p>
-                <p className="text-2xl font-bold text-green-600 mt-2">
-                  {formatCurrency(paidAmount)}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Tunggakan</p>
-                <p className="text-2xl font-bold text-red-600 mt-2">
-                  {formatCurrency(overdueAmount)}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filter */}
+      {/* Filters */}
       <Card>
-        <CardHeader>
-          <CardTitle>Filter Kontrak</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Pilih status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Status</SelectItem>
-              <SelectItem value="active">Aktif</SelectItem>
-              <SelectItem value="settled">Lunas</SelectItem>
-              <SelectItem value="overdue">Ada Tunggakan</SelectItem>
-              <SelectItem value="macet">Macet</SelectItem>
-            </SelectContent>
-          </Select>
+        <CardContent className="px-4 flex flex-col md:flex-row gap-4 items-center">
+          <div className="relative flex-1 w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Cari nomor pesanan..."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              className="pl-9"
+            />
+          </div>
         </CardContent>
       </Card>
 
-      {/* Receivables List */}
+      {/* Orders List */}
       <div className="space-y-4">
-        {filteredReceivables.map((receivable) => {
-        //   const StatusIcon = statusConfig[receivable.status].icon;
-          const progressPercentage = (receivable.completedTerms / receivable.totalTerms) * 100;
-          const nextPendingTerm = receivable.terms.find((t) => t.status === 'pending');
-
-          return (
-            <Card key={receivable.id} className="hover:shadow-lg transition">
-              <CardContent className="pt-6 space-y-4">
-                {/* Header */}
-                <div className="flex items-start justify-between pb-4 border-b">
-                  <div className="flex items-center gap-4 flex-1">
-                    <Image
-                      src={receivable.vendorImage}
-                      alt={receivable.vendorName}
-                      width={60}
-                      height={60}
-                      className="w-14 h-14 rounded-lg object-cover"
-                    />
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-900">
-                        {receivable.contractNo}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {receivable.vendorName}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Dimulai: {formatDate(receivable.startDate)}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge
-                    className={`${statusConfig[receivable.status].color} border-0`}
-                  >
-                    {statusConfig[receivable.status].label}
-                  </Badge>
-                </div>
-
-                {/* Amount Summary */}
-                <div className="grid grid-cols-2 gap-4 p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">Total Kontrak</p>
-                    <p className="font-bold text-gray-900">
-                      {formatCurrency(receivable.totalAmount)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">Progress</p>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className="h-full gradient-green transition-all"
-                          style={{ width: `${progressPercentage}%` }}
-                        />
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+          </div>
+        ) : orders.length > 0 ? (
+          <Card className="overflow-hidden px-4">
+            <Table>
+              <TableHeader className="bg-gray-50/50">
+                <TableRow>
+                  <TableHead>No.</TableHead>
+                  <TableHead className="w-[180px]">No. Pesanan</TableHead>
+                  <TableHead>Toko</TableHead>
+                  <TableHead>Tipe Piutang</TableHead>
+                  <TableHead>Status Tagihan</TableHead>
+                  <TableHead>Total Tagihan</TableHead>
+                  <TableHead className="text-right">Aksi</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {orders.map((order, index) => (
+                  <TableRow key={order.id} className="hover:bg-gray-50/50">
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>
+                      <div className="font-semibold text-gray-900">{order.invoice_number || order.order_number || `ORD-${order.id}`}</div>
+                      <div className="text-xs text-gray-500 mt-0.5">
+                        {order.created_at ? new Date(order.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                       </div>
-                      <span className="text-sm font-semibold">
-                        {receivable.completedTerms}/{receivable.totalTerms}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <IconBuildingStore size={16} className="text-gray-400" />
+                        <span className="text-sm">{storeNames[order.store_id] || order.store?.name || 'Toko Vendor'}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="capitalize">
+                        {order.debt?.type || 'Piutang'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <Badge variant="outline" className={`w-fit shadow-none border ${getSettlementStatus(order) === 'LUNAS'
+                          ? 'border-emerald-200 text-emerald-700 bg-emerald-50'
+                          : getSettlementStatus(order) === 'DIBAYAR SEBAGIAN'
+                            ? 'border-blue-200 text-blue-700 bg-blue-50'
+                            : 'border-amber-200 text-amber-700 bg-amber-50'
+                          }`}>
+                          {getSettlementStatus(order)}
+                        </Badge>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-bold text-emerald-600">
+                        {formatCurrency(order.total_amount)}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {getSettlementStatus(order) !== 'LUNAS' && (
+                          <Button
+                            size="sm"
+                            className="bg-emerald-600 hover:bg-emerald-700 h-8 text-xs font-semibold px-3"
+                            onClick={() => handlePay(order)}
+                            disabled={order.status === 'cancelled' || paying === order.id}
+                          >
+                            {paying === order.id ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}
+                            Bayar
+                          </Button>
+                        )}
+                        <Link href={`/dashboard/koperasi/marketplace/pembelian/${order.id}`}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 px-3 gap-1.5 border-gray-200 text-gray-600 hover:text-gray-900"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            <span className="text-[10px] font-bold uppercase">Detail</span>
+                          </Button>
+                        </Link>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
+        ) : (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <IconCash className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500 mb-2">Tidak ada transaksi piutang ditemukan</p>
+              {searchQuery ? (
+                <Button variant="outline" onClick={() => { setInputValue(''); }}>Reset Pencarian</Button>
+              ) : (
+                <Link href="/dashboard/koperasi/marketplace"><Button>Marketplace</Button></Link>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
-                {/* Terms Table */}
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-gray-50">
-                        <th className="px-3 py-2 text-left font-semibold text-gray-700">
-                          Termin
-                        </th>
-                        <th className="px-3 py-2 text-left font-semibold text-gray-700">
-                          Jatuh Tempo
-                        </th>
-                        <th className="px-3 py-2 text-right font-semibold text-gray-700">
-                          Jumlah
-                        </th>
-                        <th className="px-3 py-2 text-left font-semibold text-gray-700">
-                          Status
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {receivable.terms.map((term) => {
-                        const daysOverdue = getDaysOverdue(term.dueDate);
-                        const isOverdue =
-                          term.status === 'overdue' ||
-                          (term.status === 'pending' && daysOverdue > 0);
-
-                        return (
-                          <tr key={term.termNo} className="border-t">
-                            <td className="px-3 py-2 font-semibold text-gray-900">
-                              #{term.termNo}
-                            </td>
-                            <td className="px-3 py-2 text-gray-600">
-                              {formatDate(term.dueDate)}
-                              {isOverdue && (
-                                <span className="ml-2 text-xs text-red-600 font-semibold">
-                                  ({daysOverdue}h terlambat)
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-3 py-2 text-right font-semibold">
-                              {formatCurrency(term.amount)}
-                            </td>
-                            <td className="px-3 py-2">
-                              <Badge
-                                className={
-                                  term.status === 'paid'
-                                    ? 'bg-green-100 text-green-800 border-0'
-                                    : term.status === 'overdue'
-                                    ? 'bg-red-100 text-red-800 border-0'
-                                    : 'bg-yellow-100 text-yellow-800 border-0'
-                                }
-                              >
-                                {term.status === 'paid'
-                                  ? '✓ Lunas'
-                                  : term.status === 'overdue'
-                                  ? '⚠ Terlambat'
-                                  : '⏳ Pending'}
-                              </Badge>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Next Due */}
-                {nextPendingTerm && (
-                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <p className="text-sm text-blue-900 font-semibold">
-                      📅 Termin Berikutnya:{' '}
-                      {formatDate(nextPendingTerm.dueDate)}
-                    </p>
-                    <p className="text-sm text-blue-700 mt-1">
-                      Jumlah: {formatCurrency(nextPendingTerm.amount)}
-                    </p>
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex gap-2 pt-2 border-t">
-                  <Button variant="outline" size="sm" className="gap-2 flex-1">
-                    <FileText className="w-4 h-4" />
-                    Kontrak
-                  </Button>
-                  {nextPendingTerm && (
-                    <Button
-                      size="sm"
-                      className="gradient-green text-white gap-2 flex-1"
-                    >
-                      <DollarSign className="w-4 h-4" />
-                      Bayar Termin
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm font-medium">Halaman {page} dari {totalPages}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
+
+
     </div>
   );
 }
