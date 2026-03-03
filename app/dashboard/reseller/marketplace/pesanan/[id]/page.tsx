@@ -24,6 +24,7 @@ import {
 import { useAuthStore } from '@/store/authStore';
 import { getAccessToken } from '@/utils/auth';
 import { orderService, productService } from '@/services/apiService';
+import { useNotificationStore } from '@/store/notificationStore';
 import { Loader2, ArrowLeft, Package, Truck, CheckCircle2, History } from 'lucide-react';
 import { IconBuildingStore } from '@tabler/icons-react';
 import { toast } from 'sonner';
@@ -51,6 +52,7 @@ export default function PesananDetailPage() {
     const params = useParams();
     const router = useRouter();
     const { user } = useAuthStore();
+    const { markAsRead } = useNotificationStore();
     const [order, setOrder] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -75,6 +77,7 @@ export default function PesananDetailPage() {
                 setNewStatus(res.data.status);
                 setTrackingNumber(res.data.tracking_number || '');
                 setAdminNotes(res.data.admin_notes || '');
+                markAsRead(params.id as string);
             }
         } catch (err) {
             console.error('Failed to fetch order details', err);

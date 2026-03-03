@@ -35,6 +35,7 @@ import {
 import { useAuthStore } from '@/store/authStore';
 import { getAccessToken } from '@/utils/auth';
 import { orderService } from '@/services/apiService';
+import { useNotificationStore } from '@/store/notificationStore';
 import { Input } from '@/components/ui/input';
 
 // Status color mapping
@@ -82,6 +83,7 @@ const getSettlementStatus = (order: any) => {
 
 export default function VendorPesananPage() {
     const { user } = useAuthStore();
+    const { readOrderIds } = useNotificationStore();
 
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -195,68 +197,75 @@ export default function VendorPesananPage() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {orders.map((order, index) => (
-                                        <TableRow key={order.id} className="hover:bg-muted/20 transition-colors">
+                                    {orders.map((order, index) => {
+                                        const isUnread = !readOrderIds.includes(order.id.toString());
+                                        return (
+                                            <TableRow key={order.id} className={`transition-colors ${isUnread ? 'bg-gray-100' : ''}`}>
 
-                                            <TableCell>{index + 1}</TableCell>
-                                            <TableCell>
-                                                <div className="font-semibold text-gray-900">{order.invoice_number || order.order_number || `ORD-${order.id}`}</div>
-                                                <div className="text-xs text-gray-500 mt-0.5">
-                                                    {order.created_at ? new Date(order.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex flex-col gap-1">
-                                                    <div className="flex items-center gap-1.5 font-medium text-sm">
-                                                        <User size={14} className="text-gray-400" />
-                                                        <span>{order.customer_name || 'Pembeli'}</span>
+                                                <TableCell>{index + 1}</TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="font-semibold text-gray-900">{order.invoice_number || order.order_number || `ORD-${order.id}`}</div>
+                                                        {isUnread && (
+                                                            <Badge className="bg-emerald-500 text-white text-[10px] h-4 px-1 border-0">NEW</Badge>
+                                                        )}
                                                     </div>
-                                                    <span className="text-xs text-gray-500 pl-5">{order.customer_phone || '-'}</span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge
-                                                    className={`${statusConfig[order.status]?.color || 'bg-gray-100 text-gray-800'} border-0 shadow-none pointer-events-none`}
-                                                >
-                                                    {getStatusLabel(order.status, order.payment_category, order.paid_at)}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex flex-col gap-1">
-                                                    <Badge variant="outline" className={`w-fit shadow-none border ${getSettlementStatus(order) === 'LUNAS'
-                                                        ? 'border-emerald-200 text-emerald-700 bg-emerald-50'
-                                                        : getSettlementStatus(order) === 'DIBAYAR SEBAGIAN'
-                                                            ? 'border-blue-200 text-blue-700 bg-blue-50'
-                                                            : 'border-amber-200 text-amber-700 bg-amber-50'
-                                                        }`}>
-                                                        {getSettlementStatus(order)}
-                                                    </Badge>
-                                                    <span className="text-[10px] text-gray-500 uppercase font-medium mt-0.5">
-                                                        {order.payment_category === 'piutang' && order.debt?.type
-                                                            ? `PIUTANG (${order.debt.type})`
-                                                            : order.payment_category || '-'}
-                                                    </span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="font-bold text-emerald-600">
-                                                    {formatCurrency(order.total_amount)}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <Link href={`/dashboard/vendor/pesanan/${order.id}`}>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-8 w-8 text-emerald-600 hover:bg-emerald-50"
-                                                        title="Lihat Detail"
+                                                    <div className="text-xs text-gray-500 mt-0.5">
+                                                        {order.created_at ? new Date(order.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex flex-col gap-1">
+                                                        <div className="flex items-center gap-1.5 font-medium text-sm">
+                                                            <User size={14} className="text-gray-400" />
+                                                            <span>{order.customer_name || 'Pembeli'}</span>
+                                                        </div>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge
+                                                        className={`${statusConfig[order.status]?.color || 'bg-gray-100 text-gray-800'} border-0 shadow-none pointer-events-none`}
                                                     >
-                                                        <Eye className="w-4 h-4" />
-                                                    </Button>
-                                                </Link>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
+                                                        {getStatusLabel(order.status, order.payment_category, order.paid_at)}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex flex-col gap-1">
+                                                        <Badge variant="outline" className={`w-fit shadow-none border ${getSettlementStatus(order) === 'LUNAS'
+                                                            ? 'border-emerald-200 text-emerald-700 bg-emerald-50'
+                                                            : getSettlementStatus(order) === 'DIBAYAR SEBAGIAN'
+                                                                ? 'border-blue-200 text-blue-700 bg-blue-50'
+                                                                : 'border-amber-200 text-amber-700 bg-amber-50'
+                                                            }`}>
+                                                            {getSettlementStatus(order)}
+                                                        </Badge>
+                                                        <span className="text-[10px] text-gray-500 uppercase font-medium mt-0.5">
+                                                            {order.payment_category === 'piutang' && order.debt?.type
+                                                                ? `PIUTANG (${order.debt.type})`
+                                                                : order.payment_category || '-'}
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="font-bold text-emerald-600">
+                                                        {formatCurrency(order.total_amount)}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Link href={`/dashboard/vendor/pesanan/${order.id}`}>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-8 w-8 text-emerald-600 hover:bg-emerald-50"
+                                                            title="Lihat Detail"
+                                                        >
+                                                            <Eye className="w-4 h-4" />
+                                                        </Button>
+                                                    </Link>
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                    })}
                                 </TableBody>
                             </Table>
                         </div>

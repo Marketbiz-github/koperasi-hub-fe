@@ -6,6 +6,7 @@ import {
   IconBuildingCommunity,
   IconGift,
   IconCashRegister,
+  IconFileInvoice,
   IconSettings,
   IconUsers,
   IconInnerShadowTop,
@@ -14,6 +15,9 @@ import {
 
 import { NavMain } from "@/components/nav-main"
 import { useAuthStore } from "@/store/authStore"
+import { useNotificationStore } from "@/store/notificationStore"
+import { getAccessToken } from "@/utils/auth"
+import { useEffect, useMemo } from "react"
 import {
   Sidebar,
   SidebarContent,
@@ -63,9 +67,9 @@ const vendorNav = [
     ],
   },
   {
-    title: "Pesanan",
+    title: "Pesanan Masuk",
     url: "#",
-    icon: IconCashRegister,
+    icon: IconFileInvoice,
     items: [
       {
         title: "Semua Pesanan",
@@ -118,6 +122,28 @@ const vendorNav = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user, store } = useAuthStore();
+  const { unreadOrderCounts, fetchUnreadCounts } = useNotificationStore();
+
+  useEffect(() => {
+    const fetch = async () => {
+      const token = await getAccessToken();
+      if (token && store?.id) {
+        fetchUnreadCounts('vendor', { store_id: store.id }, token);
+      }
+    };
+    fetch();
+    const interval = setInterval(fetch, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, [store?.id]);
+
+  const navigation = useMemo(() => {
+    return vendorNav.map(item => {
+      if (item.title === "Pesanan Masuk") {
+        return { ...item, badge: unreadOrderCounts };
+      }
+      return item;
+    });
+  }, [unreadOrderCounts]);
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -150,7 +176,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={vendorNav} />
+        <NavMain items={navigation} />
       </SidebarContent>
       <SidebarFooter>
       </SidebarFooter>

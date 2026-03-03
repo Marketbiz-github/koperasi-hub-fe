@@ -32,6 +32,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuthStore } from '@/store/authStore';
 import { getAccessToken } from '@/utils/auth';
 import { orderService, productService } from '@/services/apiService';
+import { useNotificationStore } from '@/store/notificationStore';
 import { Loader2, ArrowLeft, Package, Truck, CheckCircle2, History, User, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -82,6 +83,7 @@ export default function VendorPesananDetailPage() {
     const params = useParams();
     const router = useRouter();
     const { user } = useAuthStore();
+    const { markAsRead } = useNotificationStore();
     const [order, setOrder] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -118,6 +120,7 @@ export default function VendorPesananDetailPage() {
                 if (res.data.payment_category === 'piutang') {
                     fetchDebtInfo();
                 }
+                markAsRead(params.id as string);
             }
 
         } catch (err) {
