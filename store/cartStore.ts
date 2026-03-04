@@ -11,6 +11,7 @@ export type CartItem = {
   image?: string;
   category?: string;
   storeId?: number;
+  variantName?: string;
 };
 
 type CartState = {

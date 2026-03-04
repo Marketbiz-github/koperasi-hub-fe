@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Share2, ShoppingCart } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { toast } from 'sonner';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 interface Product {
     id: number | string;
@@ -19,16 +19,28 @@ interface Product {
     category?: string;
     images?: { image_url: string; is_primary: boolean }[] | null;
     product_category?: { name: string } | null;
+    product_variants?: any[] | null;
+    variants?: any[] | null;
 }
 
 export default function StoreProductCard({ product }: { product: Product }) {
     const addItem = useCartStore((s) => s.addItem);
     const params = useParams();
+    const router = useRouter(); // Use useRouter for consistency if possible, or window.location
     const storeId = params.storeId;
+
+    const hasVariants = (product.product_variants && product.product_variants.length > 0) ||
+        (product.variants && product.variants.length > 0);
 
     const handleAdd = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+
+        if (hasVariants) {
+            window.location.href = `/store/${storeId}/product/${product.id}`;
+            return;
+        }
+
         const primaryImage = product.images?.find(img => img.is_primary)?.image_url
             || product.images?.[0]?.image_url
             || product.image
@@ -93,8 +105,14 @@ export default function StoreProductCard({ product }: { product: Product }) {
                     onClick={handleAdd}
                     className="flex-1 bg-[var(--store-primary,#10b981)] hover:opacity-90 text-white font-bold px-4 py-2.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-xs shadow-lg shadow-[var(--store-primary-soft)]"
                 >
-                    <ShoppingCart size={16} />
-                    <span>Beli Sekarang</span>
+                    {hasVariants ? (
+                        <span>Lihat Detail</span>
+                    ) : (
+                        <>
+                            <ShoppingCart size={16} />
+                            <span>Beli Sekarang</span>
+                        </>
+                    )}
                 </button>
 
                 <button

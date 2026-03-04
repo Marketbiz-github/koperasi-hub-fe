@@ -11,16 +11,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { User, Settings, LogOut } from "lucide-react"
+import { User, Settings, LogOut, StoreIcon } from "lucide-react"
 import { IconUser } from "@tabler/icons-react"
 import { useAuthStore } from "@/store/authStore"
 
 export function SiteHeader() {
-  const { user, logout } = useAuthStore()
+  const { user, store, logout } = useAuthStore()
 
   const handleLogout = async () => {
     await logout()
   }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_DOMAIN || 'koperasihub.com'
+  const storeUrl = store?.domain
+    ? `https://${store.domain}`
+    : store?.subdomain
+      ? `https://${store.subdomain}.${appUrl}`
+      : null
 
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
@@ -30,6 +37,19 @@ export function SiteHeader() {
           orientation="vertical"
           className="mx-2 data-[orientation=vertical]:h-4"
         />
+
+        {storeUrl && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 gap-2 rounded-full px-3 text-xs font-medium"
+            onClick={() => window.open(storeUrl, '_blank')}
+          >
+            <StoreIcon className="size-3.5" />
+            <span className="hidden md:inline">Lihat Toko</span>
+          </Button>
+        )}
+
 
         <div className="ml-auto flex items-center gap-2">
           <DropdownMenu>

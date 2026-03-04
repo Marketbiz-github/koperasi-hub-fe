@@ -18,7 +18,6 @@ import {
     Store,
     Package,
     ShieldCheck,
-    Truck,
     Loader2,
     AlertCircle
 } from "lucide-react"
@@ -60,7 +59,7 @@ interface ProductDetail {
     discount_price?: string | number
 }
 
-export default function ProductDetailPage() {
+export default function ResellerProductDetailPage() {
     const { id } = useParams()
     const router = useRouter()
     const [product, setProduct] = useState<ProductDetail | null>(null)
@@ -180,9 +179,9 @@ export default function ProductDetailPage() {
         <div className="space-y-6">
             {/* Breadcrumbs / Back button */}
             <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Link href="/dashboard/koperasi/marketplace" className="hover:text-emerald-600 transition-colors">Marketplace</Link>
+                <Link href="/dashboard/reseller/marketplace" className="hover:text-emerald-600 transition-colors">Marketplace</Link>
                 <span>/</span>
-                <Link href={`/dashboard/koperasi/marketplace?category=${product.product_category?.name}`} className="hover:text-emerald-600 transition-colors">{product.product_category?.name || "Kategori"}</Link>
+                <Link href={`/dashboard/reseller/marketplace?category=${product.product_category?.name}`} className="hover:text-emerald-600 transition-colors">{product.product_category?.name || "Kategori"}</Link>
                 <span>/</span>
                 <span className="text-gray-900 font-medium truncate max-w-[200px]">{product.name}</span>
             </div>
@@ -232,7 +231,7 @@ export default function ProductDetailPage() {
                     </div>
 
                     <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 space-y-1">
-                        <p className="text-gray-500 text-sm font-medium">Harga Koperasi</p>
+                        <p className="text-gray-500 text-sm font-medium">Harga Reseller</p>
                         <div className="flex items-baseline gap-2">
                             {product.is_discount ? (
                                 <>
@@ -252,16 +251,6 @@ export default function ProductDetailPage() {
                             {product.is_discount && (
                                 <Badge className="bg-rose-100 text-rose-700 hover:bg-rose-100 border-none px-2 py-0.5 text-xs font-semibold">
                                     Diskon {product.discount_type === 'percent' ? `${product.discount_value}%` : formatCurrency(product.discount_value || 0)}
-                                </Badge>
-                            )}
-                            {product.is_gratis_ongkir && (
-                                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none px-2 py-0.5 text-xs font-semibold">
-                                    <Truck size={12} className="mr-1 inline" /> Gratis Ongkir
-                                </Badge>
-                            )}
-                            {product.is_cashback && (
-                                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-none px-2 py-0.5 text-xs font-semibold">
-                                    Cashback {product.cashback_unit === 'percent' ? `${product.cashback_value}%` : formatCurrency(product.cashback_value || 0)}
                                 </Badge>
                             )}
                         </div>
@@ -325,8 +314,6 @@ export default function ProductDetailPage() {
                             </Button>
                         </div>
                     </div>
-
-
 
                     <div className="space-y-4">
                         <h3 className="text-lg font-bold text-gray-900 border-b pb-2">Deskripsi Produk</h3>

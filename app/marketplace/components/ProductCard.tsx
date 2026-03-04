@@ -20,6 +20,8 @@ interface Product {
   category?: string;
   images?: { image_url: string; is_primary: boolean }[] | null;
   product_category?: { name: string } | null;
+  product_variants?: any[] | null;
+  variants?: any[] | null;
 }
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -28,9 +30,18 @@ export default function ProductCard({ product }: { product: Product }) {
   const [isShareOpen, setIsShareOpen] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
+  const hasVariants = (product.product_variants && product.product_variants.length > 0) ||
+    (product.variants && product.variants.length > 0);
+
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (hasVariants) {
+      window.location.href = `/marketplace/${product.id}`;
+      return;
+    }
+
     const primaryImage = product.images?.find(img => img.is_primary)?.image_url
       || product.images?.[0]?.image_url
       || product.image
@@ -113,8 +124,14 @@ export default function ProductCard({ product }: { product: Product }) {
           onClick={handleAdd}
           className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 text-sm shadow-sm hover:shadow-md"
         >
-          <ShoppingCart size={16} />
-          <span>Beli</span>
+          {hasVariants ? (
+            <span>Lihat Detail</span>
+          ) : (
+            <>
+              <ShoppingCart size={16} />
+              <span>Beli</span>
+            </>
+          )}
         </button>
 
         <button

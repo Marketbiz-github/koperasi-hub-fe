@@ -45,6 +45,7 @@ interface ProductDetail {
   discount_type?: string;
   discount_value?: number;
   discount_price?: string | number;
+  product_variants?: any[] | null;
 }
 
 export default function ProductDetailPage({ params }: PageProps) {
@@ -53,6 +54,8 @@ export default function ProductDetailPage({ params }: PageProps) {
   const [product, setProduct] = React.useState<ProductDetail | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [totalStock, setTotalStock] = React.useState<number | null>(null);
+  const [variants, setVariants] = React.useState<any[]>([]);
+  const [selectedVariant, setSelectedVariant] = React.useState<any>(null);
   const [quantity, setQuantity] = React.useState(1);
   const [isWishlisted, setIsWishlisted] = React.useState(false);
 
@@ -64,10 +67,11 @@ export default function ProductDetailPage({ params }: PageProps) {
       if (res.data) {
         setProduct(res.data);
 
-        // Fetch Stock
+        // Fetch Stock and Variants
         try {
           const vRes = await productVariantService.getList(token || "", productId);
           if (vRes.data && vRes.data.length > 0) {
+            setVariants(vRes.data);
             const sumStock = vRes.data.reduce((acc: number, curr: any) => acc + (curr.total_stock || 0), 0);
             setTotalStock(sumStock);
           } else {
@@ -97,13 +101,20 @@ export default function ProductDetailPage({ params }: PageProps) {
   const handleAddToCart = () => {
     if (!product) return;
 
+    if (variants.length > 0 && !selectedVariant) {
+      toast.error("Silakan pilih varian terlebih dahulu");
+      return;
+    }
+
     addItem({
       id: product.id,
       name: product.name,
-      price: product.price,
-      image: product.images?.find(img => img.is_primary)?.image_url || product.images?.[0]?.image_url || '/images/placeholder.png',
+      price: selectedVariant ? Number(selectedVariant.price) : product.price,
+      image: selectedVariant?.image || product.images?.find(img => img.is_primary)?.image_url || product.images?.[0]?.image_url || '/images/placeholder.png',
       category: product.product_category?.name || 'Produk',
       quantity: quantity,
+      variantId: selectedVariant?.id || 0,
+      variantName: selectedVariant?.option_values?.map((ov: any) => ov.value).join(' - ')
     });
     toast.success('Berhasil ditambahkan ke keranjang');
   };
@@ -223,7 +234,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                     {product.is_discount ? (
                       <>
                         <p className="text-4xl font-extrabold text-[#10b981]">
-                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(Number(product.discount_price || 0))}
+                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(Number(selectedVariant ? selectedVariant.price : (product.discount_price || 0)))}
                         </p>
                         <p className="text-lg text-gray-400 line-through decoration-gray-300">
                           {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.price)}
@@ -231,15 +242,15 @@ export default function ProductDetailPage({ params }: PageProps) {
                       </>
                     ) : (
                       <p className="text-4xl font-extrabold text-[#10b981]">
-                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.price)}
+                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(Number(selectedVariant ? selectedVariant.price : product.price))}
                       </p>
                     )}
                   </div>
 
                   <div className="flex flex-wrap gap-2 mb-6">
-                    {totalStock !== null && (
-                      <Badge variant="outline" className={`px-2 py-0.5 text-xs font-semibold ${totalStock > 0 ? 'text-blue-700 bg-blue-50 border-blue-200' : 'text-red-700 bg-red-50 border-red-200'}`}>
-                        Stok: {totalStock > 0 ? totalStock : 'Habis'}
+                    {(selectedVariant ? selectedVariant.total_stock : totalStock) !== null && (
+                      <Badge variant="outline" className={`px-2 py-0.5 text-xs font-semibold ${(selectedVariant ? selectedVariant.total_stock : totalStock) > 0 ? 'text-blue-700 bg-blue-50 border-blue-200' : 'text-red-700 bg-red-50 border-red-200'}`}>
+                        Stok: {(selectedVariant ? selectedVariant.total_stock : totalStock) > 0 ? (selectedVariant ? selectedVariant.total_stock : totalStock) : 'Habis'}
                       </Badge>
                     )}
                     {product.is_discount && (
@@ -262,6 +273,33 @@ export default function ProductDetailPage({ params }: PageProps) {
                   <div className="prose prose-sm max-w-none text-gray-600 leading-relaxed mb-6">
                     {product.description || 'Tidak ada deskripsi produk.'}
                   </div>
+
+                  {variants.length > 0 && (
+                    <div className="space-y-3 mb-6">
+                      <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Pilih Varian:</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {variants.map((v) => {
+                          const variantLabel = v.option_values?.map((ov: any) => ov.value).join(' - ') || `Varian ${v.id}`;
+                          const isSelected = selectedVariant?.id === v.id;
+                          return (
+                            <button
+                              key={v.id}
+                              onClick={() => {
+                                setSelectedVariant(isSelected ? null : v);
+                              }}
+                              disabled={v.total_stock === 0}
+                              className={`px-4 py-2 rounded-lg border-2 transition-all text-sm font-semibold flex items-center gap-2 ${isSelected
+                                ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                                : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                                } ${v.total_stock === 0 ? "opacity-50 cursor-not-allowed grayscale" : ""}`}
+                            >
+                              {variantLabel}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Store Info */}

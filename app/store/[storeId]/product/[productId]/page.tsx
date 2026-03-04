@@ -5,9 +5,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Star, Heart, Share2, ShoppingCart, ArrowLeft, Loader2, Minus, Plus } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
-import { productService, storeService } from '@/services/apiService';
+import { productService, storeService, productVariantService, inventoryService } from '@/services/apiService';
 import { getPublicAccessToken } from '@/utils/auth';
 import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 import StoreHeader from '../../components/StoreHeader';
 import StoreFooter from '../../components/StoreFooter';
 
@@ -24,6 +25,10 @@ export default function StoreProductDetailPage({ params }: PageProps) {
     const [product, setProduct] = React.useState<any>(null);
     const [store, setStore] = React.useState<any>(null);
     const [isLoading, setIsLoading] = React.useState(true);
+    const [variants, setVariants] = React.useState<any[]>([]);
+    const [selectedVariant, setSelectedVariant] = React.useState<any>(null);
+    const [totalStock, setTotalStock] = React.useState<number | null>(null);
+    const [selectedImage, setSelectedImage] = React.useState<string>("");
     const [quantity, setQuantity] = React.useState(1);
 
     const fetchData = React.useCallback(async () => {
@@ -35,6 +40,26 @@ export default function StoreProductDetailPage({ params }: PageProps) {
             const prodRes = await productService.getProductDetail(productId, token || '');
             if (prodRes.data) {
                 setProduct(prodRes.data);
+                setSelectedImage(prodRes.data.images?.find((img: any) => img.is_primary)?.image_url || prodRes.data.images?.[0]?.image_url || '/images/placeholder.png');
+
+                // Fetch Stock and Variants
+                try {
+                    const vRes = await productVariantService.getList(token || "", productId);
+                    if (vRes.data && vRes.data.length > 0) {
+                        setVariants(vRes.data);
+                        const sumStock = vRes.data.reduce((acc: number, curr: any) => acc + (curr.total_stock || 0), 0);
+                        setTotalStock(sumStock);
+                    } else {
+                        const sRes = await inventoryService.getStockByProduct(token || "", productId);
+                        if (Array.isArray(sRes.data)) {
+                            setTotalStock(sRes.data.reduce((acc: number, curr: any) => acc + (curr.stock || 0), 0));
+                        } else {
+                            setTotalStock(typeof sRes.data === 'number' ? sRes.data : (sRes.data?.total_stock ?? 0));
+                        }
+                    }
+                } catch (stockErr) {
+                    console.error('Error fetching stock:', stockErr);
+                }
             }
 
             // Fetch Store Detail for branding
@@ -56,16 +81,23 @@ export default function StoreProductDetailPage({ params }: PageProps) {
 
     const handleAddToCart = () => {
         if (!product) return;
-        const primaryImage = product.images?.find((img: any) => img.is_primary)?.image_url || product.images?.[0]?.image_url || '/images/placeholder.png';
+
+        if (variants.length > 0 && !selectedVariant) {
+            toast.error("Silakan pilih varian terlebih dahulu");
+            return;
+        }
+
         addItem({
             id: product.id,
             name: product.name,
-            price: product.price,
-            image: primaryImage,
+            price: selectedVariant ? Number(selectedVariant.price) : product.price,
+            image: selectedVariant?.image || selectedImage,
             category: product.product_category?.name || 'Produk',
             quantity: quantity,
+            variantId: selectedVariant?.id || 0,
+            variantName: selectedVariant?.option_values?.map((ov: any) => ov.value).join(' - ')
         });
-        toast.success('Berhasil ditambahkan ke keranjang');
+        toast.success(`${product.name}${selectedVariant ? ` (${selectedVariant.option_values?.map((ov: any) => ov.value).join(' - ')})` : ''} ditambahkan ke keranjang`);
     };
 
     if (isLoading) {
@@ -110,7 +142,7 @@ export default function StoreProductDetailPage({ params }: PageProps) {
                         <div className="space-y-4">
                             <div className="relative aspect-square rounded-[2.5rem] overflow-hidden bg-slate-50 border border-slate-100 shadow-xl shadow-slate-100/50">
                                 <Image
-                                    src={primaryImage}
+                                    src={selectedImage}
                                     alt={product.name}
                                     fill
                                     className="object-cover"
@@ -126,7 +158,8 @@ export default function StoreProductDetailPage({ params }: PageProps) {
                             {/* Image Gallery Placeholder (Optional) */}
                             <div className="grid grid-cols-4 gap-4">
                                 {product.images?.map((img: any, i: number) => (
-                                    <div key={i} className="aspect-square rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 cursor-pointer hover:border-[var(--store-primary)] transition-colors">
+                                    <div key={i} className="aspect-square rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 cursor-pointer hover:border-[var(--store-primary)] transition-colors"
+                                        onClick={() => setSelectedImage(img.image_url)}>
                                         <Image src={img.image_url} alt={`${product.name} ${i}`} width={100} height={100} className="w-full h-full object-cover" />
                                     </div>
                                 ))}
@@ -155,15 +188,43 @@ export default function StoreProductDetailPage({ params }: PageProps) {
                                 </div>
 
                                 <div className="text-4xl font-black text-[var(--store-primary)] tracking-tight mb-6">
-                                    {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.price)}
+                                    {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(Number(selectedVariant ? selectedVariant.price : product.price))}
                                 </div>
 
-                                <div className="p-6 bg-slate-50/50 rounded-[2rem] border border-slate-100">
+                                <div className="p-6 bg-slate-50/50 rounded-[2rem] border border-slate-100 mb-6">
                                     <h3 className="font-bold text-slate-900 mb-3">Deskripsi Produk</h3>
                                     <p className="text-slate-500 leading-relaxed font-medium text-sm md:text-base">
                                         {product.description || 'Tidak ada deskripsi tersedia untuk produk ini.'}
                                     </p>
                                 </div>
+
+                                {variants.length > 0 && (
+                                    <div className="space-y-3 mb-6">
+                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Pilih Varian:</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {variants.map((v: any) => {
+                                                const variantLabel = v.option_values?.map((ov: any) => ov.value).join(' - ') || `Varian ${v.id}`;
+                                                const isSelected = selectedVariant?.id === v.id;
+                                                return (
+                                                    <button
+                                                        key={v.id}
+                                                        onClick={() => {
+                                                            setSelectedVariant(isSelected ? null : v);
+                                                            if (v.image) setSelectedImage(v.image);
+                                                        }}
+                                                        disabled={v.total_stock === 0}
+                                                        className={`px-4 py-2 rounded-lg border-2 transition-all text-sm font-semibold flex items-center gap-2 ${isSelected
+                                                            ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                                                            : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                                                            } ${v.total_stock === 0 ? "opacity-50 cursor-not-allowed grayscale" : ""}`}
+                                                    >
+                                                        {variantLabel}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Purchase Actions */}
@@ -191,7 +252,7 @@ export default function StoreProductDetailPage({ params }: PageProps) {
                                                 <Plus size={18} />
                                             </button>
                                         </div>
-                                        <span className="text-slate-400 text-sm font-bold">Stok: <span className="text-slate-900">{product.total_stock ?? product.stock ?? 0}</span></span>
+                                        <span className="text-slate-400 text-sm font-bold">Stok: <span className="text-slate-900">{(selectedVariant ? selectedVariant.total_stock : totalStock) ?? 0}</span></span>
                                     </div>
                                 </div>
 

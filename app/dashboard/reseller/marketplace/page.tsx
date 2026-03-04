@@ -38,6 +38,7 @@ interface Product {
   images?: { image_url: string; is_primary: boolean }[] | null
   product_category?: { name: string } | null
   product_variants?: any[] | null
+  variants?: any[] | null
 }
 
 interface Vendor {
@@ -55,7 +56,8 @@ function ProductCardComponent({ product }: { product: Product }) {
     e.preventDefault()
     e.stopPropagation()
 
-    const hasVariants = product.product_variants && product.product_variants.length > 0
+    const hasVariants = (product.product_variants && product.product_variants.length > 0) ||
+      (product.variants && product.variants.length > 0)
 
     if (hasVariants) {
       router.push(`/dashboard/reseller/marketplace/${product.id}`)
@@ -118,7 +120,7 @@ function ProductCardComponent({ product }: { product: Product }) {
             onClick={handleAddToCart}
             className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg flex items-center justify-center gap-2 transition text-sm shadow-sm hover:shadow-md"
           >
-            {product.product_variants && product.product_variants.length > 0 ? (
+            {((product.product_variants && product.product_variants.length > 0) || (product.variants && product.variants.length > 0)) ? (
               <>Lihat Detail</>
             ) : (
               <><ShoppingCart size={14} /> Tambah</>
