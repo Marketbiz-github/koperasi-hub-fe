@@ -76,6 +76,11 @@ interface VariantOption {
     values: string[];
 }
 
+interface StockEntry {
+    gudang_id: string;
+    stock: string;
+}
+
 interface GeneratedVariant {
     id?: number;
     sku: string;
@@ -83,8 +88,7 @@ interface GeneratedVariant {
     discount_price: string;
     weight: string;
     optionValues: string[];
-    gudang_id: string;
-    stock: string;
+    stocks: StockEntry[];
     image: string;
     file?: File;
     previewUrl?: string;
@@ -133,9 +137,8 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
     const [variantOptions, setVariantOptions] = useState<VariantOption[]>([]);
     const [generatedVariants, setGeneratedVariants] = useState<GeneratedVariant[]>([]);
 
-    // Simple Product Stock/Warehouse
-    const [simpleStock, setSimpleStock] = useState('0');
-    const [simpleWarehouseId, setSimpleWarehouseId] = useState('');
+    // Simple Product Stock/Warehouse (multi-gudang)
+    const [simpleStocks, setSimpleStocks] = useState<StockEntry[]>([{ gudang_id: '', stock: '0' }]);
 
     // Popup State
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -256,9 +259,9 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                                 });
                                 setVariantOptions(mappedOptions);
 
-                                // Map Variants
+                                // Map Variants with multi-gudang stocks
                                 setGeneratedVariants(variants.map((v: any) => {
-                                    const variantStock = stocks.find((s: any) => s.product_variant_id === v.id);
+                                    const variantStocks = stocks.filter((s: any) => s.product_variant_id === v.id);
                                     return {
                                         id: v.id,
                                         sku: v.sku,
@@ -266,17 +269,19 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                                         discount_price: v.discount_price?.toString() || '',
                                         weight: v.weight?.toString() || '200',
                                         optionValues: (v.option_values || v.product_option_values || []).map((ov: any) => ov.value),
-                                        gudang_id: variantStock?.gudang_id?.toString() || '',
-                                        stock: variantStock?.stock?.toString() || '0',
+                                        stocks: variantStocks.length > 0
+                                            ? variantStocks.map((s: any) => ({ gudang_id: s.gudang_id?.toString() || '', stock: s.stock?.toString() || '0' }))
+                                            : [{ gudang_id: '', stock: '0' }],
                                         image: v.image || '',
                                         is_active: v.is_active !== false
                                     };
                                 }));
                             } else if (stocks.length > 0) {
-                                // Simple Product Stock
-                                const mainStock = stocks[0];
-                                setSimpleStock(mainStock.stock?.toString() || '0');
-                                setSimpleWarehouseId(mainStock.gudang_id?.toString() || '');
+                                // Simple Product Stock — multi-gudang
+                                setSimpleStocks(stocks.map((s: any) => ({
+                                    gudang_id: s.gudang_id?.toString() || '',
+                                    stock: s.stock?.toString() || '0'
+                                })));
                             }
                         } catch (err) {
                             console.error('Error fetching variant details:', err);
@@ -412,15 +417,14 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                     discount_price: '',
                     weight: formData.weight || '200',
                     optionValues: combo,
-                    gudang_id: simpleWarehouseId,
-                    stock: '0',
+                    stocks: simpleStocks.length > 0 ? [...simpleStocks] : [{ gudang_id: '', stock: '0' }],
                     image: '', // Don't auto-fill from gallery
                     is_active: true
                 };
             });
         });
 
-    }, [hasVariants, variantOptions, formData.sku, formData.price, formData.weight, simpleWarehouseId, images]);
+    }, [hasVariants, variantOptions, formData.sku, formData.price, formData.weight, simpleStocks, images]);
 
     const uploadImages = async () => {
         const uploaded: any[] = [];
@@ -535,8 +539,13 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
             return;
         }
 
-        if (!hasVariants && !simpleWarehouseId) {
+        if (!hasVariants && simpleStocks.length === 0) {
             toast.error('Silakan pilih gudang untuk mengisi stok');
+            return;
+        }
+
+        if (!hasVariants && simpleStocks.some(s => !s.gudang_id)) {
+            toast.error('Pastikan semua baris stok sudah memilih gudang');
             return;
         }
 
@@ -600,8 +609,9 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
             if (hasVariants) {
                 // 3. Validation: Check mandatory variant fields
                 for (const v of generatedVariants) {
-                    if (!v.sku || !v.price || !v.stock || !v.image) {
-                        toast.error(`Varian ${v.optionValues.join(' / ')} wajib mengisi SKU, Harga, Stok, dan Gambar`);
+                    const hasStock = v.stocks.some(s => s.gudang_id && s.stock !== '');
+                    if (!v.sku || !v.price || !hasStock || !v.image) {
+                        toast.error(`Varian ${v.optionValues.join(' / ')} wajib mengisi SKU, Harga, Stok (minimal 1 gudang), dan Gambar`);
                         setIsSaving(false);
                         return;
                     }
@@ -671,27 +681,32 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                         variantId = variantRes.data.id;
                     }
 
-                    // Update Stock for this variant
-                    if (variant.gudang_id && variant.stock !== undefined && variant.stock !== '') {
-                        // Fix: Ensure stock is sent as number, and check if 0 is the issue
-                        const stockValue = Number(variant.stock);
-                        await inventoryService.updateStock(token, {
-                            product_id: Number(currentProductId),
-                            product_variant_id: variantId as number,
-                            gudang_id: Number(variant.gudang_id),
-                            stock: stockValue
-                        });
+                    // Update Stock for this variant (Multi-Gudang)
+                    for (const s of variant.stocks) {
+                        if (s.gudang_id && s.stock !== undefined && s.stock !== '') {
+                            const stockValue = Number(s.stock);
+                            await inventoryService.updateStock(token, {
+                                product_id: Number(currentProductId),
+                                product_variant_id: variantId as number,
+                                gudang_id: Number(s.gudang_id),
+                                stock: stockValue
+                            });
+                        }
                     }
                 }
 
                 toast.success(isEdit ? 'Produk berhasil diperbarui!' : 'Produk dan varian berhasil dibuat!');
             } else {
-                // Simple Product Stock
-                await inventoryService.updateStock(token, {
-                    product_id: Number(currentProductId),
-                    gudang_id: Number(simpleWarehouseId),
-                    stock: Number(simpleStock)
-                });
+                // Simple Product Stock (Multi-Gudang)
+                for (const s of simpleStocks) {
+                    if (s.gudang_id && s.stock !== '') {
+                        await inventoryService.updateStock(token, {
+                            product_id: Number(currentProductId),
+                            gudang_id: Number(s.gudang_id),
+                            stock: Number(s.stock)
+                        });
+                    }
+                }
                 toast.success(isEdit ? 'Produk berhasil diperbarui!' : 'Produk berhasil dibuat!');
             }
 
@@ -911,7 +926,7 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                                             </Button>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Pilihan Varian</Label>
+                                            <Label>Pilihan Varian <span className="text-xs text-muted-foreground">(enter untuk menambahkan)</span></Label>
                                             <div className="flex flex-wrap gap-2 mb-2">
                                                 {opt.values.map((val, valIndex) => (
                                                     <Badge key={valIndex} variant="secondary" className="pl-2 pr-1 py-1 gap-1">
@@ -999,10 +1014,15 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                                                                         <td className="px-4 py-3">Rp {Number(gv.price).toLocaleString()}</td>
                                                                         <td className="px-4 py-3">Rp {Number(gv.discount_price).toLocaleString()}</td>
                                                                         <td className="px-4 py-3">
-                                                                            {warehouses.find(w => w.id.toString() === gv.gudang_id)?.nama_gudang ||
-                                                                                warehouses.find(w => w.id.toString() === gv.gudang_id)?.name || '-'}
+                                                                            <div className="flex flex-col gap-1">
+                                                                                {gv.stocks.map((s, si) => (
+                                                                                    <div key={si} className="text-[10px] whitespace-nowrap">
+                                                                                        <span className="font-semibold">{warehouses.find(w => w.id.toString() === s.gudang_id)?.nama_gudang || warehouses.find(w => w.id.toString() === s.gudang_id)?.name || 'Gudang'}:</span> {s.stock}
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
                                                                         </td>
-                                                                        <td className="px-4 py-3">{gv.stock}</td>
+                                                                        <td className="px-4 py-3 font-semibold">{gv.stocks.reduce((acc, s) => acc + (Number(s.stock) || 0), 0)}</td>
                                                                         <td className="px-4 py-3 text-center">
                                                                             <Button
                                                                                 type="button"
@@ -1038,8 +1058,7 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                                                                 <th className="px-4 py-2 text-[10px] font-semibold text-blue-700">SKU</th>
                                                                 <th className="px-4 py-2 text-[10px] font-semibold text-blue-700 w-28">Harga (Rp)</th>
                                                                 <th className="px-4 py-2 text-[10px] font-semibold text-blue-700 w-28">H. Diskon</th>
-                                                                <th className="px-4 py-2 text-[10px] font-semibold text-blue-700 w-20">Stok</th>
-                                                                <th className="px-4 py-2 text-[10px] font-semibold text-blue-700 w-24">Gudang</th>
+                                                                <th className="px-4 py-2 text-[10px] font-semibold text-blue-700 w-44">Stok per Gudang</th>
                                                                 <th className="px-4 py-2 text-[10px] font-semibold text-blue-700 w-16 text-center">Img</th>
                                                                 <th className="px-4 py-2 text-[10px] font-semibold text-blue-700 w-12 text-center">Aktif</th>
                                                             </tr>
@@ -1074,27 +1093,67 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                                                                             />
                                                                         </td>
                                                                         <td className="px-4 py-3">
-                                                                            <Input
-                                                                                className="h-8 text-xs"
-                                                                                type="number"
-                                                                                value={gv.stock}
-                                                                                onChange={e => updateGeneratedVariant(actualIdx, 'stock', e.target.value)}
-                                                                            />
-                                                                        </td>
-                                                                        <td className="px-4 py-3">
-                                                                            <Select
-                                                                                value={gv.gudang_id}
-                                                                                onValueChange={val => updateGeneratedVariant(actualIdx, 'gudang_id', val)}
-                                                                            >
-                                                                                <SelectTrigger className="h-8 text-[10px]">
-                                                                                    <SelectValue placeholder="Gudang" />
-                                                                                </SelectTrigger>
-                                                                                <SelectContent>
-                                                                                    {warehouses.map(wh => (
-                                                                                        <SelectItem key={wh.id} value={wh.id.toString()}>{wh.nama_gudang || wh.name}</SelectItem>
-                                                                                    ))}
-                                                                                </SelectContent>
-                                                                            </Select>
+                                                                            <div className="space-y-2">
+                                                                                {gv.stocks.length > 0 ? gv.stocks.map((s, si) => (
+                                                                                    <div key={si} className="flex gap-1 items-center bg-blue-50/50 p-1 rounded border border-blue-100 relative group/stock">
+                                                                                        <Select
+                                                                                            value={s.gudang_id}
+                                                                                            onValueChange={val => {
+                                                                                                const updated = [...gv.stocks];
+                                                                                                updated[si].gudang_id = val;
+                                                                                                updateGeneratedVariant(actualIdx, 'stocks', updated);
+                                                                                            }}
+                                                                                        >
+                                                                                            <SelectTrigger className="h-7 text-[9px] w-24">
+                                                                                                <SelectValue placeholder="Gudang" />
+                                                                                            </SelectTrigger>
+                                                                                            <SelectContent>
+                                                                                                {warehouses.map(wh => (
+                                                                                                    <SelectItem key={wh.id} value={wh.id.toString()}>{wh.nama_gudang || wh.name}</SelectItem>
+                                                                                                ))}
+                                                                                            </SelectContent>
+                                                                                        </Select>
+                                                                                        <Input
+                                                                                            className="h-7 text-[9px] w-12"
+                                                                                            type="number"
+                                                                                            value={s.stock}
+                                                                                            onChange={e => {
+                                                                                                const updated = [...gv.stocks];
+                                                                                                updated[si].stock = e.target.value;
+                                                                                                updateGeneratedVariant(actualIdx, 'stocks', updated);
+                                                                                            }}
+                                                                                        />
+                                                                                        {gv.stocks.length > 1 && (
+                                                                                            <Button
+                                                                                                type="button"
+                                                                                                variant="ghost"
+                                                                                                size="icon"
+                                                                                                className="h-4 w-4 text-red-400 hover:text-red-600 opacity-0 group-hover/stock:opacity-100 transition-opacity"
+                                                                                                onClick={() => {
+                                                                                                    const updated = gv.stocks.filter((_, i) => i !== si);
+                                                                                                    updateGeneratedVariant(actualIdx, 'stocks', updated);
+                                                                                                }}
+                                                                                            >
+                                                                                                <Trash2 className="h-3 w-3" />
+                                                                                            </Button>
+                                                                                        )}
+                                                                                    </div>
+                                                                                )) : (
+                                                                                    <p className="text-[10px] text-muted-foreground italic text-center">Belum ada stok</p>
+                                                                                )}
+                                                                                <Button
+                                                                                    type="button"
+                                                                                    variant="ghost"
+                                                                                    size="sm"
+                                                                                    className="h-6 w-full text-[9px] text-blue-600 hover:bg-blue-100 border border-dashed border-blue-200"
+                                                                                    onClick={() => {
+                                                                                        const updated = [...gv.stocks, { gudang_id: '', stock: '0' }];
+                                                                                        updateGeneratedVariant(actualIdx, 'stocks', updated);
+                                                                                    }}
+                                                                                >
+                                                                                    <Plus className="h-3 w-3 mr-1" /> Gudang
+                                                                                </Button>
+                                                                            </div>
                                                                         </td>
                                                                         <td className="px-4 py-3">
                                                                             <div className="flex flex-col items-center gap-1">
@@ -1142,39 +1201,82 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                 <div className="space-y-6">
                     {!hasVariants && (
                         <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Warehouse className="h-5 w-5 text-emerald-600" /> Stok
+                            <CardHeader className="pb-3">
+                                <CardTitle className="flex items-center justify-between text-base">
+                                    <div className="flex items-center gap-2">
+                                        <Warehouse className="h-4 w-4 text-emerald-600" /> Stok per Gudang
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 text-[10px] text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                        onClick={() => setSimpleStocks([...simpleStocks, { gudang_id: '', stock: '0' }])}
+                                    >
+                                        <Plus className="mr-1 h-3 w-3" /> Tambah
+                                    </Button>
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="gudang">Pilih Gudang <span className="text-red-500">*</span></Label>
-                                    <Select
-                                        value={simpleWarehouseId}
-                                        onValueChange={setSimpleWarehouseId}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Pilih Gudang" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {warehouses.map(wh => (
-                                                <SelectItem key={wh.id} value={wh.id.toString()}>{wh.nama_gudang || wh.name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <p className="text-[10px] text-muted-foreground italic">Wajib ada gudang dahulu sebelum isi stok.</p>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="simple_stock">Jumlah Stok</Label>
-                                    <Input
-                                        id="simple_stock"
-                                        type="number"
-                                        value={simpleStock}
-                                        onChange={e => setSimpleStock(e.target.value)}
-                                        disabled={!simpleWarehouseId}
-                                    />
-                                </div>
+                                {simpleStocks.map((s, idx) => (
+                                    <div key={idx} className="p-3 rounded-lg border border-slate-100 bg-slate-50/30 space-y-3 relative group">
+                                        {simpleStocks.length > 1 && (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                onClick={() => setSimpleStocks(simpleStocks.filter((_, i) => i !== idx))}
+                                            >
+                                                <XIcon className="h-3 w-3" />
+                                            </Button>
+                                        )}
+                                        <div className="space-y-1.5">
+                                            <Label className="text-[10px] font-medium text-slate-500">Gudang</Label>
+                                            <Select
+                                                value={s.gudang_id}
+                                                onValueChange={val => {
+                                                    const updated = [...simpleStocks];
+                                                    updated[idx].gudang_id = val;
+                                                    setSimpleStocks(updated);
+                                                }}
+                                            >
+                                                <SelectTrigger className="h-8 text-xs">
+                                                    <SelectValue placeholder="Pilih Gudang" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {warehouses.map(wh => (
+                                                        <SelectItem
+                                                            key={wh.id}
+                                                            value={wh.id.toString()}
+                                                            disabled={simpleStocks.some((st, i) => i !== idx && st.gudang_id === wh.id.toString())}
+                                                        >
+                                                            {wh.nama_gudang || wh.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <Label className="text-[10px] font-medium text-slate-500">Jumlah Stok</Label>
+                                            <Input
+                                                type="number"
+                                                className="h-8 text-xs"
+                                                value={s.stock}
+                                                onChange={e => {
+                                                    const updated = [...simpleStocks];
+                                                    updated[idx].stock = e.target.value;
+                                                    setSimpleStocks(updated);
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                                {simpleStocks.length === 0 && (
+                                    <div className="text-center py-4 border-2 border-dashed border-slate-200 rounded-lg">
+                                        <p className="text-xs text-muted-foreground">Belum ada stok yang diatur.</p>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     )}
@@ -1341,32 +1443,78 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                                     onChange={e => setEditingVariant({ ...editingVariant, discount_price: e.target.value })}
                                 />
                             </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="v-stock" className="text-right text-xs">Stok</Label>
-                                <Input
-                                    id="v-stock"
-                                    type="number"
-                                    className="col-span-3 h-8 text-xs"
-                                    value={editingVariant.stock}
-                                    onChange={e => setEditingVariant({ ...editingVariant, stock: e.target.value })}
-                                />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="v-gudang" className="text-right text-xs">Gudang</Label>
-                                <div className="col-span-3">
-                                    <Select
-                                        value={editingVariant.gudang_id}
-                                        onValueChange={val => setEditingVariant({ ...editingVariant, gudang_id: val })}
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-xs font-semibold">Stok per Gudang</Label>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-7 text-[10px]"
+                                        onClick={() => {
+                                            if (editingVariant) {
+                                                setEditingVariant({
+                                                    ...editingVariant,
+                                                    stocks: [...editingVariant.stocks, { gudang_id: '', stock: '0' }]
+                                                });
+                                            }
+                                        }}
                                     >
-                                        <SelectTrigger className="h-8 text-xs">
-                                            <SelectValue placeholder="Pilih Gudang" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {warehouses.map(wh => (
-                                                <SelectItem key={wh.id} value={wh.id.toString()}>{wh.nama_gudang || wh.name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                        <Plus className="mr-1 h-3 w-3" /> Tambah Gudang
+                                    </Button>
+                                </div>
+                                <div className="grid gap-2">
+                                    {editingVariant.stocks.map((s, idx) => (
+                                        <div key={idx} className="grid grid-cols-7 gap-2 items-end border-b pb-2">
+                                            <div className="col-span-4 space-y-1">
+                                                <Label className="text-[10px]">Gudang</Label>
+                                                <Select
+                                                    value={s.gudang_id}
+                                                    onValueChange={val => {
+                                                        const updated = [...editingVariant.stocks];
+                                                        updated[idx].gudang_id = val;
+                                                        setEditingVariant({ ...editingVariant, stocks: updated });
+                                                    }}
+                                                >
+                                                    <SelectTrigger className="h-8 text-[10px]">
+                                                        <SelectValue placeholder="Gudang" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {warehouses.map(wh => (
+                                                            <SelectItem key={wh.id} value={wh.id.toString()}>{wh.nama_gudang || wh.name}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="col-span-2 space-y-1">
+                                                <Label className="text-[10px]">Stok</Label>
+                                                <Input
+                                                    className="h-8 text-xs"
+                                                    type="number"
+                                                    value={s.stock}
+                                                    onChange={e => {
+                                                        const updated = [...editingVariant.stocks];
+                                                        updated[idx].stock = e.target.value;
+                                                        setEditingVariant({ ...editingVariant, stocks: updated });
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="col-span-1 pb-1">
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6 text-red-500"
+                                                    onClick={() => {
+                                                        const updated = editingVariant.stocks.filter((_, i) => i !== idx);
+                                                        setEditingVariant({ ...editingVariant, stocks: updated });
+                                                    }}
+                                                >
+                                                    <Trash2 className="h-3 w-3" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
