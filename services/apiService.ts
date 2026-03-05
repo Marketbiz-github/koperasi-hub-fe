@@ -510,6 +510,19 @@ export const affiliationService = {
         })
     },
 
+    async getChild(token: string, params: { status?: number, parent_id?: number } = {}) {
+        let query = new URLSearchParams();
+        if (params.status !== undefined) query.append('status', params.status.toString());
+        if (params.parent_id !== undefined) query.append('parent_id', params.parent_id.toString());
+
+        const queryString = query.toString();
+        const endpoint = `/affiliations/child${queryString ? `?${queryString}` : ''}`;
+
+        return apiRequest(endpoint, {
+            token,
+        })
+    },
+
     async approve(token: string, id: number | string) {
         return apiRequest(`/affiliations/${id}/approve`, {
             method: 'POST',

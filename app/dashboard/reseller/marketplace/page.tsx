@@ -22,10 +22,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { ShoppingCart, Star, Loader2, Search, Package, ChevronLeft, ChevronRight, Share2 } from "lucide-react"
 import { useCartStore } from "@/store/cartStore"
-import { productService, storeService } from "@/services/apiService"
+import { productService, storeService, userService, debtService, orderService } from "@/services/apiService"
 import { getAccessToken } from "@/utils/auth"
 import { toast } from "sonner"
 import { getSafeImageSrc } from "@/utils/image"
+import { useAuthStore } from "@/store/authStore"
 
 import { useRouter } from "next/navigation"
 
@@ -51,8 +52,10 @@ interface Vendor {
 function ProductCardComponent({ product }: { product: Product }) {
   const router = useRouter()
   const addItem = useCartStore((s) => s.addItem)
+  const currentUser = useAuthStore((s) => s.user)
+  const [isValidating, setIsValidating] = useState(false)
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -64,20 +67,75 @@ function ProductCardComponent({ product }: { product: Product }) {
       return
     }
 
-    const rawImage = product.images?.find(img => img.is_primary)?.image_url || product.images?.[0]?.image_url
-    const primaryImage = getSafeImageSrc(rawImage)
+    setIsValidating(true)
+    try {
+      const token = await getAccessToken()
+      if (!token) return
 
-    addItem({
-      id: product.id.toString(),
-      name: product.name,
-      price: Number(product.price),
-      image: primaryImage,
-      category: product.product_category?.name || "Uncategorized",
-      quantity: 1,
-      storeId: (product as any).store_id || (product as any).store?.id || 1,
-      variantId: 0,
-    })
-    toast.success(`${product.name} ditambahkan ke keranjang`)
+      const storeId = (product as any).store_id || (product as any).store?.id || 1
+
+      // 1. Get vendor's user_id from store detail
+      const storeRes = await storeService.getDetail(token, storeId)
+      const parentId = storeRes.data?.user_id
+
+      // 2. Check Affiliation
+      let affiliated = false
+      if (parentId && currentUser?.id) {
+        const userRes = await userService.getUserDetail(token, currentUser.id)
+        const affiliations = userRes.data?.parent_affiliations || []
+        affiliated = affiliations.some((a: any) => a.user?.id === parentId)
+      }
+
+      if (!affiliated) {
+        toast.error("Anda belum terafiliasi dengan vendor ini atau afiliasi belum disetujui.")
+        return
+      }
+
+      // 3. Check unpaid POs / Debts for this specific product
+      const debtRes = await debtService.getDebts({ buyer_id: currentUser?.id ? Number(currentUser.id) : undefined, user_id: parentId ? Number(parentId) : undefined, status: 'unpaid' }, token)
+      const debts = Array.isArray(debtRes.data?.debts) ? debtRes.data.debts : (Array.isArray(debtRes.data) ? debtRes.data : [])
+
+      let isProductInUnpaidPO = false;
+      for (const debt of debts) {
+        if (debt.type === 'po' && debt.order_id) {
+          try {
+            const orderRes = await orderService.getOrderDetail(debt.order_id, token)
+            const orderItems = orderRes.data?.items || []
+            if (orderItems.some((item: any) => item.product_id === Number(product.id))) {
+              isProductInUnpaidPO = true;
+              break;
+            }
+          } catch (err) {
+            console.error("Error fetching order details for debt", err)
+          }
+        }
+      }
+
+      if (isProductInUnpaidPO) {
+        toast.error("Anda masih memiliki pesanan/PO yang belum lunas untuk produk ini di vendor ini.")
+        return
+      }
+
+      const rawImage = product.images?.find(img => img.is_primary)?.image_url || product.images?.[0]?.image_url
+      const primaryImage = getSafeImageSrc(rawImage)
+
+      addItem({
+        id: product.id.toString(),
+        name: product.name,
+        price: Number(product.price),
+        image: primaryImage,
+        category: product.product_category?.name || "Uncategorized",
+        quantity: 1,
+        storeId: Number(storeId),
+        variantId: 0,
+      })
+      toast.success(`${product.name} ditambahkan ke keranjang`)
+    } catch (error) {
+      console.error("Validation error:", error)
+      toast.error("Terjadi kesalahan saat memvalidasi. Silakan coba lagi.")
+    } finally {
+      setIsValidating(false)
+    }
   }
 
   const formatCurrency = (amount: string | number) => {
@@ -118,9 +176,12 @@ function ProductCardComponent({ product }: { product: Product }) {
         <div className="flex gap-2 mt-auto">
           <button
             onClick={handleAddToCart}
-            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg flex items-center justify-center gap-2 transition text-sm shadow-sm hover:shadow-md"
+            disabled={isValidating}
+            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg flex items-center justify-center gap-2 transition text-sm shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {((product.product_variants && product.product_variants.length > 0) || (product.variants && product.variants.length > 0)) ? (
+            {isValidating ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /> Sedang memvalidasi...</>
+            ) : ((product.product_variants && product.product_variants.length > 0) || (product.variants && product.variants.length > 0)) ? (
               <>Lihat Detail</>
             ) : (
               <><ShoppingCart size={14} /> Tambah</>

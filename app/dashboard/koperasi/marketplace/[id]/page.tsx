@@ -23,9 +23,10 @@ import {
     AlertCircle
 } from "lucide-react"
 import { useCartStore } from "@/store/cartStore"
-import { productService, inventoryService, productVariantService } from "@/services/apiService"
+import { productService, inventoryService, productVariantService, storeService, userService, debtService, orderService } from "@/services/apiService"
 import { getAccessToken } from "@/utils/auth"
 import { toast } from "sonner"
+import { useAuthStore } from "@/store/authStore"
 
 interface ProductImage {
     id: number
@@ -63,6 +64,7 @@ interface ProductDetail {
 export default function ProductDetailPage() {
     const { id } = useParams()
     const router = useRouter()
+    const currentUser = useAuthStore((s) => s.user)
     const [product, setProduct] = useState<ProductDetail | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [totalStock, setTotalStock] = useState<number | null>(null)
@@ -70,6 +72,10 @@ export default function ProductDetailPage() {
     const [selectedVariant, setSelectedVariant] = useState<any>(null)
     const [selectedImage, setSelectedImage] = useState<string>("")
     const [quantity, setQuantity] = useState(1)
+    const [isValidating, setIsValidating] = useState(false)
+    const [isAffiliated, setIsAffiliated] = useState(true) // Default true to prevent flash
+    const [hasUnpaidPO, setHasUnpaidPO] = useState(false)
+    const [validationMessage, setValidationMessage] = useState("")
 
     const addItem = useCartStore((s) => s.addItem)
 
@@ -119,8 +125,77 @@ export default function ProductDetailPage() {
         }
     }, [id, fetchProductDetail])
 
+    const validatePurchase = useCallback(async (storeId: number) => {
+        setIsValidating(true)
+        try {
+            const token = await getAccessToken()
+            if (!token) return
+
+            // 1. Get vendor's user_id from store detail
+            const storeRes = await storeService.getDetail(token, storeId)
+            const parentId = storeRes.data?.user_id
+
+            // 2. Check Affiliation
+            let affiliated = false
+            if (parentId && currentUser?.id) {
+                const userRes = await userService.getUserDetail(token, currentUser.id)
+                const affiliations = userRes.data?.parent_affiliations || []
+                // Check if any affiliation points to the required parentId
+                affiliated = affiliations.some((a: any) => a.user?.id === parentId)
+            }
+            setIsAffiliated(affiliated)
+
+            if (!affiliated) {
+                setValidationMessage("Anda belum terafiliasi dengan vendor ini atau afiliasi belum disetujui.")
+            } else {
+                // 3. Check unpaid POs / Debts for this specific product
+                const debtRes = await debtService.getDebts({ buyer_id: currentUser?.id ? Number(currentUser.id) : undefined, user_id: parentId ? Number(parentId) : undefined, status: 'unpaid' }, token)
+                const debts = Array.isArray(debtRes.data?.debts) ? debtRes.data.debts : (Array.isArray(debtRes.data) ? debtRes.data : [])
+
+                let isProductInUnpaidPO = false;
+                for (const debt of debts) {
+                    if (debt.type === 'po' && debt.order_id) {
+                        try {
+                            const orderRes = await orderService.getOrderDetail(debt.order_id, token)
+                            const orderItems = orderRes.data?.items || []
+                            if (orderItems.some((item: any) => item.product_id === Number(id))) {
+                                isProductInUnpaidPO = true;
+                                break;
+                            }
+                        } catch (err) {
+                            console.error("Error fetching order details for debt", err)
+                        }
+                    }
+                }
+
+                setHasUnpaidPO(isProductInUnpaidPO)
+
+                if (isProductInUnpaidPO) {
+                    setValidationMessage("Anda memiliki pesanan/PO yang belum lunas di vendor ini.")
+                } else {
+                    setValidationMessage("")
+                }
+            }
+        } catch (error) {
+            console.error("Validation error:", error)
+        } finally {
+            setIsValidating(false)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (product?.store?.id) {
+            validatePurchase(product.store.id)
+        }
+    }, [product?.store?.id, validatePurchase])
+
     const handleAddToCart = () => {
         if (!product) return
+
+        if (!isAffiliated || hasUnpaidPO) {
+            toast.error(validationMessage || "Anda tidak dapat membeli produk ini.")
+            return
+        }
 
         if (variants.length > 0 && !selectedVariant) {
             toast.error("Silakan pilih varian terlebih dahulu")
@@ -134,7 +209,7 @@ export default function ProductDetailPage() {
             image: selectedVariant?.image || selectedImage,
             category: product.product_category?.name || "Uncategorized",
             quantity: quantity,
-            storeId: product.store?.id || 0,
+            storeId: Number(product.store?.id || (product as any).store_id || 0),
             variantId: selectedVariant?.id || 0,
             variantName: selectedVariant?.option_values?.map((ov: any) => ov.value).join(' - ')
         })
@@ -297,6 +372,15 @@ export default function ProductDetailPage() {
                     )}
 
                     <div className="space-y-4 py-4 border-y border-gray-100">
+                        {validationMessage && (
+                            <div className="bg-red-50 text-red-600 p-3 rounded-lg flex items-start gap-2 text-sm border border-red-100">
+                                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                                <div>
+                                    <p className="font-semibold">Pembelian diblokir</p>
+                                    <p>{validationMessage}</p>
+                                </div>
+                            </div>
+                        )}
                         <div className="flex items-center gap-4">
                             <div className="flex items-center border rounded-lg overflow-hidden h-11">
                                 <button
@@ -317,11 +401,17 @@ export default function ProductDetailPage() {
                             </div>
                             <Button
                                 onClick={handleAddToCart}
-                                disabled={totalStock !== null && totalStock === 0}
+                                disabled={(totalStock !== null && totalStock === 0) || isValidating || !isAffiliated || hasUnpaidPO}
                                 className="w-fit bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 text-lg gap-2 shadow-md shadow-emerald-100 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                <ShoppingCart size={20} />
-                                {totalStock !== null && totalStock === 0 ? 'Stok Habis' : 'Tambah ke Keranjang'}
+                                {isValidating ? (
+                                    <><Loader2 className="w-5 h-5 animate-spin" /> Sedang memvalidasi...</>
+                                ) : (
+                                    <>
+                                        <ShoppingCart size={20} />
+                                        {totalStock !== null && totalStock === 0 ? 'Stok Habis' : 'Tambah ke Keranjang'}
+                                    </>
+                                )}
                             </Button>
                         </div>
                     </div>

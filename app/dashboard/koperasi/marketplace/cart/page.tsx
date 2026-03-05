@@ -28,6 +28,7 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import ShippingForm from "@/components/ShippingForm"
 import { Badge } from "@/components/ui/badge"
+import { getSafeImageSrc } from "@/utils/image"
 import { getAccessToken } from "@/utils/auth"
 import { useSearchParams } from "next/navigation"
 import {
@@ -62,6 +63,7 @@ export default function CartPage() {
   const [storeDetail, setStoreDetail] = useState<any>(null)
   const [storeInfoMap, setStoreInfoMap] = useState<Record<number, any>>({})
   const [isLoadingDetails, setIsLoadingDetails] = useState(false)
+  const [isFetchingStores, setIsFetchingStores] = useState(false)
   const [customerNotes, setCustomerNotes] = useState("")
   const [variantDetailMap, setVariantDetailMap] = useState<Record<string, any[]>>({})
   const [productStockMap, setProductStockMap] = useState<Record<string, number>>({})
@@ -75,22 +77,37 @@ export default function CartPage() {
 
   // Fetch store info for ALL unique stores (for multi-store picker)
   useEffect(() => {
-    const uniqueStoreIds = [...new Set(items.map(it => it.storeId).filter(Boolean))] as number[]
-    if (uniqueStoreIds.length <= 1) return
+    const uniqueStoreIds = [...new Set(items.map(it => Number(it.storeId)).filter(id => id > 0))]
+    if (uniqueStoreIds.length === 0) return
+
     const fetchStoreInfos = async () => {
+      setIsFetchingStores(true)
       const token = await getAccessToken()
-      const map: Record<number, any> = {}
-      await Promise.all(
-        uniqueStoreIds.map(async (sId) => {
-          try {
-            const res = await storeService.getDetail(token || "", sId)
-            map[sId] = res.data
-          } catch (e) {
-            console.error("Error fetching store:", e)
-          }
-        })
-      )
-      setStoreInfoMap(map)
+      const map: Record<number, any> = { ...storeInfoMap }
+      let hasChanged = false
+
+      try {
+        await Promise.all(
+          uniqueStoreIds.map(async (sId) => {
+            if (map[sId]) return // Skip if already fetched
+            try {
+              const res = await storeService.getDetail(token || "", sId)
+              if (res.data) {
+                map[sId] = res.data
+                hasChanged = true
+              }
+            } catch (e) {
+              console.error("Error fetching store:", e)
+            }
+          })
+        )
+      } finally {
+        setIsFetchingStores(false)
+      }
+
+      if (hasChanged) {
+        setStoreInfoMap(map)
+      }
     }
     fetchStoreInfos()
   }, [items])
@@ -414,38 +431,45 @@ export default function CartPage() {
         <h1 className="text-2xl font-semibold">Keranjang Belanja Koperasi</h1>
         <p className="text-sm text-gray-500">Anda memiliki item dari beberapa toko. Pilih keranjang untuk checkout.</p>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {Object.entries(storeGroups).map(([sId, sItems]) => {
-            const info = storeInfoMap[Number(sId)]
-            const storeName = info?.name || info?.store_name || `Toko ${sId}`
-            const storeLogo = info?.logo || info?.image
-            return (
-              <Card key={sId} className="hover:border-emerald-500 transition-colors cursor-pointer" onClick={() => router.push(`/dashboard/koperasi/marketplace/cart?store_id=${sId}`)}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg flex items-center gap-3">
-                    <div className="relative h-10 w-10 rounded-full bg-gray-100 overflow-hidden shrink-0 border">
-                      {storeLogo ? (
-                        <Image src={storeLogo} alt={storeName} fill className="object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-emerald-600 font-bold text-sm">
-                          {storeName.charAt(0).toUpperCase()}
-                        </div>
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold truncate">{storeName}</p>
-                      <Badge variant="outline" className="text-xs mt-0.5">{sItems.length} Produk</Badge>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+        {isFetchingStores ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border">
+            <Loader2 className="h-10 w-10 animate-spin text-emerald-600 mb-4" />
+            <p className="text-gray-500">Memuat informasi toko...</p>
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            {Object.entries(storeGroups).map(([sId, sItems]) => {
+              const info = storeInfoMap[Number(sId)] || {}
+              const storeName = info.name || info.store_name || `Toko ${sId}`
+              const storeLogo = info.logo_url || info.logo || info.image
+              return (
+                <Card key={sId} className="hover:border-emerald-500 transition-colors cursor-pointer" onClick={() => router.push(`/dashboard/koperasi/marketplace/cart?store_id=${sId}`)}>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg flex items-center gap-3">
+                      <div className="relative h-10 w-10 rounded-full bg-gray-100 overflow-hidden shrink-0 border">
+                        {storeLogo ? (
+                          <Image src={getSafeImageSrc(storeLogo)} alt={storeName} fill className="object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-emerald-600 font-bold text-sm">
+                            {storeName.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-semibold truncate">{storeName}</p>
+                        <Badge variant="outline" className="text-xs mt-0.5">{sItems.length} Produk</Badge>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
 
-                  <Button className="w-full" variant="outline">Lihat Keranjang</Button>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
+                    <Button className="w-full" variant="outline">Lihat Keranjang</Button>
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+        )}
 
       </div>
     )
