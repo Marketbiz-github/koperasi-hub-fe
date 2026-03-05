@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Share2, ShoppingCart } from 'lucide-react';
+import { Share2, ShoppingCart, Loader2 } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import LoginShareCommission from './LoginShareCommission';
 import ShareCommission from './ShareCommission';
@@ -29,6 +29,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
   const [isShareOpen, setIsShareOpen] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [isValidating, setIsValidating] = React.useState(false);
 
   const hasVariants = (product.product_variants && product.product_variants.length > 0) ||
     (product.variants && product.variants.length > 0);
@@ -46,6 +47,7 @@ export default function ProductCard({ product }: { product: Product }) {
       || product.images?.[0]?.image_url
       || product.image
       || "/images/placeholder.png";
+    const storeId = (product as any).store_id || (product as any).store?.id || 1;
     addItem({
       id: product.id.toString(),
       name: product.name,
@@ -53,6 +55,8 @@ export default function ProductCard({ product }: { product: Product }) {
       image: primaryImage,
       category: product.product_category?.name || product.category || "Uncategorized",
       quantity: 1,
+      storeId: Number(storeId),
+      variantId: 0,
     });
     toast.success(`${product.name} ditambahkan ke keranjang`);
   };
@@ -124,7 +128,9 @@ export default function ProductCard({ product }: { product: Product }) {
           onClick={handleAdd}
           className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 text-sm shadow-sm hover:shadow-md"
         >
-          {hasVariants ? (
+          {isValidating ? (
+            <><Loader2 className="w-4 h-4 animate-spin" /> Sedang memvalidasi...</>
+          ) : hasVariants ? (
             <span>Lihat Detail</span>
           ) : (
             <>

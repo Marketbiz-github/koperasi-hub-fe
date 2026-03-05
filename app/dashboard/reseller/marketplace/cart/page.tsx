@@ -391,45 +391,50 @@ export default function CartPage() {
 
   const isEmpty = items.length === 0
 
-  if (!storeIdParam && Object.keys(storeGroups).length > 1 && !isEmpty) {
+  if (!storeIdParam && Object.keys(storeGroups).length > 0 && !isEmpty) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold">Keranjang Belanja Reseller</h1>
-        <p className="text-sm text-gray-500">Anda memiliki item dari beberapa toko. Pilih keranjang untuk checkout.</p>
+        <div className="text-center md:text-left">
+          <h1 className="text-2xl font-bold">Pilih Keranjang Belanja</h1>
+          <p className="text-gray-500 text-sm">Silahkan pilih toko untuk melanjutkan pembayaran.</p>
+        </div>
 
         {isFetchingStores ? (
-          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border">
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-dashed border-emerald-200">
             <Loader2 className="h-10 w-10 animate-spin text-emerald-600 mb-4" />
-            <p className="text-gray-500">Memuat informasi toko...</p>
+            <p className="text-gray-500 font-medium text-sm">Memuat info toko...</p>
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.entries(storeGroups).map(([sId, sItems]) => {
               const info = storeInfoMap[Number(sId)] || {}
-              const storeName = info.name || info.store_name || `Toko ${sId}`
-              const storeLogo = info.logo_url || info.logo || info.image
+              const name = info.name || info.store_name || `Toko ${sId}`
+              const logo = info.logo_url || info.logo || info.image
               return (
-                <Card key={sId} className="hover:border-emerald-500 transition-colors cursor-pointer" onClick={() => router.push(`/dashboard/reseller/marketplace/cart?store_id=${sId}`)}>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg flex items-center gap-3">
-                      <div className="relative h-10 w-10 rounded-full bg-gray-100 overflow-hidden shrink-0 border">
-                        {storeLogo ? (
-                          <Image src={getSafeImageSrc(storeLogo)} alt={storeName} fill className="object-cover" />
+                <Card
+                  key={sId}
+                  className="hover:border-emerald-500 transition-all cursor-pointer shadow-sm hover:shadow-md border-transparent"
+                  onClick={() => router.push(`/dashboard/reseller/marketplace/cart?store_id=${sId}`)}
+                >
+                  <CardHeader className="pb-3 px-4">
+                    <CardTitle className="text-lg flex items-center gap-4">
+                      <div className="relative h-14 w-14 rounded-full bg-emerald-50 overflow-hidden shrink-0 border border-emerald-100 flex items-center justify-center">
+                        {logo ? (
+                          <Image src={getSafeImageSrc(logo)} alt={name} fill className="object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-emerald-600 font-bold text-sm">
-                            {storeName.charAt(0).toUpperCase()}
-                          </div>
+                          <span className="text-emerald-600 font-bold text-xl">
+                            {name.charAt(0).toUpperCase()}
+                          </span>
                         )}
                       </div>
-                      <div className="min-w-0">
-                        <p className="font-semibold truncate">{storeName}</p>
-                        <Badge variant="outline" className="text-xs mt-0.5">{sItems.length} Produk</Badge>
+                      <div className="flex-1">
+                        <span className="line-clamp-1 text-base font-bold text-gray-900">{name}</span>
+                        <p className="text-xs text-emerald-600 font-medium mt-1 flex items-center gap-1.5">
+                          <ShoppingCart size={14} /> {sItems.length} Produk dalam keranjang
+                        </p>
                       </div>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <Button className="w-full" variant="outline">Lihat Keranjang</Button>
-                  </CardContent>
                 </Card>
               )
             })}

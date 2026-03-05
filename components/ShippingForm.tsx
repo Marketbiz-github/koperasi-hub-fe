@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Search, MapPin, Truck, Check, Loader2, Package } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { shippingService, gudangService } from "@/services/apiService";
-import { getAccessToken } from "@/utils/auth";
+import { getPublicAccessToken as getAccessToken } from "@/utils/auth";
 import { toast } from "sonner";
 
 interface ShippingFormProps {
@@ -140,7 +140,11 @@ export default function ShippingForm({ onSelectRate, onAddressLocked, items, sto
 
             const filteredRates = allowedCouriers.length > 0
                 ? allRates.filter((rate: any) =>
-                    allowedCouriers.some((c: string) => c.trim().toLowerCase() === rate.courier_code?.toLowerCase())
+                    allowedCouriers.some((c: string) => {
+                        const normalizedStore = c.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+                        const normalizedRate = rate.courier_code?.toLowerCase().replace(/[^a-z0-9]/g, '');
+                        return normalizedStore === normalizedRate;
+                    })
                 )
                 : allRates;
 
@@ -153,7 +157,11 @@ export default function ShippingForm({ onSelectRate, onAddressLocked, items, sto
             }
 
             if (filteredRates.length === 0) {
-                toast.warning("Tidak ada kurir tersedia untuk wilayah ini");
+                if (allRates.length > 0 && allowedCouriers.length > 0) {
+                    toast.warning("Kurir dari toko ini tidak tersedia untuk wilayah tujuan. (Tersedia di toko: " + allowedCouriers.join(', ') + ")");
+                } else {
+                    toast.warning("Tidak ada kurir tersedia untuk wilayah ini");
+                }
             }
         } catch (error: any) {
             console.error("Fetch Rates Error:", error);

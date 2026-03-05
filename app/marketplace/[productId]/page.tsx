@@ -58,6 +58,7 @@ export default function ProductDetailPage({ params }: PageProps) {
   const [selectedVariant, setSelectedVariant] = React.useState<any>(null);
   const [quantity, setQuantity] = React.useState(1);
   const [isWishlisted, setIsWishlisted] = React.useState(false);
+  const [isValidating, setIsValidating] = React.useState(false);
 
   const fetchProductDetail = React.useCallback(async () => {
     setIsLoading(true);
@@ -107,12 +108,13 @@ export default function ProductDetailPage({ params }: PageProps) {
     }
 
     addItem({
-      id: product.id,
+      id: String(product.id),
       name: product.name,
       price: selectedVariant ? Number(selectedVariant.price) : product.price,
       image: selectedVariant?.image || product.images?.find(img => img.is_primary)?.image_url || product.images?.[0]?.image_url || '/images/placeholder.png',
       category: product.product_category?.name || 'Produk',
       quantity: quantity,
+      storeId: Number(product.store?.id || (product as any).store_id || 1),
       variantId: selectedVariant?.id || 0,
       variantName: selectedVariant?.option_values?.map((ov: any) => ov.value).join(' - ')
     });
@@ -369,7 +371,13 @@ export default function ProductDetailPage({ params }: PageProps) {
                       className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 shadow-lg shadow-emerald-600/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ShoppingCart size={20} />
-                      {totalStock !== null && totalStock === 0 ? 'Stok Habis' : 'Tambah ke Keranjang'}
+                      {isValidating ? (
+                        "Sedang memvalidasi..."
+                      ) : totalStock !== null && totalStock === 0 ? (
+                        'Stok Habis'
+                      ) : (
+                        'Tambah ke Keranjang'
+                      )}
                     </button>
                   </div>
                 </div>

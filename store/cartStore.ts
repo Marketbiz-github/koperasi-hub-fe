@@ -65,10 +65,11 @@ export const useCartStore = create<CartState>((set, get) => {
 
     addItem: (item) => {
       const items = get().items.slice();
-      const idx = items.findIndex((i) => i.id === item.id);
+      const stringifiedId = String(item.id);
+      const idx = items.findIndex((i) => String(i.id) === stringifiedId);
 
       // Default to selected when newly added if not specified
-      const newItem = { ...item, selected: item.selected ?? true };
+      const newItem = { ...item, id: stringifiedId, selected: item.selected ?? true };
 
       if (idx > -1) {
         items[idx].quantity += item.quantity;

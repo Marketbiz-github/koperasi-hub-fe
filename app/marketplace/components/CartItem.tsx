@@ -4,13 +4,26 @@ import Image from 'next/image';
 import { Minus, Plus, Trash } from 'lucide-react';
 import { useCartStore, CartItem as CI } from '@/store/cartStore';
 
-export default function CartItem({ item }: { item: CI }) {
+export default function CartItem({
+  item,
+  details,
+  variantDetail
+}: {
+  item: CI;
+  details?: any;
+  variantDetail?: any;
+}) {
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
   const toggleSelectItem = useCartStore((s) => s.toggleSelectItem);
   const selectedItems = useCartStore((s) => s.selectedItems);
 
-  const imgSrc = (item.image as string) || '';
+  const name = details?.name || item.name || 'Produk';
+  const price = variantDetail ? Number(variantDetail.price) : (details?.discount_price ? Number(details.discount_price) : (details?.price ? Number(details.price) : (item.price || 0)));
+  const category = details?.product_category?.name || details?.category || item.category || 'Kategori';
+  const variantName = variantDetail?.option_values?.map((ov: any) => ov.value).join(' - ') || item.variantName;
+
+  const primaryImage = variantDetail?.image || details?.images?.find((img: any) => img.is_primary)?.image_url || details?.images?.[0]?.image_url || item.image || '/images/placeholder.png';
   const isSelected = selectedItems.has(item.id);
 
   return (
@@ -24,21 +37,22 @@ export default function CartItem({ item }: { item: CI }) {
         />
       </div>
 
-      <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0">
-        {item.image ? (
-          <Image src={imgSrc} alt={item.name || 'Produk'} width={80} height={80} className="object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
-        )}
+      <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0 border">
+        <Image src={primaryImage} alt={name} width={80} height={80} className="object-cover w-full h-full" />
       </div>
 
       <div className="flex-1">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="font-semibold text-gray-900">{item.name}</h4>
-            <p className="text-sm text-gray-500">{item.category}</p>
+            <h4 className="font-semibold text-gray-900 line-clamp-1">{name}</h4>
+            <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">{category}</p>
+            {variantName && (
+              <p className="text-xs text-emerald-600 font-medium mt-1 bg-emerald-50 px-2 py-0.5 rounded-full w-fit border border-emerald-100 italic">
+                Varian: {variantName}
+              </p>
+            )}
           </div>
-          <div className="text-[#10b981] font-bold">Rp {(item.price || 0).toLocaleString('id-ID')}</div>
+          <div className="text-[#10b981] font-bold">Rp {price.toLocaleString('id-ID')}</div>
         </div>
 
         <div className="mt-3 flex items-center justify-between">
