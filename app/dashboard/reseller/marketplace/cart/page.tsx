@@ -641,6 +641,7 @@ export default function CartPage() {
                 onAddressLocked={setIsAddressLocked}
                 items={currentItems.filter(it => selectedItems.has(it.id))}
                 storeId={cartDetails[currentItems.filter(it => selectedItems.has(it.id))[0]?.id]?.store_id || currentItems[0]?.storeId || 1}
+                storeCouriers={storeDetail?.courier}
               />
             </div>
 

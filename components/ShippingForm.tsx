@@ -16,9 +16,10 @@ interface ShippingFormProps {
     onAddressLocked?: (locked: boolean) => void;
     items: any[];
     storeId: number;
+    storeCouriers?: string[] | string | null; // kurir yang terdaftar di toko
 }
 
-export default function ShippingForm({ onSelectRate, onAddressLocked, items, storeId }: ShippingFormProps) {
+export default function ShippingForm({ onSelectRate, onAddressLocked, items, storeId, storeCouriers }: ShippingFormProps) {
     const { store, user } = useAuthStore();
     const [address, setAddress] = useState({
         name: "",
@@ -128,7 +129,22 @@ export default function ShippingForm({ onSelectRate, onAddressLocked, items, sto
             };
 
             const res = await shippingService.getRates(payload, token || undefined);
-            setRates(res.data.rates || []);
+            const allRates = res.data.rates || [];
+
+            // Filter rates berdasarkan storeCouriers jika ada
+            const allowedCouriers = Array.isArray(storeCouriers)
+                ? storeCouriers
+                : typeof storeCouriers === 'string' && storeCouriers
+                    ? storeCouriers.split(',')
+                    : [];
+
+            const filteredRates = allowedCouriers.length > 0
+                ? allRates.filter((rate: any) =>
+                    allowedCouriers.some((c: string) => c.trim().toLowerCase() === rate.courier_code?.toLowerCase())
+                )
+                : allRates;
+
+            setRates(filteredRates);
             setWarehouseId(res.data.warehouse_id);
 
             // Fetch warehouse info if warehouse_id is returned
@@ -136,7 +152,7 @@ export default function ShippingForm({ onSelectRate, onAddressLocked, items, sto
                 fetchWarehouseDetail(res.data.warehouse_id, token || undefined);
             }
 
-            if (res.data.rates?.length === 0) {
+            if (filteredRates.length === 0) {
                 toast.warning("Tidak ada kurir tersedia untuk wilayah ini");
             }
         } catch (error: any) {

@@ -16,7 +16,7 @@ interface StoreData {
     city_id: number | null;
     district_id: number | null;
     area_id: number | null;
-    courier: string | null;
+    courier: string[] | string | null;
     logo: string | null;
     color: string | null;
     [key: string]: any;
@@ -63,7 +63,8 @@ export default function StoreValidationPopup() {
                     if (!store.area_id) missingFields.push('Area/Kelurahan');
                     if (!store.logo) missingFields.push('Logo Toko');
                     // color check removed
-                    if (!store.courier) missingFields.push('Kurir Pengiriman');
+                    const courierEmpty = !store.courier || (Array.isArray(store.courier) ? store.courier.length === 0 : store.courier === '');
+                    if (courierEmpty) missingFields.push('Kurir Pengiriman');
 
                     if (missingFields.length > 0) {
                         setShowPopup(true);
@@ -106,7 +107,7 @@ export default function StoreValidationPopup() {
                                     {!storeData?.area_id && <li>Alamat Lengkap (Area/Kelurahan)</li>}
                                     {!storeData?.logo && <li>Logo Toko</li>}
                                     {/* color check removed */}
-                                    {!storeData?.courier && <li>Kurir Pengiriman</li>}
+                                    {(!storeData?.courier || (Array.isArray(storeData.courier) ? storeData.courier.length === 0 : storeData.courier === '')) && <li>Kurir Pengiriman</li>}
                                 </ul>
                             </div>
                         </div>

@@ -46,11 +46,11 @@ const AVAILABLE_COURIERS: Courier[] = [
     { id: 'rpx', name: 'RPX', image: '/images/courier/rpx.png' },
     { id: 'wahana', name: 'Wahana', image: '/images/courier/WHN.png' },
     { id: 'jnt', name: 'J&T', image: '/images/courier/JNT.png' },
-    { id: 'gojek', name: 'Gojek', image: '/images/courier/gosend.png' },
-    { id: 'grab', name: 'Grab', image: '/images/courier/grab.png' },
+    // { id: 'gojek', name: 'Gojek', image: '/images/courier/gosend.png' },
+    // { id: 'grab', name: 'Grab', image: '/images/courier/grab.png' },
     { id: 'idexpress', name: 'ID Express', image: '/images/courier/idexpress.png' },
-    { id: 'ipaymu_cod', name: 'iPaymu COD', image: '/images/courier/ipaymu-cod.png' },
-    { id: 'self_pickup', name: 'Self Pickup', image: '/images/courier/self-pickup.png' },
+    // { id: 'ipaymu_cod', name: 'iPaymu COD', image: '/images/courier/ipaymu-cod.png' },
+    // { id: 'self_pickup', name: 'Self Pickup', image: '/images/courier/self-pickup.png' },
 ];
 
 export default function StoreSettingsForm() {
@@ -344,10 +344,29 @@ export default function StoreSettingsForm() {
 
         try {
             const payload = {
-                ...formData,
+                name: formData.name,
+                slogan: formData.slogan,
+                description: formData.description,
+                alamat: formData.alamat,
+                province_id: formData.province_id,
+                city_id: formData.city_id,
+                district_id: formData.district_id,
+                area_id: formData.area_id,
+                province: formData.province,
+                city: formData.city,
+                district: formData.district,
+                area: formData.area,
                 zipcode: String(formData.zipcode || ''),
-                courier: formData.courier, // Send as array
+                phone: formData.phone,
+                status: formData.status,
+                color: formData.color,
+                courier: Array.isArray(formData.courier) ? formData.courier : [], // Send as JSON array
+                fee_setting: formData.fee_setting,
                 is_gratis_ongkir: formData.is_gratis_ongkir,
+                gratis_ongkir_unit: formData.gratis_ongkir_unit,
+                gratis_ongkir_value: formData.gratis_ongkir_value,
+                logo: formData.logo,
+                cover: formData.cover,
                 latitude: formData.latitude,
                 longitude: formData.longitude,
             };
