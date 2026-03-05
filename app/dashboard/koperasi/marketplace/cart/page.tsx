@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Trash2, ChevronLeft, ShoppingCart, CreditCard, Clock, FileText, Loader2, CheckCircle2, Ticket, Gift, Edit2 } from "lucide-react"
+import { Trash2, ChevronLeft, ShoppingCart, CreditCard, Clock, FileText, Loader2, CheckCircle2, Ticket, Gift, Edit2, Info } from "lucide-react"
 import { useCartStore } from "@/store/cartStore"
 import { productService, storeService, productVariantService, inventoryService } from "@/services/apiService"
 import { useEffect } from "react"
@@ -216,20 +216,43 @@ export default function CartPage() {
   const baseShippingCost = selectedRate?.price || 0
 
   const shippingDiscount = useMemo(() => {
-    // Find first selected item that has gratis_ongkir on the product itself
+    if (baseShippingCost <= 0) return 0
+
+    // 1. Check Store-wide Free Shipping
+    const isStoreGratis = storeDetail?.is_gratis_ongkir === "1" || storeDetail?.is_gratis_ongkir === 1
+    const minOrder = Number(storeDetail?.gratis_ongkir_min_order || 0)
+    const isStoreThresholdMet = isStoreGratis && subtotal >= minOrder
+
+    // 2. Check Per-product Free Shipping
     const freeShippingItem = filteredItems
       .filter(it => selectedItems.has(it.id))
       .find(it => cartDetails[it.id]?.is_gratis_ongkir)
-    if (!freeShippingItem || baseShippingCost <= 0) return 0
-    const detail = cartDetails[freeShippingItem.id]
-    // Use product's gratis_ongkir_value; fallback to store's if available
-    const discountVal = detail?.gratis_ongkir_value
-      ? parseInt(detail.gratis_ongkir_value)
-      : storeDetail?.gratis_ongkir_value
-        ? parseInt(storeDetail.gratis_ongkir_value)
-        : baseShippingCost // full free shipping if no value specified
+
+    if (!isStoreThresholdMet && !freeShippingItem) return 0
+
+    // Determine discount value
+    let discountVal = 0
+    if (isStoreThresholdMet) {
+      // Use store's gratis_ongkir_value
+      if (storeDetail?.gratis_ongkir_unit === 'percent') {
+        const percent = Number(storeDetail?.gratis_ongkir_value || 0)
+        discountVal = baseShippingCost * (percent / 100)
+      } else {
+        discountVal = Number(storeDetail?.gratis_ongkir_value || baseShippingCost)
+      }
+    } else if (freeShippingItem) {
+      // Use product's gratis_ongkir_value
+      const detail = cartDetails[freeShippingItem.id]
+      if (detail?.gratis_ongkir_unit === 'percent') {
+        const percent = Number(detail?.gratis_ongkir_value || 0)
+        discountVal = baseShippingCost * (percent / 100)
+      } else {
+        discountVal = Number(detail?.gratis_ongkir_value || baseShippingCost)
+      }
+    }
+
     return Math.min(baseShippingCost, discountVal || 0)
-  }, [filteredItems, selectedItems, cartDetails, storeDetail, baseShippingCost])
+  }, [filteredItems, selectedItems, cartDetails, storeDetail, baseShippingCost, subtotal])
 
   const shippingCost = Math.max(0, baseShippingCost - shippingDiscount)
   const total = subtotal + tax + shippingCost
@@ -651,6 +674,13 @@ export default function CartPage() {
                     <Ticket size={14} /> Potongan Ongkir
                   </span>
                   <span>-{formatCurrency(shippingDiscount)}</span>
+                </div>
+              )}
+              {storeDetail?.is_gratis_ongkir === "1" && subtotal < Number(storeDetail?.gratis_ongkir_min_order || 0) && (
+                <div className="p-2 bg-blue-50 rounded border border-blue-100 text-[10px] mt-2 text-blue-700">
+                  <p className="flex items-center gap-1 font-medium">
+                    <Info size={12} /> Tambah {formatCurrency(Number(storeDetail.gratis_ongkir_min_order) - subtotal)} lagi untuk mendapat gratis ongkir!
+                  </p>
                 </div>
               )}
               {totalCashback > 0 && (

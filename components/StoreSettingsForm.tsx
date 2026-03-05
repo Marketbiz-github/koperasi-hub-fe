@@ -83,6 +83,7 @@ export default function StoreSettingsForm() {
         is_gratis_ongkir: '0',
         gratis_ongkir_unit: 'nominal' as 'nominal' | 'percent',
         gratis_ongkir_value: '',
+        gratis_ongkir_min_order: '',
         logo: '',
         cover: '',
         latitude: '',
@@ -137,6 +138,7 @@ export default function StoreSettingsForm() {
                         is_gratis_ongkir: data.is_gratis_ongkir?.toString() || '0',
                         gratis_ongkir_unit: data.gratis_ongkir_unit || 'nominal',
                         gratis_ongkir_value: data.gratis_ongkir_value || '',
+                        gratis_ongkir_min_order: data.gratis_ongkir_min_order || '',
                         logo: data.logo || '',
                         cover: data.cover || '',
                         latitude: data.latitude || '',
@@ -365,6 +367,7 @@ export default function StoreSettingsForm() {
                 is_gratis_ongkir: formData.is_gratis_ongkir,
                 gratis_ongkir_unit: formData.gratis_ongkir_unit,
                 gratis_ongkir_value: formData.gratis_ongkir_value,
+                gratis_ongkir_min_order: formData.gratis_ongkir_min_order,
                 logo: formData.logo,
                 cover: formData.cover,
                 latitude: formData.latitude,
@@ -844,6 +847,22 @@ export default function StoreSettingsForm() {
                                             className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
                                             placeholder={formData.gratis_ongkir_unit === 'nominal' ? '50000' : '10'}
                                         />
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Minimal Belanja (Subtotal)</label>
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                                <span className="text-slate-500 text-sm">Rp</span>
+                                            </div>
+                                            <input
+                                                type="number"
+                                                value={formData.gratis_ongkir_min_order}
+                                                onChange={(e) => setFormData({ ...formData, gratis_ongkir_min_order: e.target.value })}
+                                                className="w-full pl-10 px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                                                placeholder="Contoh: 100000"
+                                            />
+                                        </div>
+                                        <p className="text-[10px] text-slate-500 mt-1 italic text-emerald-600 font-medium">Ambang batas minimal belanja (subtotal) agar gratis ongkir aktif.</p>
                                     </div>
                                 </div>
                             )}
