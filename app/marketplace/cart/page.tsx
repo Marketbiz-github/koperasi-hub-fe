@@ -255,6 +255,19 @@ export default function CartPage() {
   const finalShippingCost = baseShippingCost - shippingDiscount;
   const finalTotal = subtotal + tax + finalShippingCost;
 
+  const isShippingValid = useMemo(() => {
+    if (!shippingAddress) return false;
+    return (
+      !!shippingAddress.name?.trim() &&
+      !!shippingAddress.phone?.trim() &&
+      !!shippingAddress.address_detail?.trim() &&
+      !!shippingAddress.province &&
+      !!shippingAddress.city &&
+      !!shippingAddress.district &&
+      !!shippingAddress.zipcode
+    );
+  }, [shippingAddress]);
+
   const handleCheckout = async () => {
     if (selectedItems.size === 0) {
       toast.error("Pilih minimal satu item untuk checkout");
@@ -302,6 +315,12 @@ export default function CartPage() {
       if (res.data) {
         toast.success("Pesanan berhasil dibuat!");
         removeItems(Array.from(selectedItems));
+
+        // Immediate redirect if payment_url exists
+        if (res.data.payment_url) {
+          window.location.href = res.data.payment_url;
+          return;
+        }
 
         setCheckoutSuccessData({
           orderId: res.data.order?.id || res.data.id || 0,
@@ -709,7 +728,7 @@ export default function CartPage() {
                   {/* Checkout Button */}
                   <Button
                     className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-lg font-bold shadow-lg shadow-emerald-200"
-                    disabled={selectedItems.size === 0 || !selectedRate || isSubmitting}
+                    disabled={selectedItems.size === 0 || !selectedRate || !isShippingValid || isSubmitting}
                     onClick={handleCheckout}
                   >
                     {isSubmitting ? (
@@ -718,6 +737,13 @@ export default function CartPage() {
                       "Bayar Sekarang"
                     )}
                   </Button>
+
+                  {!isShippingValid && selectedRate && (
+                    <div className="flex items-center gap-2 text-[10px] text-amber-600 bg-amber-50 p-2 rounded border border-amber-100 animate-pulse">
+                      <Info size={12} />
+                      <p>Lengkapi Nama, No. HP, dan Alamat Detail di Info Pengiriman.</p>
+                    </div>
+                  )}
 
                   <p className="text-[10px] text-gray-400 text-center">
                     Dengan mengklik tombol belanja, Anda menyetujui <span className="underline">Syarat & Ketentuan</span> kami.
