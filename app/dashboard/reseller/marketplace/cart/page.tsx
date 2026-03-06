@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, Suspense } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import {
@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/dialog"
 import { useSearchParams } from "next/navigation"
 
-export default function CartPage() {
+function CartContent() {
   const router = useRouter()
   const {
     items,
@@ -876,5 +876,18 @@ export default function CartPage() {
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+export default function CartPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-dashed border-emerald-200">
+        <Loader2 className="h-10 w-10 animate-spin text-emerald-600 mb-4" />
+        <p className="text-gray-500 font-medium text-sm">Memuat konten keranjang...</p>
+      </div>
+    }>
+      <CartContent />
+    </Suspense>
   )
 }

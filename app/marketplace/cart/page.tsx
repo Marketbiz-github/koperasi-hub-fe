@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -36,7 +36,7 @@ import CartItem from '../components/CartItem';
 import CartHeader from '../components/CartHeader';
 import CartFooter from '../components/CartFooter';
 
-export default function CartPage() {
+function CartContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const storeIdParam = searchParams.get('store_id');
@@ -783,5 +783,17 @@ export default function CartPage() {
       </main>
       <CartFooter />
     </div>
+  );
+}
+
+export default function CartPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin text-emerald-600 h-10 w-10" />
+      </div>
+    }>
+      <CartContent />
+    </Suspense>
   );
 }
