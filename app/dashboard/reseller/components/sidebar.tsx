@@ -145,6 +145,21 @@ const data = {
       icon: IconBuildingCommunity,
     },
     {
+      title: "Campaign",
+      url: "#",
+      icon: IconGift,
+      items: [
+        {
+          title: "Daftar Campaign",
+          url: "/dashboard/reseller/campaign",
+        },
+        {
+          title: "Topup Saldo",
+          url: "/dashboard/reseller/campaign/topup",
+        },
+      ],
+    },
+    {
       title: "Pengaturan Toko",
       url: "/dashboard/reseller/store-settings",
       icon: IconSettings,

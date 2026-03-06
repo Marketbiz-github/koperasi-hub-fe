@@ -154,6 +154,21 @@ const data = {
       icon: IconFileInvoice,
     },
     {
+      title: "Campaign",
+      url: "#",
+      icon: IconGift,
+      items: [
+        {
+          title: "Daftar Campaign",
+          url: "/dashboard/koperasi/campaign",
+        },
+        {
+          title: "Topup Saldo",
+          url: "/dashboard/koperasi/campaign/topup",
+        },
+      ],
+    },
+    {
       title: "Pengaturan Toko",
       url: "/dashboard/koperasi/store-settings",
       icon: IconSettings,

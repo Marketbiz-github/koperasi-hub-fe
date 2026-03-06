@@ -680,3 +680,53 @@ export const debtService = {
     }
 }
 
+export const campaignService = {
+    async getStoreCampaigns(token: string, storeId: string | number) {
+        return apiRequest(`/campaigns/store/${storeId}`, { token });
+    },
+
+    async createCampaign(token: string, data: {
+        product_id: number;
+        fee_per_click: number;
+        fee_per_reshare: number;
+        fee_per_sale: number;
+        max_budget: number;
+    }) {
+        return apiRequest('/campaigns', {
+            method: 'POST',
+            body: data,
+            token,
+        });
+    },
+
+    async updateCampaign(token: string, id: string | number, data: {
+        fee_per_click?: number;
+        fee_per_reshare?: number;
+        fee_per_sale?: number;
+        max_budget?: number;
+        is_active?: boolean;
+        status?: boolean;
+    }) {
+        return apiRequest(`/campaigns/${id}`, {
+            method: 'PUT',
+            body: data,
+            token,
+        });
+    },
+
+    async deleteCampaign(token: string, id: string | number) {
+        return apiRequest(`/campaigns/${id}`, {
+            method: 'DELETE',
+            token,
+        });
+    },
+
+    async topupSaldo(token: string, amount: number) {
+        return apiRequest('/campaigns/topup', {
+            method: 'POST',
+            body: { amount },
+            token,
+        });
+    }
+}
+
