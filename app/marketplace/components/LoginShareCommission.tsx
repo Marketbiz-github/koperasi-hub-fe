@@ -7,9 +7,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Eye, EyeOff, Loader2, MailCheck } from 'lucide-react'
 import { useState } from 'react'
-import { authService, affiliationService, affiliatorService } from '@/services/apiService'
+import { authService, affiliatorService } from '@/services/apiService'
 import { toast } from 'sonner'
 
 interface LoginShareCommissionProps {
@@ -20,7 +20,6 @@ interface LoginShareCommissionProps {
   productSlug?: string
   storeSubdomain?: string
   storeDomain?: string
-  affiliationType?: 'affiliator_koperasi' | 'affiliator_reseller'
 }
 
 export default function LoginShareCommission({
@@ -31,11 +30,11 @@ export default function LoginShareCommission({
   productSlug,
   storeSubdomain,
   storeDomain,
-  affiliationType = 'affiliator_koperasi',
 }: LoginShareCommissionProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [isRegister, setIsRegister] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [registeredEmail, setRegisteredEmail] = useState('')
 
   // Login State
   const [email, setEmail] = useState('')
@@ -44,8 +43,6 @@ export default function LoginShareCommission({
   // Register State (Onboarding)
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
-  const [storeName, setStoreName] = useState('')
-  const [subdomain, setSubdomain] = useState('')
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -56,7 +53,7 @@ export default function LoginShareCommission({
     setLoading(true)
     try {
       const response = await authService.login(email, password)
-      const { token, role, user_id } = response.data
+      const { token, role } = response.data
 
       if (role !== 'affiliate') {
         toast.error('Hanya akun Promotor (Affiliate) yang dapat membagikan link komisi ini.')
@@ -71,7 +68,7 @@ export default function LoginShareCommission({
       // Generate Share Link (with reshare logic)
       const parentShareCode = localStorage.getItem('last_share_code') || undefined;
       const shareRes = await affiliatorService.generateShareLink(productId, token, parentShareCode)
-      
+
       // Store the generated share info for attribution and future reshares
       if (shareRes.data) {
         localStorage.setItem('shared_product_id', shareRes.data.id.toString());
@@ -122,84 +119,29 @@ export default function LoginShareCommission({
 
     setLoading(true)
     try {
-      const generatedSubdomain = name.toLowerCase().replace(/\s+/g, '-') + '-' + Math.random().toString(36).substring(2, 7)
-
       const onboardingData = {
         name,
         email,
         password,
         phone,
         role: 'affiliator',
-        store_name: `Promotor ${name}`,
-        store_subdomain: generatedSubdomain,
-        store_description: `Promotor store for ${name}`,
-        store_phone: phone,
-        store_alamat: 'N/A',
-        ipaymu_password: 'password123',
-        flag_ids: [1],
-        plan_id: 3,
+        ipaymu_password: password,
+        plan_id: 1,
       }
 
-      const response = await authService.onboarding(onboardingData)
-      const token = response.data.token || response.data.user.token // Adjust based on actual API response structure
-
-      if (token) {
-        localStorage.setItem('affiliate_token', token)
-        localStorage.setItem('affiliate_user', JSON.stringify(response.data.user))
-
-        try {
-          // Attempt to request affiliation if we have the parent info
-          // We can try to derive parentUserId from the product's store if needed
-          // For now, if we don't have it, we skip but keep the flow going
-          // If the user provided a parent ID or it's available in product context:
-          // await affiliationService.create(token, {
-          //   parent_id: ...
-          //   type: affiliationType
-          // })
-        } catch (affError) {
-          console.error('Affiliation request failed:', affError)
+      try {
+        await authService.onboarding(onboardingData)
+      } catch (err: any) {
+        if (err?.message?.includes('duplicate key value violates unique constraint "idx_users_email"') || err?.data?.error?.includes('duplicate key')) {
+          toast.error('Email ini sudah terdaftar. Silakan gunakan email lain atau login jika Anda sudah memiliki akun.');
+          setLoading(false);
+          return;
         }
-
-        const parentShareCode = localStorage.getItem('last_share_code') || undefined;
-        const shareRes = await affiliatorService.generateShareLink(productId, token, parentShareCode)
-
-        // Store the generated share info for attribution and future reshares
-        if (shareRes.data) {
-          localStorage.setItem('shared_product_id', shareRes.data.id.toString());
-          localStorage.setItem('share_code', shareRes.data.share_code);
-        }
-
-        const finalSlug = productSlug || productId.toString();
-        let finalSubdomain = storeSubdomain || 'www';
-        let finalDomain = storeDomain || '';
-
-        if ((!storeSubdomain || storeSubdomain === 'www') && !storeDomain) {
-          const storeId = (response.data.store_id || (response.data.user?.store?.id));
-          if (storeId) {
-            try {
-              const { storeService } = await import('@/services/apiService');
-              const sRes = await storeService.getDetail(token, storeId);
-              if (sRes.data) {
-                if (sRes.data.subdomain) finalSubdomain = sRes.data.subdomain;
-                if (sRes.data.domain) finalDomain = sRes.data.domain;
-              }
-            } catch (err) {
-              console.error('Failed to fetch store detail for subdomain:', err);
-            }
-          }
-        }
-
-        const baseAppDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || window.location.host.split('.').slice(-2).join('.');
-        const shareUrl = finalDomain
-          ? `https://${finalDomain}/produk/${finalSlug}?sh=${shareRes.data.share_code}`
-          : `https://${finalSubdomain}.${baseAppDomain}/produk/${finalSlug}?sh=${shareRes.data.share_code}`;
-
-        toast.success('Pendaftaran berhasil! Anda sekarang adalah Promotor.')
-        if (onLoginSuccess) {
-          onLoginSuccess(shareUrl)
-        }
-        onOpenChange(false)
+        throw err;
       }
+
+      // Show email activation notice
+      setRegisteredEmail(email)
     } catch (error: any) {
       toast.error(error.message || 'Gagal mendaftar')
     } finally {
@@ -207,9 +149,41 @@ export default function LoginShareCommission({
     }
   }
 
+  // Email activation notice state
+  if (registeredEmail) {
+    return (
+      <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) setRegisteredEmail(''); }}>
+        <DialogContent aria-describedby="activation-description" className="max-w-md p-0 overflow-hidden">
+          <DialogHeader className="flex flex-row items-center justify-between px-6 py-4 border-b">
+            <DialogTitle className="text-lg font-semibold">Pendaftaran Berhasil!</DialogTitle>
+          </DialogHeader>
+          <div id="activation-description" className="px-6 py-8 flex flex-col items-center text-center gap-4">
+            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center">
+              <MailCheck className="w-8 h-8 text-blue-600" />
+            </div>
+            <div className="space-y-2">
+              <p className="font-semibold text-gray-900 text-base">Silakan aktivasi email Anda dahulu</p>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Kami telah mengirimkan link aktivasi ke{' '}
+                <span className="font-medium text-gray-800">{registeredEmail}</span>.
+                Periksa inbox atau folder spam Anda.
+              </p>
+            </div>
+            <button
+              onClick={() => { onOpenChange(false); setRegisteredEmail(''); }}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
+            >
+              Mengerti
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md p-0 overflow-hidden">
+      <DialogContent aria-describedby="dialog-description" className="max-w-md p-0 overflow-hidden">
         {/* Header */}
         <DialogHeader className="flex flex-row items-center justify-between px-6 py-4 border-b">
           <DialogTitle className="text-lg font-semibold">
@@ -218,7 +192,7 @@ export default function LoginShareCommission({
         </DialogHeader>
 
         {/* Body */}
-        <div className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+        <div id="dialog-description" className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
           {!isRegister && (
             <p className="text-sm text-gray-600 leading-relaxed">
               Dapatkan fee share sebesar{' '}
