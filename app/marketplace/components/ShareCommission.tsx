@@ -13,17 +13,20 @@ type ShareCommissionProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   productName: string;
+  shareUrl?: string;
 };
 
 export default function ShareCommission({
   open,
   onOpenChange,
+  productName,
+  shareUrl,
 }: ShareCommissionProps) {
   const [href, setHref] = React.useState('');
 
   React.useEffect(() => {
-    setHref(window.location.href);
-  }, []);
+    setHref(shareUrl || window.location.href);
+  }, [shareUrl]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -35,43 +38,49 @@ export default function ShareCommission({
         {/* Social Share */}
         <div className="flex justify-between text-center px-12 mb-6 mt-4">
           {/* Facebook */}
-          <div className="flex flex-col items-center gap-2">
+          <a
+            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(href)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center gap-2 hover:opacity-80 transition-opacity"
+          >
             <div className="relative">
               <div className="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center">
                 <Facebook className="w-6 h-6 text-white" />
               </div>
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full">
-                23
-              </span>
             </div>
             <span className="text-sm text-gray-700">Facebook</span>
-          </div>
+          </a>
 
           {/* WhatsApp */}
-          <div className="flex flex-col items-center gap-2">
+          <a
+            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`${productName} - ${href}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center gap-2 hover:opacity-80 transition-opacity"
+          >
             <div className="relative">
               <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center">
                 <MessageCircle className="w-6 h-6 text-white" />
               </div>
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full">
-                10
-              </span>
             </div>
             <span className="text-sm text-gray-700">WhatsApp</span>
-          </div>
+          </a>
 
           {/* X */}
-          <div className="flex flex-col items-center gap-2">
+          <a
+            href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(href)}&text=${encodeURIComponent(productName)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center gap-2 hover:opacity-80 transition-opacity"
+          >
             <div className="relative">
               <div className="w-14 h-14 rounded-full bg-black flex items-center justify-center">
                 <X className="w-6 h-6 text-white" />
               </div>
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full">
-                6
-              </span>
             </div>
             <span className="text-sm text-gray-700">X</span>
-          </div>
+          </a>
         </div>
 
         <div className="space-y-3">
@@ -84,7 +93,7 @@ export default function ShareCommission({
           <div className="flex gap-2">
             <button
               onClick={() =>
-                navigator.clipboard.writeText(window.location.href)
+                navigator.clipboard.writeText(href)
               }
               className="flex-1 gradient-green text-white py-2 rounded-md text-sm font-medium"
             >
@@ -95,7 +104,7 @@ export default function ShareCommission({
 
         {/* Info */}
         <p className="text-xs text-gray-500">
-        *Sebarkan link untuk memperoleh komisi dari setiap transaksi
+          *Sebarkan link untuk memperoleh komisi dari setiap transaksi
         </p>
       </DialogContent>
     </Dialog>

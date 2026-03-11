@@ -66,6 +66,7 @@ export const metadata: Metadata = {
 
 import { CaptchaProvider } from "@/components/providers/CaptchaProvider";
 import { Toaster } from "@/components/ui/sonner";
+import AffiliateTracker from "@/components/AffiliateTracker";
 
 export default function RootLayout({
   children,
@@ -86,6 +87,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <CaptchaProvider>
+          <AffiliateTracker />
           {children}
           <Toaster />
         </CaptchaProvider>

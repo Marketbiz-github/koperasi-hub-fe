@@ -1,8 +1,30 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { SectionCards } from "@/components/section-cards";
 import { TopSelling } from "@/components/top-selling";
+import { affiliatorService } from '@/services/apiService'
+import { getAccessToken } from '@/utils/auth'
 
 export default function DashboardPage() {
+  const [stats, setStats] = useState<any>(null)
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const token = await getAccessToken()
+        if (token) {
+          const response = await affiliatorService.getStats(token)
+          setStats(response.data)
+        }
+      } catch (error) {
+        console.error('Failed to fetch stats:', error)
+      }
+    }
+    fetchStats()
+  }, [])
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Promotor Dashboard</h1>
@@ -10,77 +32,29 @@ export default function DashboardPage() {
         <SectionCards
           items={[
             {
-              title: "Penjualan Hari Ini",
-              value: "Rp.250.00",
+              title: "Total Komisi",
+              value: stats ? `Rp. ${stats.total_commission?.toLocaleString('id-ID') || 0}` : "...",
+              description: "Total komisi yang didapat",
             },
             {
-              title: "Transaksi Bulan Ini",
-              value: "Rp. 5.000.234",
+              title: "Konversi Penjualan",
+              value: stats ? `${stats.conversion_rate || 0}%` : "...",
+              description: "Rasio klik menjadi penjualan",
             },
             {
-              title: "Penjualan Bulan Ini",
-              value: "356",
+              title: "Total Klik",
+              value: stats ? `${stats.total_clicks || 0}` : "...",
+              description: "Jumlah klik pada link afiliasi",
             },
             {
-              title: "Total Saldo",
-              value: "Rp. 500.000",
+              title: "Total Share",
+              value: stats ? `${stats.total_shares || 0}` : "...",
+              description: "Jumlah link yang dibagikan",
             }
           ]}
         />
       </div>
 
-      <div className="my-6 flex flex-col gap-6 lg:flex-row">
-        <TopSelling
-          title="Top Selling Produk"
-          description="Produk terlaris"
-          items={[
-            {
-              name: "Kaos Polos Premium",
-              type: "Produk",
-              image: "/images/products/kaos.jpg",
-              sold: 120,
-              revenue: "Rp. 3.200.000",
-            },
-            {
-              name: "Paket Dropship Gold",
-              type: "Paket",
-              image: "/images/products/paket.jpg",
-              sold: 85,
-              revenue: "Rp. 5.500.000",
-            },
-            {
-              name: "Jasa Admin Marketplace",
-              type: "Jasa",
-              image: "/images/products/jasa.jpg",
-              sold: 42,
-              revenue: "Rp. 2.100.000",
-            },
-          ]}
-        />
-        <TopSelling
-          title="Top Customers"
-          description="Customers terbaik"
-          items={[
-            {
-              name: "Andi Wijaya",
-              type: "Customers",
-              image: "/images/users/andi.jpg",
-              sold: 15,
-              revenue: "Rp. 1.500.000",
-            },
-            {
-              name: "Siti Aminah",
-              type: "Customers",
-              image: "/images/users/siti.jpg",
-              sold: 12,
-              revenue: "Rp. 1.200.000",
-            },
-          ]}
-        />
-      </div>
-
-
-      <ChartAreaInteractive />
     </div>
   );
 }

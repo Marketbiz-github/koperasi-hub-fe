@@ -18,7 +18,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\" : \"pisogow580@example.com\",\n    \"password\" : \"password123\"\n}",
+              "raw": "{\n    \"email\" : \"affiliator@example.com\",\n    \"password\" : \"password123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -318,7 +318,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"janestore1@gmail.com\",\n  \"password\": \"password123\",\n  \"phone\": \"08123456789\",\n  \"role\": \"vendor\",\n  \"store_name\": \"Toko Jane\",\n  \"store_subdomain\": \"janestore2\",\n  \"store_description\": \"Toko retail serba ada\",\n  \"store_phone\": \"08123456789\",\n  \"store_alamat\": \"Jl. Merdeka No. 10\",\n  \"ipaymu_password\": \"ipaymupassword123\",\n  \"flag_ids\": [1, 2],\n  \"plan_id\": 1\n}",
+              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"janestore4@gmail.com\",\n  \"password\": \"password123\",\n  \"phone\": \"08123456789\",\n  \"role\": \"vendor\",\n  \"store_name\": \"Toko Jane\",\n  \"store_subdomain\": \"janestore4\",\n  \"store_description\": \"Toko retail serba ada\",\n  \"store_phone\": \"08123456789\",\n  \"store_alamat\": \"Jl. Merdeka No. 10\",\n  \"ipaymu_password\": \"ipaymupassword123\",\n  \"flag_ids\": [1, 2],\n  \"plan_id\": 1\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -416,6 +416,114 @@
               ],
               "cookie": [],
               "body": "{\n    \"meta\": {\n        \"message\": \"Onboarding success\",\n        \"code\": 201,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"user\": {\n            \"id\": 11,\n            \"name\": \"Jane Doe\",\n            \"email\": \"janestore1@gmail.com\",\n            \"phone\": \"08123456789\",\n            \"role\": \"vendor\",\n            \"plan_id\": 1,\n            \"expired_at\": \"2026-03-11T01:35:55.467847461Z\",\n            \"plan\": {\n                \"id\": 1,\n                \"name\": \"Test Bussines Package\",\n                \"price\": \"100000\",\n                \"duration_days\": 30,\n                \"created_at\": \"2026-02-09T01:24:38.055922Z\",\n                \"updated_at\": \"2026-02-09T01:24:38.055922Z\",\n                \"deleted_at\": null\n            },\n            \"flags\": [\n                {\n                    \"id\": 1,\n                    \"name\": \"Test Indonesia\",\n                    \"created_at\": \"2026-02-09T01:24:00.24067Z\",\n                    \"updated_at\": \"2026-02-09T01:24:00.24067Z\"\n                },\n                {\n                    \"id\": 2,\n                    \"name\": \"Kode Indonesia\",\n                    \"created_at\": \"2026-02-09T01:24:08.676168Z\",\n                    \"updated_at\": \"2026-02-09T01:24:08.676168Z\"\n                }\n            ],\n            \"status\": 0,\n            \"created_at\": \"2026-02-09T01:35:54.310743585Z\",\n            \"updated_at\": \"2026-02-09T01:35:55.467986502Z\"\n        },\n        \"store\": {\n            \"id\": 12,\n            \"user_id\": 11,\n            \"uuid\": \"c9fae16b-1e94-4c32-9914-3f4c91606348\",\n            \"name\": \"Toko Jane\",\n            \"ipaymu_va\": \"1179028123456789\",\n            \"ipaymu_response\": null,\n            \"subdomain\": \"janestore2\",\n            \"domain\": null,\n            \"slogan\": null,\n            \"description\": \"Toko retail serba ada\",\n            \"alamat\": \"Jl. Merdeka No. 10\",\n            \"province_id\": null,\n            \"city_id\": null,\n            \"district_id\": null,\n            \"area_id\": null,\n            \"province\": null,\n            \"city\": null,\n            \"district\": null,\n            \"area\": null,\n            \"courier\": null,\n            \"phone\": \"08123456789\",\n            \"zipcode\": null,\n            \"logo\": null,\n            \"cover\": null,\n            \"color\": null,\n            \"status\": null,\n            \"type\": null,\n            \"payment_method\": null,\n            \"latitude\": null,\n            \"longitude\": null,\n            \"fee_setting\": null,\n            \"theme_id\": null,\n            \"is_gratis_ongkir\": null,\n            \"gratis_ongkir_unit\": null,\n            \"gratis_ongkir_value\": null,\n            \"created_at\": \"2026-02-09T01:35:54.322341877Z\",\n            \"updated_at\": \"2026-02-09T01:35:55.430436919Z\",\n            \"deleted_at\": null\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Onboarding Register Affiliator",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Taufik Affiliator\",\n  \"email\": \"affiliator@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"08123000444\",\n  \"role\": \"affiliator\",\n  \"ipaymu_password\": \"ipaymupassword123\",\n  \"plan_id\": 1,\n  \"flag_ids\": [1]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/onboarding",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "onboarding"
+              ]
+            },
+            "description": "Digunakan untuk melakukan pendaftaran user baru dengan satu endpoint yang sudah menjalankan beberapa fungsi , Register > create store > SSO Ipaymu > flag > plan. jika gagal user data tidak akan di buat dan akan di rollback  \n  \nPada api ini, token tidak di perlukan"
+          },
+          "response": [
+            {
+              "name": "Onboarding Register Affiliator",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Taufik Affiliator\",\n  \"email\": \"affiliator@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"08123000444\",\n  \"role\": \"affiliator\",\n  \"ipaymu_password\": \"ipaymupassword123\",\n  \"plan_id\": 1,\n  \"flag_ids\": [1]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/onboarding",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "onboarding"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 09 Mar 2026 14:15:28 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "767"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Onboarding success\",\n        \"code\": 201,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"user\": {\n            \"id\": 15,\n            \"name\": \"Taufik Affiliator\",\n            \"email\": \"affiliator@example.com\",\n            \"phone\": \"08123000444\",\n            \"role\": \"affiliator\",\n            \"plan_id\": 1,\n            \"expired_at\": \"2026-04-08T14:15:28.011164253Z\",\n            \"plan\": {\n                \"id\": 1,\n                \"name\": \"Test Bussines Package\",\n                \"price\": \"100000\",\n                \"duration_days\": 30,\n                \"created_at\": \"2026-02-09T01:24:38.055922Z\",\n                \"updated_at\": \"2026-02-09T01:24:38.055922Z\",\n                \"deleted_at\": null\n            },\n            \"flags\": [\n                {\n                    \"id\": 1,\n                    \"name\": \"Test Indonesia\",\n                    \"created_at\": \"2026-02-09T01:24:00.24067Z\",\n                    \"updated_at\": \"2026-02-09T01:24:00.24067Z\"\n                }\n            ],\n            \"status\": 0,\n            \"ipaymu_va\": \"0000008123000444\",\n            \"campaign_balance\": 0,\n            \"affiliate_share_balance\": 0,\n            \"created_at\": \"2026-03-09T14:15:22.726095626Z\",\n            \"updated_at\": \"2026-03-09T14:15:28.011203462Z\"\n        },\n        \"store\": null\n    }\n}"
             }
           ]
         }
@@ -10971,7 +11079,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzIwMjA1NzUsInVzZXJfaWQiOjJ9.2yqHL77I7Hn3Hc94aPL0nE9B9c0h5pms_s-W9Knb6FY",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzI2NDg2NDUsInVzZXJfaWQiOjJ9.lDzj-x_0NdxKw7zkQOYNSsXy6WHGp_zgIfCNYy2sOQw",
                   "type": "string"
                 }
               ]
@@ -10980,7 +11088,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"store_id\": 9,\n    \"shipping_address\": {\n        \"name\": \"kop\",\n        \"email\": \"pranatayeye18@gmail.com\",\n        \"phone\": \"543545135781\",\n        \"address\": \"jl letda reta\",\n        \"province\": \"Bali\",\n        \"city\": \"Denpasar\",\n        \"district\": \"Denpasar Utara\",\n        \"subdistrict\": \"\",\n        \"zipcode\": \"80111\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 5,\n            \"product_variant_id\": 0,\n            \"quantity\": 1\n        }\n    ],\n    \"shipping_cost\": 10800,\n    \"courier_name\": \"GRAB\",\n    \"courier_code\": \"grab\",\n    \"courier_service\": \"Instant\",\n    \"warehouse_id\": 3,\n    \"customer_notes\": \"da\",\n    \"payment_category\": \"instant\"\n}",
+              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"kop\",\n        \"email\": \"pranatayeye18@gmail.com\",\n        \"phone\": \"543545135781\",\n        \"address\": \"jl letda reta\",\n        \"province\": \"Bali\",\n        \"city\": \"Denpasar\",\n        \"district\": \"Denpasar Utara\",\n        \"subdistrict\": \"\",\n        \"zipcode\": \"80111\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 1\n        }\n    ],\n    \"shipping_cost\": 10800,\n    \"courier_name\": \"GRAB\",\n    \"courier_code\": \"grab\",\n    \"courier_service\": \"Instant\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"da\",\n    \"payment_category\": \"instant\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -12155,7 +12263,7 @@
           ]
         }
       ],
-      "description": "Menejemen order\n\n**Order Status**\n\n| **Status** | **Deskripsi** |\n| --- | --- |\n| pending | Pesanan baru dibuat, menunggu pembayaran. Stok sudah di-reserve |\n| paid | Pembayaran berhasil dikonfirmasi (via iPaymu) |\n| processing | Pesanan sedang disiapkan/dipacking di gudang |\n| shipped | Barang telah diserahkan ke kurir dan nomor resi telah di-update |\n| delivered | Barang telah sampai di tujuan |\n| completed | Transaksi selesai (barang diterima dan dikonfirmasi pembeli) |\n| cancelled | Pesanan dibatalkan (oleh admin/pembeli). Reservasi stok dilepaskan |\n| refunded | Dana dikembalikan ke pembeli |\n| failed | Terjadi kesalahan pada proses pembayaran atau sistem |\n| expired | Waktu pembayaran habis. Reservasi stok dilepaskan otomatis |\n\n**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category` (string, required): \"instant\" or \"piutang\"\n    \n- `debt_type` (string, optional): \"tenor\" or \"po\" (if category is piutang)\n    \n- `tenor_months` (int, optional): number of months for tenor\n    \n- `buyer_id` (int, optional): Manuel override for Buyer ID (defaults to authenticated user)\n    \n- `shared_product_id` (int, optional): ID dari `shared_product` (didapat dari param sh di URL) untuk pelacakan komisi.\n    \n\n**NOTE!!**\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login.\n    \n\n**Request Body (Input dari Frontend):**\n\n- `shipping_cost` (number): Harga ongkir yang didapat dari cek tarif kurir.\n    \n- `is_gratis_ongkir` (boolean): `true` jika customer mengklaim gratis ongkir."
+      "description": "Menejemen order\n\n**Order Status**\n\n| **Status** | **Deskripsi** |\n| --- | --- |\n| pending | Pesanan baru dibuat, menunggu pembayaran. Stok sudah di-reserve |\n| paid | Pembayaran berhasil dikonfirmasi (via iPaymu) |\n| processing | Pesanan sedang disiapkan/dipacking di gudang |\n| shipped | Barang telah diserahkan ke kurir dan nomor resi telah di-update |\n| delivered | Barang telah sampai di tujuan |\n| completed | Transaksi selesai (barang diterima dan dikonfirmasi pembeli) |\n| cancelled | Pesanan dibatalkan (oleh admin/pembeli). Reservasi stok dilepaskan |\n| refunded | Dana dikembalikan ke pembeli |\n| failed | Terjadi kesalahan pada proses pembayaran atau sistem |\n| expired | Waktu pembayaran habis. Reservasi stok dilepaskan otomatis |\n\n**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category` (string, required): \"instant\" or \"piutang\"\n    \n- `debt_type` (string, optional): \"tenor\" or \"po\" (if category is piutang)\n    \n- `tenor_months` (int, optional): number of months for tenor\n    \n- `buyer_id` (int, optional): Manuel override for Buyer ID (defaults to authenticated user)\n    \n- `shared_product_id` (int, optional): ID yang tertera pada saat generate link.\n    \n- `shared_code` (int, optional): code share affiliator yang tergenerate saat generate link\n    \n\n**NOTE!!**\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login.\n    \n\n**Request Body (Input dari Frontend):**\n\n- `shipping_cost` (number): Harga ongkir yang didapat dari cek tarif kurir.\n    \n- `is_gratis_ongkir` (boolean): `true` jika customer mengklaim gratis ongkir."
     },
     {
       "name": "Piutang",
@@ -12537,7 +12645,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA3MjUxMzQsInVzZXJfaWQiOjF9.4FXQ9Fd5iDGWRpnKZvqHP3BEZcyRf1Aw-eP_eKk77rQ",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzI2NDg2NDUsInVzZXJfaWQiOjJ9.lDzj-x_0NdxKw7zkQOYNSsXy6WHGp_zgIfCNYy2sOQw",
                   "type": "string"
                 }
               ]
@@ -12549,13 +12657,13 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{base_url}}/debts/1/pay?type=installment",
+              "raw": "{{base_url}}/debts/7/pay?type=installment",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "debts",
-                "1",
+                "7",
                 "pay"
               ],
               "query": [
@@ -12762,6 +12870,125 @@
               ],
               "cookie": [],
               "body": "{\n    \"meta\": {\n        \"message\": \"Debts fetched successfully\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"debts\": [\n            {\n                \"id\": 5,\n                \"order_id\": 17,\n                \"user_id\": 1,\n                \"buyer_id\": 11,\n                \"type\": \"tenor\",\n                \"amount\": 210000,\n                \"status\": \"unpaid\",\n                \"tenor_months\": 3,\n                \"due_date\": null,\n                \"created_at\": \"2026-02-12T02:44:43.82821Z\",\n                \"updated_at\": \"2026-02-12T02:44:43.82821Z\",\n                \"deleted_at\": null\n            }\n        ],\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"limit\": 10,\n            \"total\": 1\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get PO Status by Auth",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzMxNTI2NjAsInVzZXJfaWQiOjE1fQ.vBsu_p6Q-lJ7H9RxqMqFItCMrlHzalYrqkZ1YWnCTUs",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/debts/check-po?store_id=XX",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "debts",
+                "check-po"
+              ],
+              "query": [
+                {
+                  "key": "store_id",
+                  "value": "XX"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Get PO Status by Auth",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/debts/check-po?store_id=XX",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "debts",
+                    "check-po"
+                  ],
+                  "query": [
+                    {
+                      "key": "store_id",
+                      "value": "XX"
+                    }
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "",
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 09 Mar 2026 15:02:13 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "18"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n  \"has_active_po\": true/false,\n  \"debt\": { ... info hutang jika ada ... }\n}"
             }
           ]
         }
@@ -13352,6 +13579,85 @@
                   "body": "{\n    \"meta\": {\n        \"message\": \"Success\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": [\n        {\n            \"id\": 2,\n            \"product_id\": 1,\n            \"fee_per_click\": 100,\n            \"fee_per_reshare\": 50,\n            \"fee_per_sale\": 5000,\n            \"max_budget\": 1000000,\n            \"current_spent\": 0,\n            \"is_active\": true,\n            \"created_by\": 11,\n            \"created_at\": \"2026-02-18T05:22:35.829349Z\",\n            \"updated_at\": \"2026-02-18T05:22:35.829349Z\",\n            \"product\": {\n                \"id\": 1,\n                \"user_id\": 11,\n                \"store_id\": 12,\n                \"product_category_id\": 1,\n                \"general_category_id\": 1,\n                \"sku\": \"IPHONE-13\",\n                \"name\": \"iPhone 13 Pro Max\",\n                \"slug\": \"iphone-13-pro-max\",\n                \"short_description\": null,\n                \"long_description\": null,\n                \"price\": \"14500000\",\n                \"discount_price\": null,\n                \"status\": \"active\",\n                \"dropshiper_unit\": null,\n                \"dropshiper_value\": null,\n                \"weight\": \"200\",\n                \"length\": \"15\",\n                \"width\": \"8\",\n                \"height\": \"1\",\n                \"target_customer\": \"reseller\",\n                \"is_gratis_ongkir\": true,\n                \"is_cashback\": false,\n                \"cashback_unit\": null,\n                \"cashback_value\": null,\n                \"uuid\": \"7a8df9b2-94be-4747-b24b-a5954608ec40\",\n                \"created_at\": \"2026-02-03T03:17:39.95923Z\",\n                \"updated_at\": \"2026-02-12T02:58:47.15444Z\",\n                \"deleted_at\": null,\n                \"product_category\": null,\n                \"general_category\": null,\n                \"images\": null,\n                \"total_stock\": 0\n            }\n        }\n    ]\n}"
                 }
               ]
+            },
+            {
+              "name": "GET Histori Topup (Vendor/Affiliator)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzMxNTI2NjAsInVzZXJfaWQiOjE1fQ.vBsu_p6Q-lJ7H9RxqMqFItCMrlHzalYrqkZ1YWnCTUs",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/campaigns/topup?page=1&limit=10",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "campaigns",
+                    "topup"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                },
+                "description": "Get by Auth\n\nadd ?user_id=12 if you are SUPER ADMIN role"
+              },
+              "response": []
+            },
+            {
+              "name": "History Share Campaign (Vendor/Admin)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzMxNTI2NjAsInVzZXJfaWQiOjE1fQ.vBsu_p6Q-lJ7H9RxqMqFItCMrlHzalYrqkZ1YWnCTUs",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/campaigns/5/shares?page=1&limit=10",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "campaigns",
+                    "5",
+                    "shares"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                },
+                "description": "Hanya bisa di lihat oleh vendor terkait sesuai dengan AUth yang melakukan setup campaign  \nsuper admin juga bisa melihat data tersebut"
+              },
+              "response": []
             }
           ]
         },
@@ -13366,7 +13672,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE0NzY5OTAsInVzZXJfaWQiOjExfQ.v2fkObmWSaaTllIxIptGhRCAsgWTNDkVQ_mlRdq1YRc",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzMxNTI2NjAsInVzZXJfaWQiOjE1fQ.vBsu_p6Q-lJ7H9RxqMqFItCMrlHzalYrqkZ1YWnCTUs",
                       "type": "string"
                     }
                   ]
@@ -13583,7 +13889,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE0NzY5OTAsInVzZXJfaWQiOjExfQ.v2fkObmWSaaTllIxIptGhRCAsgWTNDkVQ_mlRdq1YRc",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzMxNTI2NjAsInVzZXJfaWQiOjE1fQ.vBsu_p6Q-lJ7H9RxqMqFItCMrlHzalYrqkZ1YWnCTUs",
                       "type": "string"
                     }
                   ]
@@ -13806,6 +14112,49 @@
                   "body": "{\n    \"meta\": {\n        \"message\": \"Success\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"active_shares\": [\n            {\n                \"id\": 1,\n                \"affiliator_id\": 11,\n                \"campaign_id\": 2,\n                \"share_code\": \"11-e0f5fb03\",\n                \"parent_shared_product_id\": null,\n                \"created_at\": \"2026-02-18T05:37:36.377353Z\",\n                \"updated_at\": \"2026-02-18T05:37:36.377353Z\",\n                \"campaign\": {\n                    \"id\": 2,\n                    \"product_id\": 1,\n                    \"fee_per_click\": 100,\n                    \"fee_per_reshare\": 50,\n                    \"fee_per_sale\": 5000,\n                    \"max_budget\": 1000000,\n                    \"current_spent\": 100,\n                    \"is_active\": true,\n                    \"created_by\": 11,\n                    \"created_at\": \"2026-02-18T05:22:35.829349Z\",\n                    \"updated_at\": \"2026-02-18T05:55:03.138213Z\",\n                    \"product\": {\n                        \"id\": 1,\n                        \"user_id\": 11,\n                        \"store_id\": 12,\n                        \"product_category_id\": 1,\n                        \"general_category_id\": 1,\n                        \"sku\": \"IPHONE-13\",\n                        \"name\": \"iPhone 13 Pro Max\",\n                        \"slug\": \"iphone-13-pro-max\",\n                        \"short_description\": null,\n                        \"long_description\": null,\n                        \"price\": \"14500000\",\n                        \"discount_price\": null,\n                        \"status\": \"active\",\n                        \"dropshiper_unit\": null,\n                        \"dropshiper_value\": null,\n                        \"weight\": \"200\",\n                        \"length\": \"15\",\n                        \"width\": \"8\",\n                        \"height\": \"1\",\n                        \"target_customer\": \"reseller\",\n                        \"is_gratis_ongkir\": true,\n                        \"is_cashback\": false,\n                        \"cashback_unit\": null,\n                        \"cashback_value\": null,\n                        \"uuid\": \"7a8df9b2-94be-4747-b24b-a5954608ec40\",\n                        \"created_at\": \"2026-02-03T03:17:39.95923Z\",\n                        \"updated_at\": \"2026-02-12T02:58:47.15444Z\",\n                        \"deleted_at\": null,\n                        \"product_category\": null,\n                        \"general_category\": null,\n                        \"images\": null,\n                        \"total_stock\": 0\n                    }\n                }\n            }\n        ],\n        \"total_commission\": 100\n    }\n}"
                 }
               ]
+            },
+            {
+              "name": "GET Histori Withdrawal (Vendor/Affiliator)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzMxNTI2NjAsInVzZXJfaWQiOjE1fQ.vBsu_p6Q-lJ7H9RxqMqFItCMrlHzalYrqkZ1YWnCTUs",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/campaigns/withdrawal?page=1&limit=5&status=success",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "campaigns",
+                    "withdrawal"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "5"
+                    },
+                    {
+                      "key": "status",
+                      "value": "success"
+                    }
+                  ]
+                },
+                "description": "Get by Auth\n\nadd ?user_id=12 if you are SUPER ADMIN role"
+              },
+              "response": []
             }
           ]
         }

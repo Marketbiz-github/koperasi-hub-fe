@@ -11,6 +11,7 @@ import { productService, inventoryService, productVariantService } from '@/servi
 import { getPublicAccessToken } from '@/utils/auth';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import LoginShareCommission from '../components/LoginShareCommission';
 
 type PageProps = {
   params: Promise<{
@@ -59,6 +60,12 @@ export default function ProductDetailPage({ params }: PageProps) {
   const [quantity, setQuantity] = React.useState(1);
   const [isWishlisted, setIsWishlisted] = React.useState(false);
   const [isValidating, setIsValidating] = React.useState(false);
+  const [showShareModal, setShowShareModal] = React.useState(false);
+
+  const handleShareSuccess = (shareUrl: string) => {
+    navigator.clipboard.writeText(shareUrl);
+    toast.success('Link share telah disalin ke clipboard');
+  };
 
   const fetchProductDetail = React.useCallback(async () => {
     setIsLoading(true);
@@ -195,6 +202,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                     {isWishlisted ? 'Tersimpan' : 'Simpan'}
                   </button>
                   <button
+                    onClick={() => setShowShareModal(true)}
                     className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg border border-gray-300 text-gray-600 hover:border-emerald-400 hover:text-emerald-600 transition font-medium"
                     aria-label="Share"
                   >
@@ -388,6 +396,13 @@ export default function ProductDetailPage({ params }: PageProps) {
       </main>
 
       <Footer />
+
+      <LoginShareCommission
+        open={showShareModal}
+        onOpenChange={setShowShareModal}
+        productId={productId}
+        onLoginSuccess={handleShareSuccess}
+      />
     </div>
   );
 }

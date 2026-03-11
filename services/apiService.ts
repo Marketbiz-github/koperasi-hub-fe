@@ -140,6 +140,14 @@ export const userService = {
             body: params,
             token,
         })
+    },
+
+    async updateUser(id: string | number, data: any, token: string) {
+        return apiRequest(`/users/${id}`, {
+            method: 'PUT',
+            body: data,
+            token,
+        })
     }
 }
 
@@ -293,6 +301,14 @@ export const productService = {
 
     async getProductDetail(id: string | number, token?: string) {
         return apiRequest(`/products/${id}`, { token });
+    },
+
+    async getProductDetailBySlug(slug: string, token?: string) {
+        return apiRequest('/products/search', {
+            method: 'POST',
+            body: { slug },
+            token,
+        });
     },
 
     async createProduct(data: any, token: string) {
@@ -725,6 +741,45 @@ export const campaignService = {
         return apiRequest('/campaigns/topup', {
             method: 'POST',
             body: { amount },
+            token,
+        });
+    }
+}
+
+export const affiliatorService = {
+    async getStats(token: string) {
+        return apiRequest('/affiliator/stats', { token });
+    },
+
+    async generateShareLink(productId: string | number, token: string, parentShareCode?: string) {
+        let endpoint = `/products/${productId}/share`;
+        if (parentShareCode) {
+            endpoint += `?sh=${parentShareCode}`;
+        }
+        return apiRequest(endpoint, { token });
+    },
+
+    async trackClick(shareCode: string, parentShareCode?: string) {
+        let endpoint = '/campaigns/track-click';
+        if (parentShareCode) {
+            endpoint += `?sh=${parentShareCode}`;
+        }
+        return apiRequest(endpoint, {
+            method: 'POST',
+            body: { share_code: shareCode },
+        });
+    },
+
+    async withdraw(amount: number, token: string) {
+        return apiRequest('/campaigns/withdrawal', {
+            method: 'POST',
+            body: { amount },
+            token,
+        });
+    },
+
+    async getWithdrawHistory(token: string) {
+        return apiRequest('/campaigns/withdrawal', {
             token,
         });
     }

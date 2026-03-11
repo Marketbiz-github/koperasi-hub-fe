@@ -36,7 +36,7 @@ export function PromotorLayoutClient({ children }: { children: ReactNode }) {
   if (!user) return null;
 
   // Jika user ada tapi role tidak sesuai, show access denied
-  if (user.role !== 'affiliator') {
+  if (user.role !== 'affiliate') {
     return <AccessDenied />;
   }
 

@@ -1,5 +1,5 @@
-import StoreSettingsForm from "@/components/StoreSettingsForm";
+import ProfileSettingsForm from "@/components/ProfileSettingsForm";
 
 export default function PromotorStoreSettingsPage() {
-    return <StoreSettingsForm />;
+    return <ProfileSettingsForm />;
 }

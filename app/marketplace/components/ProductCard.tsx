@@ -18,6 +18,12 @@ interface Product {
   badge?: string;
   image?: string;
   category?: string;
+  slug?: string;
+  store?: {
+    id: number | string;
+    subdomain: string;
+    domain?: string | null;
+  };
   images?: { image_url: string; is_primary: boolean }[] | null;
   product_category?: { name: string } | null;
   product_variants?: any[] | null;
@@ -30,6 +36,32 @@ export default function ProductCard({ product }: { product: Product }) {
   const [isShareOpen, setIsShareOpen] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [isValidating, setIsValidating] = React.useState(false);
+  const [shareUrl, setShareUrl] = React.useState('');
+  const [subdomain, setSubdomain] = React.useState<string>(product.store?.subdomain || (product as any).store_subdomain || '');
+  const [customDomain, setCustomDomain] = React.useState<string>(product.store?.domain || (product as any).store_domain || '');
+
+  React.useEffect(() => {
+    const fetchStoreInfo = async () => {
+      if (!subdomain || !customDomain) {
+        const storeId = (product as any).store_id || product.store?.id;
+        if (storeId) {
+          try {
+            const { storeService } = await import('@/services/apiService');
+            const { getPublicAccessToken } = await import('@/utils/auth');
+            const token = await getPublicAccessToken();
+            const res = await storeService.getDetail(token || '', storeId);
+            if (res.data) {
+              if (res.data.subdomain) setSubdomain(res.data.subdomain);
+              if (res.data.domain) setCustomDomain(res.data.domain);
+            }
+          } catch (err) {
+            console.error('Failed to fetch store info:', err);
+          }
+        }
+      }
+    };
+    fetchStoreInfo();
+  }, [product, subdomain, customDomain]);
 
   const hasVariants = (product.product_variants && product.product_variants.length > 0) ||
     (product.variants && product.variants.length > 0);
@@ -61,19 +93,48 @@ export default function ProductCard({ product }: { product: Product }) {
     toast.success(`${product.name} ditambahkan ke keranjang`);
   };
 
-  const handleShareClick = (e: React.MouseEvent) => {
+  const productSlug = product.slug || product.id.toString();
+  const baseAppDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || window.location.host.split('.').slice(-2).join('.');
+
+  const internalProductLink = customDomain
+    ? `https://${customDomain}/produk/${productSlug}`
+    : `https://${subdomain || 'www'}.${baseAppDomain}/produk/${productSlug}`;
+
+  const handleShareClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
     if (isLoggedIn) {
-      setIsShareOpen(true);
+      setIsValidating(true);
+      try {
+        const token = localStorage.getItem('affiliate_token');
+        if (token) {
+          const { affiliatorService } = await import('@/services/apiService');
+          const parentShareCode = localStorage.getItem('last_share_code') || undefined;
+          const res = await affiliatorService.generateShareLink(product.id, token, parentShareCode);
+          
+          if (res.data) {
+            localStorage.setItem('shared_product_id', res.data.id.toString());
+            localStorage.setItem('share_code', res.data.share_code);
+          }
+
+          setShareUrl(`${internalProductLink}?sh=${res.data.share_code}`);
+          setIsShareOpen(true);
+        }
+      } catch (err) {
+        toast.error('Gagal generate link share');
+      } finally {
+        setIsValidating(false);
+      }
     } else {
       setIsLoginOpen(true);
     }
   };
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (generatedUrl: string) => {
     setIsLoggedIn(true);
     setIsLoginOpen(false);
+    setShareUrl(generatedUrl);
     setIsShareOpen(true);
   };
 
@@ -93,7 +154,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col h-full border border-gray-100">
-      <Link href={`/marketplace/${product.id}`} className="flex-1">
+      <Link href={internalProductLink} className="flex-1">
         <div className="relative cursor-pointer overflow-hidden aspect-square md:aspect-auto md:h-56">
           <Image
             src={primaryImage}
@@ -152,12 +213,17 @@ export default function ProductCard({ product }: { product: Product }) {
           open={isLoginOpen}
           onOpenChange={setIsLoginOpen}
           onLoginSuccess={handleLoginSuccess}
+          productId={product.id}
+          productSlug={productSlug}
+          storeSubdomain={subdomain}
+          storeDomain={customDomain}
         />
 
         <ShareCommission
           open={isShareOpen}
           onOpenChange={setIsShareOpen}
           productName={product.name}
+          shareUrl={shareUrl}
         />
       </div>
     </div>

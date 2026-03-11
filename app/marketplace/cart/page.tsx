@@ -309,6 +309,9 @@ function CartContent() {
         warehouse_id: warehouseId,
         customer_notes: shippingNotes,
         payment_category: "instant",
+        // Affiliate attribution
+        shared_product_id: Number(localStorage.getItem('shared_product_id')) || undefined,
+        shared_code: localStorage.getItem('last_share_code') || undefined,
       };
 
       const res = await orderService.createOrder(orderData, token || "");

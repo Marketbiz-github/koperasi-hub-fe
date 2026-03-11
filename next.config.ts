@@ -6,20 +6,18 @@ const nextConfig: NextConfig = {
     '127.0.0.1',
     'koperasi-hub-fe.test',
     '*.koperasi-hub-fe.test',
+    'appshub.my.id',
+    '*.appshub.my.id',
   ],
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'koperasi-hub-fe.test',
+        hostname: '**',
       },
       {
-        protocol: 'https',
-        hostname: 'koperasihub.koyeb.app',
-      },
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
+        protocol: 'http',
+        hostname: '**',
       },
     ],
   },
