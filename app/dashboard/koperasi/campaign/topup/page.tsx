@@ -17,39 +17,31 @@ import { getAccessToken } from '@/utils/auth';
 import { campaignService, apiRequest } from '@/services/apiService';
 
 export default function CampaignTopupPage() {
-    const { user, isHydrated } = useAuthStore();
+    const { user, userDetail, fetchUserDetail, isHydrated } = useAuthStore();
     const [amount, setAmount] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [isBalanceLoading, setIsBalanceLoading] = useState(true);
-    const [balance, setBalance] = useState(0);
-    const [store, setStore] = useState<any>(null);
+    const [isHistoryLoading, setIsHistoryLoading] = useState(true);
+    const [history, setHistory] = useState<any[]>([]);
 
-    // Fetch Store and Balance Data
+    // Fetch History Data
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchHistory = async () => {
             if (!isHydrated || !user) return;
             try {
                 const token = await getAccessToken();
-                // Get Store
-                const storeRes = await apiRequest(`/stores/user/${user.id}`, { token: token || undefined });
-                if (storeRes.data && storeRes.data.length > 0) {
-                    const currentStore = storeRes.data[0];
-                    setStore(currentStore);
-
-                    // Get Campaign Data to show total balance (assuming balance is per store or we fetch from a specific balance endpoint)
-                    // The postman shows "Get Store Campaigns" returns campaigns, but "Campaign Owner" is used for topup.
-                    // For now, let's assume we can get balance from a dedicated endpoint if exists, 
-                    // or just show a placeholder if the API doesn't provide a direct "get balance" yet.
-                    // Based on the postman, Topup is POST to /campaigns/topup.
-                }
+                const res = await campaignService.getTopupHistory(token || '');
+                setHistory(res.data || []);
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching history:', error);
             } finally {
-                setIsBalanceLoading(false);
+                setIsHistoryLoading(false);
             }
         };
-        fetchData();
-    }, [user, isHydrated]);
+        fetchHistory();
+        if (isHydrated && user) {
+            fetchUserDetail();
+        }
+    }, [user, isHydrated, fetchUserDetail]);
 
     const handleTopup = async () => {
         if (!amount || Number(amount) < 10000) {
@@ -83,6 +75,8 @@ export default function CampaignTopupPage() {
         }).format(val);
     };
 
+    const campaignBalance = (userDetail as any)?.campaign_balance || 0;
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -106,10 +100,10 @@ export default function CampaignTopupPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {isBalanceLoading ? (
+                        {!isHydrated ? (
                             <Loader2 className="w-6 h-6 animate-spin text-emerald-100" />
                         ) : (
-                            <div className="text-4xl font-bold tracking-tight">{formatCurrency(balance)}</div>
+                            <div className="text-4xl font-bold tracking-tight">{formatCurrency(campaignBalance)}</div>
                         )}
                         <p className="text-xs text-emerald-100 mt-4 leading-relaxed opacity-80">
                             Saldo digunakan untuk membayar biaya setiap klik, share, dan penjualan yang dihasilkan melalui campaign.
@@ -180,14 +174,72 @@ export default function CampaignTopupPage() {
                 </Card>
             </div>
 
-            {/* Additional Info / History Placeholder */}
+            {/* History Table */}
             <Card className="border-none shadow-sm ring-1 ring-gray-200 mt-6">
-                <CardHeader>
-                    <CardTitle className="text-base font-bold text-gray-900">Riwayat Topup Terakhir</CardTitle>
+                <CardHeader className="border-b border-gray-100">
+                    <CardTitle className="text-base font-bold text-gray-900">Riwayat Topup</CardTitle>
                 </CardHeader>
-                <CardContent className="h-32 flex flex-col items-center justify-center text-gray-400">
-                    <Info className="w-8 h-8 mb-2 opacity-20" />
-                    <p className="text-sm">Riwayat transaksi akan muncul di sini</p>
+                <CardContent className="p-0">
+                    {isHistoryLoading ? (
+                        <div className="h-32 flex items-center justify-center">
+                            <Loader2 className="w-6 h-6 animate-spin text-emerald-600" />
+                        </div>
+                    ) : history.length > 0 ? (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="text-xs font-bold uppercase tracking-wider text-gray-500 bg-gray-50/50">
+                                    <tr>
+                                        <th className="px-6 py-4">Tanggal</th>
+                                        <th className="px-6 py-4">Nominal</th>
+                                        <th className="px-6 py-4">Status</th>
+                                        <th className="px-6 py-4">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {history.map((item: any) => (
+                                        <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
+                                            <td className="px-6 py-4 whitespace-nowrap text-gray-600">
+                                                {new Date(item.created_at).toLocaleDateString('id-ID', {
+                                                    day: '2-digit',
+                                                    month: 'long',
+                                                    year: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                })}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">
+                                                {formatCurrency(item.amount)}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${item.status === 'success' ? 'bg-emerald-100 text-emerald-700' :
+                                                        item.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                                                            'bg-red-100 text-red-700'
+                                                    }`}>
+                                                    {item.status}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {item.status === 'pending' && item.payment_url && (
+                                                    <Button
+                                                        variant="link"
+                                                        className="p-0 h-auto text-emerald-600 font-bold hover:text-emerald-700"
+                                                        onClick={() => window.open(item.payment_url, '_blank')}
+                                                    >
+                                                        Bayar Sekarang
+                                                    </Button>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="h-32 flex flex-col items-center justify-center text-gray-400">
+                            <Info className="w-8 h-8 mb-2 opacity-20" />
+                            <p className="text-sm">Belum ada riwayat transaksi</p>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </div>

@@ -701,6 +701,10 @@ export const campaignService = {
         return apiRequest(`/campaigns/store/${storeId}`, { token });
     },
 
+    async getCampaignDetail(token: string, id: string | number) {
+        return apiRequest(`/campaigns/${id}`, { token });
+    },
+
     async createCampaign(token: string, data: {
         product_id: number;
         fee_per_click: number;
@@ -743,6 +747,14 @@ export const campaignService = {
             body: { amount },
             token,
         });
+    },
+
+    async getTopupHistory(token: string) {
+        return apiRequest('/campaigns/topup', { token });
+    },
+
+    async getCampaignShares(token: string, campaignId: number | string) {
+        return apiRequest(`/campaigns/${campaignId}/shares`, { token });
     }
 }
 

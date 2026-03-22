@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import {
     Card,
     CardContent,
@@ -25,7 +27,9 @@ import {
     Edit,
     AlertCircle,
     CheckCircle2,
-    Power
+    Power,
+    BarChart3,
+    Users
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
@@ -82,6 +86,10 @@ export default function CampaignPage() {
         fee_per_sale: 0,
         max_budget: 0
     });
+
+    const pathname = usePathname();
+    const isReseller = pathname?.includes('/reseller');
+    const baseUrl = isReseller ? '/dashboard/reseller/campaign' : '/dashboard/koperasi/campaign';
 
     // Fetch Store Data
     useEffect(() => {
@@ -224,6 +232,7 @@ export default function CampaignPage() {
             toast.error('Gagal menghapus campaign');
         }
     };
+
 
     const handleToggleActive = async (campaign: Campaign) => {
         try {
@@ -415,6 +424,16 @@ export default function CampaignPage() {
                                                 title="Edit"
                                             >
                                                 <Edit className="w-4 h-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                                asChild
+                                            >
+                                                <Link href={`${baseUrl}/${c.id}/shares`} title="Lihat Statistik Share">
+                                                    <BarChart3 className="w-4 h-4" />
+                                                </Link>
                                             </Button>
                                             <Button
                                                 variant="ghost"

@@ -42,6 +42,11 @@ const data = {
       icon: IconDashboard,
     },
     {
+      title: "Marketplace",
+      url: "/dashboard/promotor/marketplace",
+      icon: IconBuildingStore,
+    },
+    {
       title: "Riwayat Transaksi",
       url: "/dashboard/promotor/transaksi",
       icon: IconTrendingUp,
