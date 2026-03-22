@@ -693,6 +693,12 @@ export const debtService = {
         return apiRequest(`/debts/${debtId}/pay?type=${type}`, {
             token,
         });
+    },
+
+    async checkPo(token: string, storeId: string | number) {
+        return apiRequest(`/debts/check-po?store_id=${storeId}`, {
+            token,
+        });
     }
 }
 

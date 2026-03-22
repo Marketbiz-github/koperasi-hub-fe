@@ -20,14 +20,14 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { ShoppingCart, Star, Loader2, Search, Package, ChevronLeft, ChevronRight } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertTriangle, Info, ShoppingCart, Star, Loader2, Search, Package, ChevronLeft, ChevronRight, Calculator, AlertCircle } from "lucide-react"
 import { useCartStore } from "@/store/cartStore"
 import { productService, storeService, userService, debtService, orderService } from "@/services/apiService"
 import { getAccessToken } from "@/utils/auth"
 import { toast } from "sonner"
 import { useAuthStore } from "@/store/authStore"
-
-import { useRouter } from "next/navigation"
 
 interface Product {
     id: number
@@ -90,28 +90,10 @@ function ProductCardComponent({ product }: { product: Product }) {
                 return
             }
 
-            // 3. Check unpaid POs / Debts for this specific product
-            const debtRes = await debtService.getDebts({ buyer_id: currentUser?.id ? Number(currentUser.id) : undefined, user_id: parentId ? Number(parentId) : undefined, status: 'unpaid' }, token)
-            const debts = Array.isArray(debtRes.data?.debts) ? debtRes.data.debts : (Array.isArray(debtRes.data) ? debtRes.data : [])
-
-            let isProductInUnpaidPO = false;
-            for (const debt of debts) {
-                if (debt.type === 'po' && debt.order_id) {
-                    try {
-                        const orderRes = await orderService.getOrderDetail(debt.order_id, token)
-                        const orderItems = orderRes.data?.items || []
-                        if (orderItems.some((item: any) => item.product_id === Number(product.id))) {
-                            isProductInUnpaidPO = true;
-                            break;
-                        }
-                    } catch (err) {
-                        console.error("Error fetching order details for debt", err)
-                    }
-                }
-            }
-
-            if (isProductInUnpaidPO) {
-                toast.error("Anda masih memiliki pesanan/PO yang belum lunas untuk produk ini di vendor ini.")
+            // 3. Check unpaid POs / Debts for this specific vendor (new system)
+            const poStatusRes = await debtService.checkPo(token, storeId)
+            if (poStatusRes.data?.has_active_po) {
+                toast.error("Anda memiliki Purchase Order (PO) yang belum lunas dengan vendor ini. Mohon selesaikan pembayaran terlebih dahulu.")
                 return
             }
 
@@ -205,7 +187,32 @@ export default function MarketplaceVendorPage() {
     const [totalPages, setTotalPages] = useState(1)
     const limit = 12
 
+    const [poStatus, setPoStatus] = useState<any>(null)
+    const [isPoLoading, setIsPoLoading] = useState(false)
+
     const cartItems = useCartStore((s) => s.items)
+
+    const fetchPoStatus = useCallback(async (storeId: string | number) => {
+        setIsPoLoading(true)
+        try {
+            const token = await getAccessToken()
+            if (!token) return
+            const res = await debtService.checkPo(token, storeId)
+            setPoStatus(res.data)
+        } catch (error) {
+            console.error('Error checking PO status:', error)
+        } finally {
+            setIsPoLoading(false)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (selectedVendor !== "all") {
+            fetchPoStatus(selectedVendor)
+        } else {
+            setPoStatus(null)
+        }
+    }, [selectedVendor, fetchPoStatus])
 
     const fetchVendors = useCallback(async () => {
         try {
@@ -367,6 +374,51 @@ export default function MarketplaceVendorPage() {
 
                 {/* Main Content */}
                 <div className="lg:col-span-3 space-y-6">
+                    {/* PO/Debt Alert */}
+                    {isPoLoading ? (
+                        <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 p-4 rounded-lg border border-gray-100 animate-pulse">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span>Memeriksa status PO...</span>
+                        </div>
+                    ) : poStatus?.has_active_po && (
+                        <Alert variant="destructive" className="bg-amber-50 border-amber-200 text-amber-900 shadow-sm">
+                            <AlertTriangle className="h-5 w-5 text-amber-600" />
+                            <AlertTitle className="font-bold text-amber-800 flex items-center gap-2">
+                                Perhatian: Hutang PO Aktif
+                                <Badge variant="outline" className="ml-2 bg-amber-100 border-amber-300 text-amber-700">PENTING</Badge>
+                            </AlertTitle>
+                            <AlertDescription className="text-amber-700 mt-2">
+                                <p className="font-medium">Anda memiliki Purchase Order (PO) yang belum lunas dengan vendor ini.</p>
+                                {poStatus.debt && (
+                                    <div className="mt-3 p-4 bg-white/60 rounded-xl border border-amber-200 shadow-inner text-sm space-y-2">
+                                        <div className="flex justify-between items-center pb-2 border-b border-amber-100">
+                                            <span className="text-xs uppercase font-bold tracking-wider text-amber-600">Status Pembayaran:</span>
+                                            <Badge className="bg-amber-500 hover:bg-amber-600 text-white">BELUM LUNAS</Badge>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4 pt-1">
+                                            <div className="space-y-1">
+                                                <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">Total Hutang</span>
+                                                <p className="font-bold text-base text-gray-900">
+                                                    Rp {Number(poStatus.debt.total_debt || 0).toLocaleString('id-ID')}
+                                                </p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">Sisa Hutang</span>
+                                                <p className="font-black text-base text-red-600 animate-pulse">
+                                                    Rp {Number(poStatus.debt.remaining_debt || 0).toLocaleString('id-ID')}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                <div className="mt-3 flex items-start gap-2 text-xs text-amber-800/80 bg-amber-200/20 p-2 rounded-lg italic">
+                                    <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                    <p>Mohon segera selesaikan pelunasan PO Anda sebelum melanjutkan transaksi baru dengan vendor ini untuk menghindari kendala pengiriman.</p>
+                                </div>
+                            </AlertDescription>
+                        </Alert>
+                    )}
+
                     {isLoading ? (
                         <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border">
                             <Loader2 className="h-10 w-10 animate-spin text-emerald-600 mb-4" />

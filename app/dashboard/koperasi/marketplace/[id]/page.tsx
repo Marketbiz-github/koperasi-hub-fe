@@ -148,30 +148,14 @@ export default function ProductDetailPage() {
             if (!affiliated) {
                 setValidationMessage("Anda belum terafiliasi dengan vendor ini atau afiliasi belum disetujui.")
             } else {
-                // 3. Check unpaid POs / Debts for this specific product
-                const debtRes = await debtService.getDebts({ buyer_id: currentUser?.id ? Number(currentUser.id) : undefined, user_id: parentId ? Number(parentId) : undefined, status: 'unpaid' }, token)
-                const debts = Array.isArray(debtRes.data?.debts) ? debtRes.data.debts : (Array.isArray(debtRes.data) ? debtRes.data : [])
+                // 3. Check unpaid POs / Debts for this specific vendor (new system)
+                const poStatusRes = await debtService.checkPo(token, storeId)
+                const activePo = poStatusRes.data?.has_active_po
 
-                let isProductInUnpaidPO = false;
-                for (const debt of debts) {
-                    if (debt.type === 'po' && debt.order_id) {
-                        try {
-                            const orderRes = await orderService.getOrderDetail(debt.order_id, token)
-                            const orderItems = orderRes.data?.items || []
-                            if (orderItems.some((item: any) => item.product_id === Number(id))) {
-                                isProductInUnpaidPO = true;
-                                break;
-                            }
-                        } catch (err) {
-                            console.error("Error fetching order details for debt", err)
-                        }
-                    }
-                }
+                setHasUnpaidPO(activePo)
 
-                setHasUnpaidPO(isProductInUnpaidPO)
-
-                if (isProductInUnpaidPO) {
-                    setValidationMessage("Anda memiliki pesanan/PO yang belum lunas di vendor ini.")
+                if (activePo) {
+                    setValidationMessage("Anda memiliki pesanan/PO yang belum lunas di vendor ini. Mohon selesaikan pembayaran terlebih dahulu.")
                 } else {
                     setValidationMessage("")
                 }
