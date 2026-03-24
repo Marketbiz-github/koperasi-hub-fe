@@ -30,6 +30,7 @@ import { IconBuildingStore, IconCash } from '@tabler/icons-react';
 import { useAuthStore } from '@/store/authStore';
 import { getAccessToken } from '@/utils/auth';
 import { orderService, storeService, debtService } from '@/services/apiService';
+import { ORDER_STATUS_CONFIG, getOrderStatusLabel } from '@/utils/constants';
 import { Input } from '@/components/ui/input';
 import {
   Dialog,
@@ -38,32 +39,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 
-// Status color mapping
-const statusConfig: Record<string, { label: string, color: string }> = {
-  pending: { label: 'Menunggu Konfirmasi', color: 'bg-yellow-100 text-yellow-800' },
-  waiting_approval: { label: 'Menunggu Persetujuan', color: 'bg-orange-100 text-orange-800' },
-  paid: { label: 'Dibayar', color: 'bg-emerald-100 text-emerald-800' },
-  processing: { label: 'Diproses', color: 'bg-blue-100 text-blue-800' },
-  shipped: { label: 'Dikirim', color: 'bg-purple-100 text-purple-800' },
-  delivered: { label: 'Terkirim', color: 'bg-indigo-100 text-indigo-800' },
-  completed: { label: 'Selesai', color: 'bg-green-100 text-green-800' },
-  cancelled: { label: 'Dibatalkan', color: 'bg-red-100 text-red-800' },
-  refunded: { label: 'Dikembalikan', color: 'bg-rose-100 text-rose-800' },
-  failed: { label: 'Gagal', color: 'bg-red-100 text-red-800' },
-  expired: { label: 'Kedaluwarsa', color: 'bg-gray-100 text-gray-800' },
-};
-
 const formatCurrency = (value: number | string) => {
   const num = typeof value === 'string' ? parseInt(value) : value;
   return `Rp${(num || 0).toLocaleString('id-ID')}`;
-};
-
-const getStatusLabel = (status: string, paymentCategory: string, paidAt?: string | null) => {
-  if (status === 'paid' && paymentCategory === 'piutang') {
-    if (!paidAt) return 'Disetujui';
-    return 'Piutang';
-  }
-  return statusConfig[status]?.label || status;
 };
 
 const getSettlementStatus = (order: any) => {
@@ -228,6 +206,7 @@ export default function PiutangPage() {
                   <TableHead className="w-[180px]">No. Pesanan</TableHead>
                   <TableHead>Toko</TableHead>
                   <TableHead>Tipe Piutang</TableHead>
+                  <TableHead>Tenor</TableHead>
                   <TableHead>Status Tagihan</TableHead>
                   <TableHead>Total Tagihan</TableHead>
                   <TableHead className="text-right">Aksi</TableHead>
@@ -250,9 +229,14 @@ export default function PiutangPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="capitalize">
+                      <Badge variant="outline" className="capitalize text-[10px] font-bold">
                         {order.debt?.type || 'Piutang'}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm text-gray-600">
+                        {order.debt?.tenor_months ? `${order.debt.tenor_months} Bulan` : '-'}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1">

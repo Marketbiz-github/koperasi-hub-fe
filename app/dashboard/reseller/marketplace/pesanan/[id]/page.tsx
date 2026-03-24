@@ -25,23 +25,10 @@ import { useAuthStore } from '@/store/authStore';
 import { getAccessToken } from '@/utils/auth';
 import { orderService, productService } from '@/services/apiService';
 import { useNotificationStore } from '@/store/notificationStore';
+import { ORDER_STATUS_CONFIG, getOrderStatusLabel } from '@/utils/constants';
 import { Loader2, ArrowLeft, Package, Truck, CheckCircle2, History } from 'lucide-react';
 import { IconBuildingStore } from '@tabler/icons-react';
 import { toast } from 'sonner';
-
-const statusConfig: Record<string, { label: string, color: string }> = {
-    pending: { label: 'Menunggu Konfirmasi', color: 'bg-yellow-100 text-yellow-800' },
-    waiting_approval: { label: 'Menunggu Persetujuan', color: 'bg-orange-100 text-orange-800' },
-    paid: { label: 'Dibayar', color: 'bg-emerald-100 text-emerald-800' },
-    processing: { label: 'Diproses', color: 'bg-blue-100 text-blue-800' },
-    shipped: { label: 'Dikirim', color: 'bg-purple-100 text-purple-800' },
-    delivered: { label: 'Terkirim', color: 'bg-indigo-100 text-indigo-800' },
-    completed: { label: 'Selesai', color: 'bg-green-100 text-green-800' },
-    cancelled: { label: 'Dibatalkan', color: 'bg-red-100 text-red-800' },
-    refunded: { label: 'Dikembalikan', color: 'bg-rose-100 text-rose-800' },
-    failed: { label: 'Gagal', color: 'bg-red-100 text-red-800' },
-    expired: { label: 'Kedaluwarsa', color: 'bg-gray-100 text-gray-800' },
-};
 
 const formatCurrency = (value: number | string) => {
     const num = typeof value === 'string' ? parseInt(value) : value;
@@ -205,8 +192,8 @@ export default function PesananDetailPage() {
                                     <Badge className={order.payment_status === 'paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}>
                                         {order.payment_status === 'paid' ? 'LUNAS' : 'BELUM LUNAS'}
                                     </Badge>
-                                    <Badge className={`${statusConfig[order.status]?.color || 'bg-gray-100 text-gray-800'} border-0`}>
-                                        {statusConfig[order.status]?.label || order.status}
+                                    <Badge className={`${ORDER_STATUS_CONFIG[order.status]?.color || 'bg-gray-100 text-gray-800'} border-0`}>
+                                        {getOrderStatusLabel(order.status, order.payment_category, order.paid_at)}
                                     </Badge>
                                 </div>
                             </div>
@@ -367,7 +354,7 @@ export default function PesananDetailPage() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {['processing', 'shipped', 'delivered', 'completed', 'cancelled'].map((key) => {
-                                            const config = statusConfig[key];
+                                            const config = ORDER_STATUS_CONFIG[key];
                                             const isCancelled = key === 'cancelled';
                                             const isDisabled = isCancelled && order.payment_status === 'paid';
 

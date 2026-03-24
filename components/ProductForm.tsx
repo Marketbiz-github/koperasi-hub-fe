@@ -121,7 +121,7 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
         length: '10',
         width: '10',
         height: '10',
-        target_customer: rolePath === 'vendor' ? 'koperasi' : (rolePath === 'koperasi' ? 'koperasi' : 'customer'),
+        target_customer: rolePath === 'vendor' ? 'koperasi' : 'customer',
         status: 'active',
         is_gratis_ongkir: false, // Don't auto-check
         is_cashback: false,
@@ -230,62 +230,60 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                     }
 
                     // Fetch Product Options and Variants
-                    if (!isDuplicate) {
-                        try {
-                            const [optRes, varRes, stockRes] = await Promise.all([
-                                productOptionService.getList(token, { product_id: productId }),
-                                productVariantService.getList(token, productId),
-                                inventoryService.getStockByProduct(token, productId)
-                            ]);
+                    try {
+                        const [optRes, varRes, stockRes] = await Promise.all([
+                            productOptionService.getList(token, { product_id: productId }),
+                            productVariantService.getList(token, productId),
+                            inventoryService.getStockByProduct(token, productId)
+                        ]);
 
-                            const options = optRes.data || [];
-                            const variants = varRes.data || [];
-                            const stocks = stockRes.data || [];
+                        const options = optRes.data || [];
+                        const variants = varRes.data || [];
+                        const stocks = stockRes.data || [];
 
-                            if (options.length > 0) {
-                                setHasVariants(true);
+                        if (options.length > 0) {
+                            setHasVariants(true);
 
-                                // Fetch all values for this store at once
-                                const allValuesRes = await productOptionValueService.getList(token, { store_id: currentStore.id });
-                                const allValues = allValuesRes.data || [];
+                            // Fetch all values for this store at once
+                            const allValuesRes = await productOptionValueService.getList(token, { store_id: currentStore.id });
+                            const allValues = allValuesRes.data || [];
 
-                                const mappedOptions: VariantOption[] = options.map((opt: any) => {
-                                    const optionValues = allValues.filter((v: any) => v.product_option_id === opt.id);
-                                    return {
-                                        id: opt.id,
-                                        name: opt.name,
-                                        values: optionValues.map((v: any) => v.value)
-                                    };
-                                });
-                                setVariantOptions(mappedOptions);
+                            const mappedOptions: VariantOption[] = options.map((opt: any) => {
+                                const optionValues = allValues.filter((v: any) => v.product_option_id === opt.id);
+                                return {
+                                    id: isDuplicate ? undefined : opt.id,
+                                    name: opt.name,
+                                    values: optionValues.map((v: any) => v.value)
+                                };
+                            });
+                            setVariantOptions(mappedOptions);
 
-                                // Map Variants with multi-gudang stocks
-                                setGeneratedVariants(variants.map((v: any) => {
-                                    const variantStocks = stocks.filter((s: any) => s.product_variant_id === v.id);
-                                    return {
-                                        id: v.id,
-                                        sku: v.sku,
-                                        price: v.price?.toString() || '0',
-                                        discount_price: v.discount_price?.toString() || '',
-                                        weight: v.weight?.toString() || '200',
-                                        optionValues: (v.option_values || v.product_option_values || []).map((ov: any) => ov.value),
-                                        stocks: variantStocks.length > 0
-                                            ? variantStocks.map((s: any) => ({ gudang_id: s.gudang_id?.toString() || '', stock: s.stock?.toString() || '0' }))
-                                            : [{ gudang_id: '', stock: '0' }],
-                                        image: v.image || '',
-                                        is_active: v.is_active !== false
-                                    };
-                                }));
-                            } else if (stocks.length > 0) {
-                                // Simple Product Stock — multi-gudang
-                                setSimpleStocks(stocks.map((s: any) => ({
-                                    gudang_id: s.gudang_id?.toString() || '',
-                                    stock: s.stock?.toString() || '0'
-                                })));
-                            }
-                        } catch (err) {
-                            console.error('Error fetching variant details:', err);
+                            // Map Variants with multi-gudang stocks
+                            setGeneratedVariants(variants.map((v: any) => {
+                                const variantStocks = stocks.filter((s: any) => s.product_variant_id === v.id);
+                                return {
+                                    id: isDuplicate ? undefined : v.id,
+                                    sku: v.sku,
+                                    price: v.price?.toString() || '0',
+                                    discount_price: v.discount_price?.toString() || '',
+                                    weight: v.weight?.toString() || '200',
+                                    optionValues: (v.option_values || v.product_option_values || []).map((ov: any) => ov.value),
+                                    stocks: variantStocks.length > 0
+                                        ? variantStocks.map((s: any) => ({ gudang_id: s.gudang_id?.toString() || '', stock: s.stock?.toString() || '0' }))
+                                        : [{ gudang_id: '', stock: '0' }],
+                                    image: v.image || '',
+                                    is_active: v.is_active !== false
+                                };
+                            }));
+                        } else if (stocks.length > 0) {
+                            // Simple Product Stock — multi-gudang
+                            setSimpleStocks(stocks.map((s: any) => ({
+                                gudang_id: s.gudang_id?.toString() || '',
+                                stock: s.stock?.toString() || '0'
+                            })));
                         }
+                    } catch (err) {
+                        console.error('Error fetching variant details:', err);
                     }
                 }
 
@@ -1325,7 +1323,7 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                                     <SelectContent>
                                         {(rolePath === 'koperasi' || rolePath === 'reseller') && <SelectItem value="customer">End Customer</SelectItem>}
                                         {rolePath === 'koperasi' && <SelectItem value="reseller">Reseller</SelectItem>}
-                                        {(rolePath === 'vendor' || rolePath === 'koperasi') && <SelectItem value="koperasi">Koperasi</SelectItem>}
+                                        {rolePath === 'vendor' && <SelectItem value="koperasi">Koperasi</SelectItem>}
                                     </SelectContent>
                                 </Select>
                                 <p className="text-[10px] text-muted-foreground">Tentukan siapa yang dapat melihat dan membeli produk ini.</p>

@@ -39,6 +39,7 @@ import { IconBuildingStore } from '@tabler/icons-react';
 import { useAuthStore } from '@/store/authStore';
 import { getAccessToken } from '@/utils/auth';
 import { orderService, storeService } from '@/services/apiService';
+import { ORDER_STATUS_CONFIG, getOrderStatusLabel } from '@/utils/constants';
 import { Input } from '@/components/ui/input';
 import {
   Dialog,
@@ -48,31 +49,9 @@ import {
 } from "@/components/ui/dialog"
 
 // Status color mapping
-const statusConfig: Record<string, { label: string, color: string }> = {
-  pending: { label: 'Menunggu Konfirmasi', color: 'bg-yellow-100 text-yellow-800' },
-  waiting_approval: { label: 'Menunggu Persetujuan', color: 'bg-orange-100 text-orange-800' },
-  paid: { label: 'Dibayar', color: 'bg-emerald-100 text-emerald-800' },
-  processing: { label: 'Diproses', color: 'bg-blue-100 text-blue-800' },
-  shipped: { label: 'Dikirim', color: 'bg-purple-100 text-purple-800' },
-  delivered: { label: 'Terkirim', color: 'bg-indigo-100 text-indigo-800' },
-  completed: { label: 'Selesai', color: 'bg-green-100 text-green-800' },
-  cancelled: { label: 'Dibatalkan', color: 'bg-red-100 text-red-800' },
-  refunded: { label: 'Dikembalikan', color: 'bg-rose-100 text-rose-800' },
-  failed: { label: 'Gagal', color: 'bg-red-100 text-red-800' },
-  expired: { label: 'Kedaluwarsa', color: 'bg-gray-100 text-gray-800' },
-};
-
 const formatCurrency = (value: number | string) => {
   const num = typeof value === 'string' ? parseInt(value) : value;
   return `Rp${(num || 0).toLocaleString('id-ID')}`;
-};
-
-const getStatusLabel = (status: string, paymentCategory: string, paidAt?: string | null) => {
-  if (status === 'paid' && paymentCategory === 'piutang') {
-    if (!paidAt) return 'Disetujui';
-    return 'Piutang';
-  }
-  return statusConfig[status]?.label || status;
 };
 
 const getSettlementStatus = (order: any) => {
@@ -258,14 +237,14 @@ export default function PembelianPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Status</SelectItem>
-              <SelectItem value="pending">Menunggu Konfirmasi</SelectItem>
-              <SelectItem value="waiting_approval">Menunggu Persetujuan</SelectItem>
-              <SelectItem value="paid">Dibayar</SelectItem>
-              <SelectItem value="processing">Diproses</SelectItem>
-              <SelectItem value="shipped">Dikirim</SelectItem>
-              <SelectItem value="delivered">Terkirim</SelectItem>
-              <SelectItem value="completed">Selesai</SelectItem>
-              <SelectItem value="cancelled">Dibatalkan</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="waiting_approval">Waiting Approval</SelectItem>
+              <SelectItem value="paid">Paid</SelectItem>
+              <SelectItem value="processing">Processing</SelectItem>
+              <SelectItem value="shipped">Shipped</SelectItem>
+              <SelectItem value="delivered">Delivered</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
         </CardContent>
@@ -309,9 +288,9 @@ export default function PembelianPage() {
                     </TableCell>
                     <TableCell>
                       <Badge
-                        className={`${statusConfig[order.status]?.color || 'bg-gray-100 text-gray-800'} border-0 shadow-none pointer-events-none`}
+                        className={`${ORDER_STATUS_CONFIG[order.status]?.color || 'bg-gray-100 text-gray-800'} border-0 shadow-none pointer-events-none`}
                       >
-                        {getStatusLabel(order.status, order.payment_category, order.paid_at)}
+                        {getOrderStatusLabel(order.status, order.payment_category, order.paid_at)}
                       </Badge>
                     </TableCell>
                     <TableCell>

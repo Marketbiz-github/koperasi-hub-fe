@@ -144,19 +144,8 @@ export default function ProductListPage({ title, description, rolePath }: Produc
         }
     }, [isStoreLoading, store, fetchProducts, fetchCategories]);
 
-    const handleDuplicate = async (productId: number) => {
-        const confirmDuplicate = confirm('Apakah Anda yakin ingin menduplikasi produk ini?');
-        if (!confirmDuplicate) return;
-
-        try {
-            const token = await getAccessToken();
-            if (!token) return;
-            await productService.duplicateProduct(productId, token);
-            toast.success('Produk berhasil diduplikasi');
-            fetchProducts();
-        } catch (error) {
-            toast.error('Gagal menduplikasi produk');
-        }
+    const handleDuplicate = (productId: number) => {
+        window.location.href = `/dashboard/${rolePath}/produk/tambah?duplicate=${productId}`;
     };
 
     const handleDelete = async (productId: number) => {
