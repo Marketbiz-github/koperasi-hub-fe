@@ -115,7 +115,7 @@ export default function LoginForm({
               <p className="text-center text-gray-600">
                 Belum jadi Promotor?{' '}
                 <Link
-                  href="/register/promotor"
+                  href="/marketplace"
                   className="font-semibold text-gray-900 hover:text-green-600 transition-colors"
                 >
                   Daftar
@@ -127,7 +127,7 @@ export default function LoginForm({
           {/* Footer Info */}
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-500">
-              © 2025 KoperasiHub. All rights reserved.
+              © 2026 KoperasiHub. All rights reserved.
             </p>
           </div>
         </div>

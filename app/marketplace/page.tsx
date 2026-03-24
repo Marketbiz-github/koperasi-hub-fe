@@ -12,6 +12,9 @@ import { Loader2, Package, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+
 interface Product {
   id: number;
   name: string;
@@ -22,14 +25,26 @@ interface Product {
   product_category?: { name: string } | null;
 }
 
-export default function Home() {
+function MarketplaceContent() {
+  const searchParams = useSearchParams();
+  const nameParam = searchParams.get('name') || '';
+
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedVendor, setSelectedVendor] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>(nameParam);
   const limit = 12;
+
+  // Sync searchQuery with nameParam when URL changes
+  useEffect(() => {
+    if (nameParam !== searchQuery) {
+      setSearchQuery(nameParam);
+      setCurrentPage(1);
+    }
+  }, [nameParam]);
 
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
@@ -42,15 +57,24 @@ export default function Home() {
         status: 'active'
       };
 
+      const hasFilters = searchQuery !== '' || selectedCategory !== 'all' || selectedVendor !== 'all';
+
       if (selectedCategory !== 'all') {
-        params.category_id = selectedCategory;
+        params.category_id = Number(selectedCategory);
       }
 
       if (selectedVendor !== 'all') {
-        params.store_id = selectedVendor;
+        params.store_id = Number(selectedVendor);
       }
 
-      const res = await productService.getProducts(params, token || undefined);
+      if (searchQuery) {
+        params.name = searchQuery;
+      }
+
+      const res = hasFilters 
+        ? await productService.searchProducts(params, token || undefined)
+        : await productService.getProducts(params, token || undefined);
+
       if (res.data) {
         setProducts(res.data.data || []);
         setTotalPages(Math.ceil((res.data.meta?.total || 0) / limit));
@@ -61,7 +85,7 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, selectedCategory, selectedVendor]);
+  }, [currentPage, selectedCategory, selectedVendor, searchQuery]);
 
   useEffect(() => {
     fetchProducts();
@@ -184,5 +208,13 @@ export default function Home() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center"><Loader2 className="h-12 w-12 animate-spin text-emerald-600" /></div>}>
+      <MarketplaceContent />
+    </Suspense>
   );
 }

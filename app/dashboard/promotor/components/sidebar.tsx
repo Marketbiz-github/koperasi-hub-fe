@@ -43,7 +43,7 @@ const data = {
     },
     {
       title: "Marketplace",
-      url: "/dashboard/promotor/marketplace",
+      url: "/marketplace",
       icon: IconBuildingStore,
     },
     {

@@ -12,13 +12,6 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -28,6 +21,7 @@ import { productService, storeService, userService, debtService, orderService } 
 import { getAccessToken } from "@/utils/auth"
 import { toast } from "sonner"
 import { useAuthStore } from "@/store/authStore"
+import { SearchableSelect } from "@/components/ui/searchable-select"
 
 interface Product {
     id: number
@@ -246,14 +240,19 @@ export default function MarketplaceVendorPage() {
             }
 
             if (selectedVendor !== "all") {
-                params.store_id = selectedVendor
+                params.store_id = Number(selectedVendor)
             }
 
             if (searchQuery) {
                 params.name = searchQuery
             }
 
-            const res = await productService.getProducts(params, token || undefined)
+            const hasFilters = searchQuery !== "" || selectedVendor !== "all";
+
+            const res = hasFilters 
+                ? await productService.searchProducts(params, token || undefined)
+                : await productService.getProducts(params, token || undefined)
+            
             if (res.data) {
                 setProducts(res.data.data || [])
                 setTotalPages(Math.ceil((res.data.meta?.total || 0) / limit))
@@ -332,22 +331,16 @@ export default function MarketplaceVendorPage() {
 
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Vendor</label>
-                                <Select value={selectedVendor} onValueChange={(val) => {
-                                    setSelectedVendor(val)
-                                    setCurrentPage(1)
-                                }}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Semua Vendor" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">Semua Vendor</SelectItem>
-                                        {vendors.map((vendor) => (
-                                            <SelectItem key={vendor.id} value={vendor.id.toString()}>
-                                                {vendor.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <SearchableSelect
+                                    options={[{ id: 'all', name: 'Semua Vendor' }, ...vendors]}
+                                    value={selectedVendor}
+                                    onValueChange={(val) => {
+                                        setSelectedVendor(val)
+                                        setCurrentPage(1)
+                                    }}
+                                    placeholder="Pilih Vendor"
+                                    searchPlaceholder="Cari vendor..."
+                                />
                             </div>
 
                             {selectedVendorData && (

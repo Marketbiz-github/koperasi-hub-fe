@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#0a2540] text-white py-12">
+    <footer className="bg-green-950 text-white py-12">
       <div className="container max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
           <div>
@@ -29,19 +29,19 @@ export default function Footer() {
           <div>
             <h3 className="font-bold text-lg mb-4">Informasi</h3>
             <ul className="space-y-2 text-gray-300 text-sm">
-              <li><a href="#" className="hover:text-[#10b981] transition">Tentang kami</a></li>
-              <li><a href="#" className="hover:text-[#10b981] transition">Cara kerja</a></li>
-              <li><a href="#" className="hover:text-[#10b981] transition">Blog</a></li>
-              <li><a href="#" className="hover:text-[#10b981] transition">Dokumentasi API</a></li>
+              <li><Link href="/tentang-kami" className="hover:text-[#10b981] transition">Tentang kami</Link></li>
+              <li><Link href="/#cara-kerja" className="hover:text-[#10b981] transition">Cara kerja</Link></li>
+              <li><Link href="/marketplace" className="hover:text-[#10b981] transition">Marketplace</Link></li>
+              <li><Link href="/kontak" className="hover:text-[#10b981] transition">Kontak kami</Link></li>
             </ul>
           </div>
 
           <div>
             <h3 className="font-bold text-lg mb-4">Bantuan</h3>
             <ul className="space-y-2 text-gray-300 text-sm">
-              <li><a href="#" className="hover:text-[#10b981] transition">FAQ</a></li>
-              <li><a href="#" className="hover:text-[#10b981] transition">Kontak kami</a></li>
-              <li><a href="#" className="hover:text-[#10b981] transition">Syarat & ketentuan</a></li>
+              <li><Link href="/faq" className="hover:text-[#10b981] transition">FAQ</Link></li>
+              <li><Link href="/syarat-ketentuan" className="hover:text-[#10b981] transition">Syarat & ketentuan</Link></li>
+              <li><Link href="/kebijakan-privasi" className="hover:text-[#10b981] transition">Kebijakan Privasi</Link></li>
             </ul>
           </div>
 

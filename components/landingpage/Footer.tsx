@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-300 py-12 px-4 sm:px-6 lg:px-8">
+    <footer className="bg-green-950 text-gray-300 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div className="col-span-2">
@@ -43,19 +43,24 @@ export default function Footer() {
             <h4 className="text-white font-bold mb-4">Tautan</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#tentang" className="hover:text-green-400 transition">
+                <Link href="/tentang-kami" className="hover:text-green-400 transition">
                   Tentang Kami
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#cara-kerja" className="hover:text-green-400 transition">
+                <Link href="/#cara-kerja" className="hover:text-green-400 transition">
                   Cara Kerja
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/marketplace" className="hover:text-green-400 transition">
+                <Link href="/marketplace" className="hover:text-green-400 transition">
                   Marketplace
-                </a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/kontak" className="hover:text-green-400 transition">
+                  Kontak
+                </Link>
               </li>
             </ul>
           </div>
@@ -64,19 +69,19 @@ export default function Footer() {
             <h4 className="text-white font-bold mb-4">Legal</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="hover:text-green-400 transition">
+                <Link href="/kebijakan-privasi" className="hover:text-green-400 transition">
                   Kebijakan Privasi
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-green-400 transition">
+                <Link href="/syarat-ketentuan" className="hover:text-green-400 transition">
                   Syarat & Ketentuan
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-green-400 transition">
+                <Link href="/faq" className="hover:text-green-400 transition">
                   FAQ
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

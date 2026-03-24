@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Navbar from '../components/landingpage/Navbar';
 import Footer from '../components/landingpage/Footer';
+import Link from 'next/link';
 
 export default function KoperasiHubPage() {
   const [activeTab, setActiveTab] = useState('vendor');
@@ -197,17 +198,17 @@ export default function KoperasiHubPage() {
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex justify-center space-x-4 mb-10">
-            {['vendor', 'koperasi'].map((tab) => (
+          <div className="flex flex-wrap justify-center gap-4 mb-10">
+            {['vendor', 'koperasi', 'reseller', 'promotor'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-6 py-3 font-semibold rounded-xl transition ${activeTab === tab
+                className={`px-6 py-3 font-semibold rounded-xl capitalize transition ${activeTab === tab
                   ? 'gradient-green text-white shadow-lg'
                   : 'bg-white text-gray-700 hover:bg-gray-50'
                   }`}
               >
-                {tab === 'vendor' ? 'Vendor' : 'Koperasi'}
+                {tab}
               </button>
             ))}
           </div>
@@ -216,20 +217,24 @@ export default function KoperasiHubPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             {/* Left Description */}
             <div>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-                {activeTab === 'vendor' ? 'Jadi Vendor' : 'Jadi Koperasi'}
+              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 capitalize">
+                {activeTab === 'vendor' ? 'Jadi Vendor' : activeTab === 'koperasi' ? 'Jadi Koperasi' : activeTab === 'reseller' ? 'Jadi Reseller' : 'Jadi Promotor'}
               </h3>
               <p className="text-gray-600 leading-relaxed mb-6">
                 {activeTab === 'vendor'
                   ? 'Vendor dapat bergabung dengan platform untuk memperluas distribusi produk melalui koperasi. Dengan sistem ini, vendor bisa mengelola reseller, memantau pesanan, dan meningkatkan penjualan.'
-                  : 'Koperasi bisa memilih vendor yang sesuai kebutuhan anggotanya, menjual produk ke anggota, dan mendapatkan komisi dari setiap transaksi.'}
+                  : activeTab === 'koperasi'
+                    ? 'Koperasi bisa memilih vendor yang sesuai kebutuhan anggotanya (Grosir), menjual produk ke anggota, dan mendapatkan komisi dari setiap transaksi.'
+                    : activeTab === 'reseller'
+                      ? 'Reseller individual dapat bergabung untuk mulai berjualan produk berkualitas tanpa stok sendiri. Manfaatkan sistem dropship dan harga grosir untuk keuntungan maksimal.'
+                      : 'Promotor atau affiliator dapat menyebarkan link produk dan mendapatkan komisi dari setiap klik atau pembelian yang dihasilkan melalui promosi online.'}
               </p>
-              <a
-                href={activeTab === 'vendor' ? '/register/vendor' : '/register/koperasi'}
+              <Link
+                href={activeTab === 'promotor' ? '/marketplace' : `/register/${activeTab}`}
                 className="inline-block gradient-green text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition transform hover:scale-105"
               >
-                Daftar {activeTab === 'vendor' ? 'Vendor' : 'Koperasi'}
-              </a>
+                {activeTab === 'promotor' ? 'Mulai Promosi' : `Daftar ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`}
+              </Link>
             </div>
 
             {/* Right Steps */}
@@ -237,7 +242,7 @@ export default function KoperasiHubPage() {
               {activeTab === 'vendor'
                 ? [
                   {
-                    title: 'Terdaftar sebagai Merchant & Punya Produk',
+                    title: 'Punya Produk',
                     description: 'Pastikan usaha Anda sudah memiliki produk yang siap dijual.',
                   },
                   {
@@ -245,8 +250,8 @@ export default function KoperasiHubPage() {
                     description: 'Registrasi di platform dan lengkapi data usaha Anda.',
                   },
                   {
-                    title: 'Pilih Paket',
-                    description: 'Ada paket standard dan premium',
+                    title: 'Kelola Affiliasi Koperasi',
+                    description: 'Atur koperasi mana yang menjadi afiliasi Anda',
                   },
                   {
                     title: 'Pantau Penjualan',
@@ -266,37 +271,101 @@ export default function KoperasiHubPage() {
                     </div>
                   </div>
                 ))
-                : [
-                  {
-                    title: 'Daftar sebagai Koperasi di Kooperasi.com',
-                    description: 'Registrasi dengan data & legalitas koperasi Anda.',
-                  },
-                  {
-                    title: 'Pilih Produk Vendor',
-                    description: 'Jelajahi Marketplace Hub dan pilih produk yang sesuai.',
-                  },
-                  {
-                    title: 'Lakukan Pembelian',
-                    description: 'Pesan produk dari vendor dan kelola stok koperasi.',
-                  },
-                  {
-                    title: 'Jual Produk Anda',
-                    description: 'Distribusikan produk kepada anggota atau masyarakat.',
-                  },
-                ].map((step, index) => (
-                  <div
-                    key={index}
-                    className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition flex items-start space-x-4"
-                  >
-                    <div className="w-10 h-10 shrink-0 gradient-green text-white rounded-full flex items-center justify-center font-bold shadow-lg">
-                      {index + 1}
+                : activeTab === 'koperasi'
+                  ? [
+                    {
+                      title: 'Daftar sebagai Koperasi',
+                      description: 'Registrasi dengan data & legalitas koperasi Anda.',
+                    },
+                    {
+                      title: 'Pilih Vendor',
+                      description: 'Jelajahi Marketplace dan pilih vendor yang sesuai dari dashboard Anda.',
+                    },
+                    {
+                      title: 'Lakukan Pembelian',
+                      description: 'Pesan produk dari vendor dan kelola stok koperasi.',
+                    },
+                    {
+                      title: 'Jual Produk Anda',
+                      description: 'Distribusikan produk kepada anggota atau masyarakat.',
+                    },
+                  ].map((step, index) => (
+                    <div
+                      key={index}
+                      className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition flex items-start space-x-4"
+                    >
+                      <div className="w-10 h-10 shrink-0 gradient-green text-white rounded-full flex items-center justify-center font-bold shadow-lg">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-1">{step.title}</h4>
+                        <p className="text-gray-600 text-sm">{step.description}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-1">{step.title}</h4>
-                      <p className="text-gray-600 text-sm">{step.description}</p>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                  : activeTab === 'reseller'
+                    ? [
+                      {
+                        title: 'Daftar sebagai Reseller',
+                        description: 'Registrasi mudah dengan email dan nomor telepon.',
+                      },
+                      {
+                        title: 'Pilih Produk',
+                        description: 'Cari produk yang ingin Anda jual di marketplace dari dashboard Anda.',
+                      },
+                      {
+                        title: 'Tentukan Margin Keuntungan',
+                        description: 'Atur harga jual Anda sendiri ke konsumen akhir.',
+                      },
+                      {
+                        title: 'Proses Pesanan Otomatis',
+                        description: 'Kami urus pengiriman, Anda fokus mencari pembeli.',
+                      },
+                    ].map((step, index) => (
+                      <div
+                        key={index}
+                        className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition flex items-start space-x-4"
+                      >
+                        <div className="w-10 h-10 shrink-0 gradient-green text-white rounded-full flex items-center justify-center font-bold shadow-lg">
+                          {index + 1}
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-1">{step.title}</h4>
+                          <p className="text-gray-600 text-sm">{step.description}</p>
+                        </div>
+                      </div>
+                    ))
+                    : [
+                      {
+                        title: 'Daftar sebagai Promotor',
+                        description: 'Mulai tanpa modal, cukup berbagi link.',
+                      },
+                      {
+                        title: 'Dapatkan Link Link Affiliate',
+                        description: 'Pilih produk dan generate link promosi Anda sendiri.',
+                      },
+                      {
+                        title: 'Sebarkan di Media Sosial',
+                        description: 'Bagikan ke WhatsApp, Instagram, TikTok, dll.',
+                      },
+                      {
+                        title: 'Terima Komisi',
+                        description: 'Cairkan pendapatan Anda dari setiap transaksi yang sukses.',
+                      },
+                    ].map((step, index) => (
+                      <div
+                        key={index}
+                        className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition flex items-start space-x-4"
+                      >
+                        <div className="w-10 h-10 shrink-0 gradient-green text-white rounded-full flex items-center justify-center font-bold shadow-lg">
+                          {index + 1}
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-1">{step.title}</h4>
+                          <p className="text-gray-600 text-sm">{step.description}</p>
+                        </div>
+                      </div>
+                    ))}
             </div>
           </div>
         </div>

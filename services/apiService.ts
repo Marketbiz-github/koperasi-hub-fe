@@ -39,6 +39,13 @@ export async function apiRequest(endpoint: string, options: ApiOptions = {}) {
     try {
         if (contentType && contentType.includes('application/json')) {
             responseData = await response.json()
+        } else if (contentType && contentType.includes('text/html')) {
+            // When API is down (Koyeb free tier sleeping or error), it often returns HTML
+            await response.text(); // Consume the body
+            responseData = { 
+                message: 'Layanan sedang tidak tersedia atau dalam mode hemat daya. Silakan coba lagi dalam beberapa saat.',
+                is_html: true 
+            }
         } else {
             const rawText = await response.text()
             responseData = { message: rawText }
@@ -297,6 +304,32 @@ export const productService = {
         const endpoint = `/products${queryString ? `?${queryString}` : ''}`;
 
         return apiRequest(endpoint, { token });
+    },
+
+    async searchProducts(params: { 
+        slug?: string, 
+        name?: string, 
+        category_id?: string | number, 
+        general_category_id?: string | number, 
+        store_id?: string | number,
+        target_customer?: string,
+        status?: string,
+        page?: number,
+        limit?: number
+    }, token?: string) {
+        const { page, limit, ...body } = params;
+        let query = new URLSearchParams();
+        if (page) query.append('page', page.toString());
+        if (limit) query.append('limit', limit.toString());
+
+        const queryString = query.toString();
+        const endpoint = `/products/search${queryString ? `?${queryString}` : ''}`;
+
+        return apiRequest(endpoint, {
+            method: 'POST',
+            body,
+            token,
+        });
     },
 
     async getProductDetail(id: string | number, token?: string) {

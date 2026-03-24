@@ -12,13 +12,6 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { ShoppingCart, Star, Loader2, Search, Package, ChevronLeft, ChevronRight } from "lucide-react"
 import { useCartStore } from "@/store/cartStore"
@@ -27,6 +20,7 @@ import { getAccessToken } from "@/utils/auth"
 import { toast } from "sonner"
 import { getSafeImageSrc } from "@/utils/image"
 import { useAuthStore } from "@/store/authStore"
+import { SearchableSelect } from "@/components/ui/searchable-select"
 
 import { useRouter } from "next/navigation"
 
@@ -241,14 +235,19 @@ export default function MarketplaceResellerPage() {
       }
 
       if (selectedVendor !== "all") {
-        params.store_id = selectedVendor
+        params.store_id = Number(selectedVendor)
       }
 
       if (searchQuery) {
         params.name = searchQuery
       }
 
-      const res = await productService.getProducts(params, token || undefined)
+      const hasFilters = searchQuery !== "" || selectedVendor !== "all";
+
+      const res = hasFilters 
+        ? await productService.searchProducts(params, token || undefined)
+        : await productService.getProducts(params, token || undefined)
+
       if (res.data) {
         setProducts(res.data.data || [])
         setTotalPages(Math.ceil((res.data.meta?.total || 0) / limit))
@@ -324,22 +323,16 @@ export default function MarketplaceResellerPage() {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Toko</label>
-                <Select value={selectedVendor} onValueChange={(val) => {
-                  setSelectedVendor(val)
-                  setCurrentPage(1)
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Semua Toko" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Semua Toko</SelectItem>
-                    {vendors.map((vendor) => (
-                      <SelectItem key={vendor.id} value={vendor.id.toString()}>
-                        {vendor.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <SearchableSelect
+                  options={[{ id: 'all', name: 'Semua Toko' }, ...vendors]}
+                  value={selectedVendor}
+                  onValueChange={(val) => {
+                    setSelectedVendor(val)
+                    setCurrentPage(1)
+                  }}
+                  placeholder="Pilih Toko"
+                  searchPlaceholder="Cari toko..."
+                />
               </div>
 
               {selectedVendorData && (

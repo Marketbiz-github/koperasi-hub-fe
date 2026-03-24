@@ -199,7 +199,7 @@ export default function LoginPage() {
                 </Link>
               </div>
               <Link
-                href="/register/promotor"
+                href="/marketplace"
                 className="w-full py-2.5 px-4 rounded-xl border border-slate-200 text-emerald-600 font-bold text-xs hover:bg-emerald-50 hover:border-emerald-200 transition-all text-center"
               >
                 Daftar Sebagai Promotor

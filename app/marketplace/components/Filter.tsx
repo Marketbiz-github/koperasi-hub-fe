@@ -3,18 +3,12 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   ListFilter,
   Store,
-  MapPin,
-  PackageCheck,
   SlidersHorizontal,
-  ArrowUpDown,
-  ShoppingCart,
-  BadgeCheck,
-  ChevronDown,
-  ChevronRight,
   Loader2
 } from 'lucide-react';
 import { productService, storeService, productCategoryService } from '@/services/apiService';
 import { getPublicAccessToken } from '@/utils/auth';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 
 type FilterKey =
   | 'kategori'
@@ -33,16 +27,6 @@ interface FilterProps {
 }
 
 export default function Filter({ selectedCategory, setSelectedCategory, selectedVendor, setSelectedVendor }: FilterProps) {
-  const [openFilters, setOpenFilters] = useState<Record<FilterKey, boolean>>({
-    kategori: true,
-    vendor: true,
-    lokasi: false,
-    ketersediaanStok: false,
-    urutan: false,
-    pilihan: false,
-    sertifikasi: false
-  });
-
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
   const [vendors, setVendors] = useState<{ id: number; name: string }[]>([]);
   const [isLoadingCats, setIsLoadingCats] = useState(true);
@@ -83,10 +67,6 @@ export default function Filter({ selectedCategory, setSelectedCategory, selected
     fetchFilterData();
   }, [fetchFilterData]);
 
-  const toggleFilter = (filterName: FilterKey) => {
-    setOpenFilters(prev => ({ ...prev, [filterName]: !prev[filterName] }));
-  };
-
   return (
     <aside className="lg:w-64 shrink-0">
       <div className="bg-white rounded-xl shadow-md p-6 sticky top-24">
@@ -108,23 +88,13 @@ export default function Filter({ selectedCategory, setSelectedCategory, selected
                 <span className="text-xs">Memuat kategori...</span>
               </div>
             ) : (
-              <select
+              <SearchableSelect
+                options={[{ id: 'all', name: 'Semua Kategori' }, ...categories]}
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none transition appearance-none"
-              >
-                <option value="all">Semua Kategori</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id.toString()}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            )}
-            {!isLoadingCats && (
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                <ChevronDown className="w-4 h-4" />
-              </div>
+                onValueChange={setSelectedCategory}
+                placeholder="Pilih Kategori"
+                searchPlaceholder="Cari kategori..."
+              />
             )}
           </div>
         </div>
@@ -142,32 +112,14 @@ export default function Filter({ selectedCategory, setSelectedCategory, selected
                 <span className="text-xs">Memuat toko...</span>
               </div>
             ) : (
-              <select
+              <SearchableSelect
+                options={[{ id: 'all', name: 'Semua Toko' }, ...vendors]}
                 value={selectedVendor}
-                onChange={(e) => setSelectedVendor(e.target.value)}
-                className="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none transition appearance-none"
-              >
-                <option value="all">Semua Toko</option>
-                {vendors.map((toko) => (
-                  <option key={toko.id} value={toko.id.toString()}>
-                    {toko.name}
-                  </option>
-                ))}
-              </select>
+                onValueChange={setSelectedVendor}
+                placeholder="Pilih Toko"
+                searchPlaceholder="Cari toko..."
+              />
             )}
-            {!isLoadingVendors && (
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                <ChevronDown className="w-4 h-4" />
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Lokasi (Disabled for now as endpoint limited) */}
-        <div className="mb-6 opacity-50 cursor-not-allowed">
-          <div className="flex items-center justify-between w-full text-left font-semibold text-gray-400 mb-3">
-            <span className="flex items-center gap-2"><MapPin className="w-4 h-4" />Lokasi</span>
-            <ChevronRight className="w-4 h-4" />
           </div>
         </div>
 

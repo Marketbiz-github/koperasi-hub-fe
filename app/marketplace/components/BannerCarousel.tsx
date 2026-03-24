@@ -6,19 +6,19 @@ import Image from 'next/image';
 export default function BannerCarousel() {
   const slides = [
     {
-      title: 'Bangun Kerjasama dengan Vendor Ternama',
-      subtitle: 'Temukan vendor yang sesuai kebutuhan koperasi Anda',
-      image: '/images/banners/suka1.webp',
+      title: 'Belanja Kebutuhan Lebih Cepat',
+      subtitle: 'Temukan produk unggulan berkualitas dengan penawaran terbaik khusus untuk Anda.',
+      image: 'https://images.unsplash.com/photo-1561715276-a2d087060f1d?auto=format&fit=crop&w=1200&q=80',
     },
     {
-      title: 'Penawaran Eksklusif untuk Koperasi',
-      subtitle: 'Nikmati harga dan benefit khusus untuk anggota',
-      image: '/images/banners/suka2.webp',
+      title: 'Dukung Pertumbuhan Ekonomi Lokal',
+      subtitle: 'Setiap transaksi Anda ikut memajukan koperasi dan membantu UMKM Indonesia berkembang.',
+      image: 'https://images.unsplash.com/photo-1514792368985-f80e9d482a02?auto=format&fit=crop&w=1200&q=80',
     },
     {
-      title: 'Integrasi Mudah dan Cepat',
-      subtitle: 'Atur pesanan dan komunikasi langsung dengan vendor',
-      image: '/images/banners/suka3.webp',
+      title: 'Praktis, Cepat, dan Aman',
+      subtitle: 'Pesan dari rumah, pantau pengiriman, dan nikmati beragam metode pembayaran yang terjamin.',
+      image: 'https://images.unsplash.com/photo-1621558272312-0877bf5241d7?auto=format&fit=crop&w=1200&q=80',
     },
   ];
 
@@ -52,7 +52,7 @@ export default function BannerCarousel() {
               />
 
               {/* Overlay */}
-              <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" />
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-[1px]" />
 
               {/* Content */}
               <div className="relative z-10 h-full flex items-center justify-center text-center px-6">
@@ -60,7 +60,7 @@ export default function BannerCarousel() {
                   <h2 className="text-xl sm:text-2xl md:text-4xl font-bold text-white mb-2">
                     {slide.title}
                   </h2>
-                  <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-2xl mx-auto">
+                  <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-3xl mx-auto">
                     {slide.subtitle}
                   </p>
                 </div>
