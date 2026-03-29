@@ -61,7 +61,7 @@ export default function Navbar() {
               className="flex items-center space-x-2 text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition"
             >
               <i className="fas fa-store"></i>
-              <span>Marketplace Koperasi</span>
+              <span>Marketplace</span>
             </Link>
 
             <div className="relative">
@@ -137,8 +137,8 @@ export default function Navbar() {
       {/* Mobile Menu */}
       <div
         className={`md:hidden transition-all duration-300 ease-in-out ${mobileMenuOpen
-            ? 'opacity-100 translate-y-0 pointer-events-auto'
-            : 'opacity-0 -translate-y-4 pointer-events-none'
+          ? 'opacity-100 translate-y-0 pointer-events-auto'
+          : 'opacity-0 -translate-y-4 pointer-events-none'
           } absolute top-20 left-4 right-4 z-50`}
       >
         <div className="bg-white border border-green-100 shadow-2xl rounded-2xl overflow-hidden">
@@ -149,7 +149,7 @@ export default function Navbar() {
               className="flex items-center space-x-3 text-gray-700 hover:text-green-600 px-4 py-4 text-sm font-semibold rounded-xl hover:bg-green-50 transition"
             >
               <i className="fas fa-store text-green-600"></i>
-              <span>Marketplace Koperasi</span>
+              <span>Marketplace</span>
             </Link>
 
             <div className="border-t border-gray-50 my-1"></div>

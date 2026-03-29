@@ -50,7 +50,7 @@ export default function Header() {
       {/* Top bar: subtitle left, desktop nav right */}
       <div className=" text-white max-w-7xl mx-auto">
         <div className="container mx-auto px-4 py-2 flex items-center justify-between">
-          <p className="text-[10px] md:text-xs text-gray-300">Marketplace Koperasi - Distribusi koperasi Indonesia</p>
+          <p className="text-[10px] md:text-xs text-gray-300">Marketplace - Distribusi koperasi Indonesia</p>
 
           {/* Desktop nav (inline, right) */}
           <nav className="hidden md:flex items-center space-x-6">
@@ -61,7 +61,7 @@ export default function Header() {
           </nav>
 
           {/* Mobile menu button */}
-          <button 
+          <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden text-white p-2 hover:bg-white/10 rounded-lg transition"
           >
@@ -147,10 +147,9 @@ export default function Header() {
       </div>
 
       {/* Mobile Menu Content */}
-      <div 
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out bg-[#2F5755] border-t border-white/10 ${
-          mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
-        }`}
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out bg-[#2F5755] border-t border-white/10 ${mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
+          }`}
       >
         <div className="container mx-auto px-4 py-6 space-y-6">
           {/* Mobile Search */}
@@ -208,4 +207,4 @@ export default function Header() {
       </div>
     </header>
   );
-}
+}
