@@ -816,14 +816,27 @@ export const affiliatorService = {
         return apiRequest(endpoint, { token });
     },
 
-    async trackClick(shareCode: string, parentShareCode?: string) {
+    async trackClick(shareCode: string, parentShareCode?: string, source?: string) {
         let endpoint = '/campaigns/track-click';
         if (parentShareCode) {
             endpoint += `?sh=${parentShareCode}`;
         }
         return apiRequest(endpoint, {
             method: 'POST',
-            body: { share_code: shareCode },
+            body: { 
+                share_code: shareCode,
+                source: source
+            },
+        });
+    },
+
+    async trackShare(shareCode: string, source?: string) {
+        return apiRequest('/campaigns/track-share', {
+            method: 'POST',
+            body: { 
+                share_code: shareCode,
+                source: source
+            },
         });
     },
 

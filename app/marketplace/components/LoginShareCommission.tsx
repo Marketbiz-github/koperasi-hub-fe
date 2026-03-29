@@ -126,8 +126,10 @@ export default function LoginShareCommission({
 
       const baseAppDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || window.location.host.split('.').slice(-2).join('.');
       const shareUrl = finalDomain
-        ? `https://${finalDomain}/produk/${finalSlug}?sh=${shareRes.data.share_code}`
-        : `https://${finalSubdomain}.${baseAppDomain}/produk/${finalSlug}?sh=${shareRes.data.share_code}`;
+        ? `https://${finalDomain}/produk/${finalSlug}?sh=${shareRes.data.share_code}&source=copy`
+        : `https://${finalSubdomain}.${baseAppDomain}/produk/${finalSlug}?sh=${shareRes.data.share_code}&source=copy`;
+
+      await affiliatorService.trackShare(shareRes.data.share_code, 'copy');
 
       toast.success('Berhasil login sebagai Promotor!')
       if (onLoginSuccess) {

@@ -7,13 +7,14 @@ import { affiliatorService } from '@/services/apiService'
 function TrackerContent() {
     const searchParams = useSearchParams()
     const sh = searchParams.get('sh')
+    const source = searchParams.get('source')
 
     useEffect(() => {
         const trackAffiliate = async () => {
             if (sh) {
                 try {
                     // Call API to track the click
-                    await affiliatorService.trackClick(sh);
+                    await affiliatorService.trackClick(sh, undefined, source || undefined);
                     
                     // Save to local storage for future reference (reshare/sale)
                     localStorage.setItem('last_share_code', sh);
