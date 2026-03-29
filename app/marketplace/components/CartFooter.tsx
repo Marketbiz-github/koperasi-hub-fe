@@ -51,7 +51,7 @@ export default function CartFooter() {
                     <div className="flex items-center gap-4">
                         <div className="relative w-32 h-8 grayscale opacity-50">
                             <Image
-                                src="/images/koperasihub-dark.png"
+                                src="/images/koperasihub-dark2.png"
                                 alt="KoperasiHub"
                                 fill
                                 className="object-contain"

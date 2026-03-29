@@ -76,7 +76,7 @@ export default function Header() {
               <Link href="/" className="">
                 <div className="relative w-32 md:w-48 h-10 md:h-14">
                   <Image
-                    src="/images/koperasihub-dark.png"
+                    src="/images/koperasihub-dark2.png"
                     alt="KoperasiHub Logo"
                     fill
                     className="object-contain"

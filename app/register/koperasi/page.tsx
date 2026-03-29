@@ -220,7 +220,7 @@ function RegisterKoperasiContent() {
                     <Link href="/" className="transition-transform hover:scale-105">
                         <div className="relative w-48 h-16">
                             <Image
-                                src="/images/koperasihub.png"
+                                src="/images/koperasihub2.png"
                                 alt="KoperasiHub Logo"
                                 fill
                                 className="object-contain"

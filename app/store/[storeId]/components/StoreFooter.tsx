@@ -92,7 +92,7 @@ export default function StoreFooter({ store }: StoreFooterProps) {
                     <div className="flex items-center gap-2">
                         <span className="text-[10px] font-bold text-slate-400">Powered by</span>
                         <div className="relative w-20 h-5">
-                            <Image src="/images/koperasihub-dark.png" alt="KoperasiHub" fill className="object-contain" />
+                            <Image src="/images/koperasihub-dark2.png" alt="KoperasiHub" fill className="object-contain" />
                         </div>
                     </div>
                 </div>

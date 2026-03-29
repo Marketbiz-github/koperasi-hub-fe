@@ -37,7 +37,7 @@ export default function Navbar() {
             <Link href="/" className="">
               <div className="relative w-36 md:w-48 h-12 md:h-16">
                 <Image
-                  src="/images/koperasihub.png"
+                  src="/images/koperasihub2.png"
                   alt="KoperasiHub Logo"
                   fill
                   className="object-contain"

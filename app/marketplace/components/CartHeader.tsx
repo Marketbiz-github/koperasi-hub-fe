@@ -12,7 +12,7 @@ export default function CartHeader() {
                     <Link href="/marketplace">
                         <div className="relative w-32 md:w-40 h-10">
                             <Image
-                                src="/images/koperasihub-dark.png"
+                                src="/images/koperasihub-dark2.png"
                                 alt="KoperasiHub Logo"
                                 fill
                                 className="object-contain"
