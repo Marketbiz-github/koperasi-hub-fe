@@ -4208,6 +4208,127 @@
               "body": "{\n    \"meta\": {\n        \"message\": \"Affiliation approved\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": null\n}"
             }
           ]
+        },
+        {
+          "name": "Check Affiliation Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzQ3OTE2NDUsInVzZXJfaWQiOjE1fQ.SWMkGAfCSGmJCNi-7wKfaAsaP0s6IPANkHb_Fqa7Exg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/check-affiliation?parent_id=11&child_id=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "check-affiliation"
+              ],
+              "query": [
+                {
+                  "key": "parent_id",
+                  "value": "11"
+                },
+                {
+                  "key": "child_id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Check Affiliation Status",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/users/check-affiliation?parent_id=11&child_id=1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "check-affiliation"
+                  ],
+                  "query": [
+                    {
+                      "key": "parent_id",
+                      "value": "11"
+                    },
+                    {
+                      "key": "child_id",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Sat, 28 Mar 2026 13:40:57 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "108"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Affiliation check success\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"is_affiliated\": true\n    }\n}"
+            }
+          ]
         }
       ],
       "description": "Menejemen jaringan afiliasi\n\n**Affiliation Types** :\n\n- **koperasi_vendor** : Koperasi affiliated with a Vendor.\n    \n- **reseller_koperasi** : Reseller affiliated with a Koperasi\n    \n- **affiliator_koperasi** : Affiliator affiliated with a Koperasi\n    \n- **affiliator_vendor** : Affiliator affiliated with a Vendor\n    \n- **affiliator_reseller** : Affiliator affiliated with a Reseller.\n    \n\n**Response Codes** : \\`200\\`, \\`400\\`, \\`403\\`  \n  \n**NOTE :**  \nSelain affiliasi affiliator , semua request affiliasi membutuhkan approval"
@@ -8004,7 +8125,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Iphone\",\n  \"page\": 1,\n  \"limit\": 10\n}",
+              "raw": "{\n  \"name\": \"Iphone\",\n  \"target_customer\": \"customer\",\n  \"page\": 1,\n  \"limit\": 10\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -13778,7 +13899,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"share_code\": \"11-e0f5fb03\"\n}",
+                  "raw": "{\n    \"share_code\": \"11-e0f5fb03\",\n    \"source\": \"facebook\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -14002,6 +14123,115 @@
               ]
             },
             {
+              "name": "Track Share (Public)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"share_code\": \"15-cf3019c3\",\n  \"source\": \"whatsapp\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/campaigns/track-share",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "campaigns",
+                    "track-share"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Track Share (Public)",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"share_code\": \"15-cf3019c3\",\n  \"source\": \"whatsapp\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/campaigns/track-share",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "campaigns",
+                        "track-share"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "Access-Control-Allow-Headers",
+                      "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Methods",
+                      "value": "POST, GET, OPTIONS, PUT, DELETE"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Origin",
+                      "value": "*"
+                    },
+                    {
+                      "key": "Content-Security-Policy",
+                      "value": "default-src 'self'"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Referrer-Policy",
+                      "value": "strict-origin-when-cross-origin"
+                    },
+                    {
+                      "key": "Strict-Transport-Security",
+                      "value": "max-age=31536000; includeSubDomains"
+                    },
+                    {
+                      "key": "X-Content-Type-Options",
+                      "value": "nosniff"
+                    },
+                    {
+                      "key": "X-Frame-Options",
+                      "value": "DENY"
+                    },
+                    {
+                      "key": "X-Xss-Protection",
+                      "value": "1; mode=block"
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Sat, 28 Mar 2026 13:26:19 GMT"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "92"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"meta\": {\n        \"message\": \"Share recorded successfully\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": null\n}"
+                }
+              ]
+            },
+            {
               "name": "Get Affiliator Stats",
               "protocolProfileBehavior": {
                 "disableBodyPruning": true
@@ -14155,6 +14385,114 @@
                 "description": "Get by Auth\n\nadd ?user_id=12 if you are SUPER ADMIN role"
               },
               "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Dashboard Summary",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzQ3OTMwMzEsInVzZXJfaWQiOjF9.mdDnrvh6nZqky71tWwQo5tjuoTAqwpl7Mb1QkGLv2P4",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/stores/1/dashboard-summary",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "stores",
+                "1",
+                "dashboard-summary"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Dashboard Summary",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/stores/1/dashboard-summary",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "stores",
+                    "1",
+                    "dashboard-summary"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Sat, 28 Mar 2026 14:03:59 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "509"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Dashboard summary retrieved\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"total_sales_today\": 0,\n        \"total_sales_yesterday\": 0,\n        \"total_sales_this_week\": 0,\n        \"total_sales_last_week\": 0,\n        \"total_sales_this_month\": 0,\n        \"total_sales_last_month\": 1260000,\n        \"total_orders_today\": 0,\n        \"total_orders_yesterday\": 0,\n        \"total_orders_this_week\": 0,\n        \"total_orders_last_week\": 0,\n        \"total_orders_this_month\": 0,\n        \"total_orders_last_month\": 6,\n        \"total_products\": 0,\n        \"top_products\": [\n            {\n                \"product_id\": 1,\n                \"product_name\": \"iPhone 13 Pro\",\n                \"total_sold\": 24\n            }\n        ]\n    }\n}"
             }
           ]
         }

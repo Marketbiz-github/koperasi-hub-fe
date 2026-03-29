@@ -12,7 +12,6 @@ export default function Navbar() {
   const { user, isHydrated, hydrate } = useAuthStore();
 
   useEffect(() => {
-    console.log('Navbar Auth Check:', { isHydrated, user });
     if (!isHydrated) {
       hydrate();
     }
@@ -136,12 +135,11 @@ export default function Navbar() {
         </div>
       </div>
       {/* Mobile Menu */}
-      <div 
-        className={`md:hidden transition-all duration-300 ease-in-out ${
-          mobileMenuOpen 
-            ? 'opacity-100 translate-y-0 pointer-events-auto' 
+      <div
+        className={`md:hidden transition-all duration-300 ease-in-out ${mobileMenuOpen
+            ? 'opacity-100 translate-y-0 pointer-events-auto'
             : 'opacity-0 -translate-y-4 pointer-events-none'
-        } absolute top-20 left-4 right-4 z-50`}
+          } absolute top-20 left-4 right-4 z-50`}
       >
         <div className="bg-white border border-green-100 shadow-2xl rounded-2xl overflow-hidden">
           <div className="px-4 pt-2 pb-6 space-y-2">
@@ -159,9 +157,8 @@ export default function Navbar() {
             <div>
               <button
                 onClick={() => setIsDaftarOpen(!isDaftarOpen)}
-                className={`flex items-center justify-between w-full px-4 py-4 text-sm font-semibold rounded-xl transition ${
-                  isDaftarOpen ? 'bg-green-50 text-green-700' : 'text-gray-700 hover:bg-green-50'
-                }`}
+                className={`flex items-center justify-between w-full px-4 py-4 text-sm font-semibold rounded-xl transition ${isDaftarOpen ? 'bg-green-50 text-green-700' : 'text-gray-700 hover:bg-green-50'
+                  }`}
               >
                 <div className="flex items-center space-x-3">
                   <i className="fas fa-user-plus text-green-600"></i>

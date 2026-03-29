@@ -5,12 +5,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Star, Heart, Share2, ShoppingCart, ArrowLeft, Loader2, Minus, Plus } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
-import { productService, storeService, productVariantService, inventoryService } from '@/services/apiService';
+import { productService, storeService, productVariantService, inventoryService, affiliationService, affiliatorService, userService } from '@/services/apiService';
 import { getPublicAccessToken } from '@/utils/auth';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import StoreHeader from '../../components/StoreHeader';
 import StoreFooter from '../../components/StoreFooter';
+import LoginShareCommission from '@/app/marketplace/components/LoginShareCommission';
 
 type PageProps = {
     params: Promise<{
@@ -30,6 +31,13 @@ export default function StoreProductDetailPage({ params }: PageProps) {
     const [totalStock, setTotalStock] = React.useState<number | null>(null);
     const [selectedImage, setSelectedImage] = React.useState<string>("");
     const [quantity, setQuantity] = React.useState(1);
+    const [isSharing, setIsSharing] = React.useState(false);
+    const [showShareModal, setShowShareModal] = React.useState(false);
+
+    const handleShareSuccess = (shareUrl: string) => {
+        navigator.clipboard.writeText(shareUrl);
+        toast.success('Link share telah disalin ke clipboard');
+    };
 
     const fetchData = React.useCallback(async () => {
         setIsLoading(true);
@@ -111,6 +119,61 @@ export default function StoreProductDetailPage({ params }: PageProps) {
             variantName: selectedVariant?.option_values?.map((ov: any) => ov.value).join(' - ')
         });
         toast.success(`${product.name}${selectedVariant ? ` (${selectedVariant.option_values?.map((ov: any) => ov.value).join(' - ')})` : ''} ditambahkan ke keranjang`);
+    };
+
+    const handleShareClick = async () => {
+        const affiliateToken = localStorage.getItem('affiliate_token');
+        const affiliateUserStr = localStorage.getItem('affiliate_user');
+
+        if (!affiliateToken || !affiliateUserStr) {
+            setShowShareModal(true);
+            return;
+        }
+
+        setIsSharing(true);
+        try {
+            const affiliateUser = JSON.parse(affiliateUserStr);
+            let vendorId = store?.user_id;
+            let pType = 'affiliator_koperasi';
+
+            const role = store?.user?.role || store?.user?.roles?.[0]?.name;
+            if (role === 'koperasi') pType = 'affiliator_koperasi';
+            else if (role === 'reseller') pType = 'affiliator_reseller';
+
+            if (vendorId) {
+                const childId = affiliateUser.user_id || affiliateUser.user?.id || affiliateUser.id;
+                const affRes = await userService.checkAffiliation(affiliateToken, vendorId, childId);
+                if (affRes.data && !affRes.data.is_affiliated) {
+                    await affiliationService.create(affiliateToken, { parent_id: vendorId, type: pType });
+                }
+            }
+
+            const parentShareCode = localStorage.getItem('last_share_code') || undefined;
+            const shareRes = await affiliatorService.generateShareLink(product.id, affiliateToken, parentShareCode);
+
+            if (shareRes.data) {
+                localStorage.setItem('shared_product_id', shareRes.data.id.toString());
+                localStorage.setItem('share_code', shareRes.data.share_code);
+            }
+
+            // Generate final url
+            const finalSlug = product.slug || product.id.toString();
+            let finalSubdomain = store?.subdomain || 'www';
+            let finalDomain = store?.domain || '';
+
+            const baseAppDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || window.location.host.split('.').slice(-2).join('.');
+            const shareUrl = finalDomain
+                ? `https://${finalDomain}/produk/${finalSlug}?sh=${shareRes.data.share_code}`
+                : `https://${finalSubdomain}.${baseAppDomain}/produk/${finalSlug}?sh=${shareRes.data.share_code}`;
+
+            handleShareSuccess(shareUrl);
+        } catch (err) {
+            console.error(err);
+            toast.error('Gagal membuat link referal, silakan coba lagi');
+            setShowShareModal(true);
+        } finally {
+            setIsSharing(false);
+        }
     };
 
     if (isLoading) {
@@ -270,24 +333,17 @@ export default function StoreProductDetailPage({ params }: PageProps) {
                                 <div className="flex gap-4">
                                     <button
                                         onClick={handleAddToCart}
-                                        className="flex-1 bg-[var(--store-primary)] hover:opacity-90 text-white text-sm font-black py-4 rounded-2xl shadow-xl shadow-[var(--store-primary-soft)] transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
+                                        className="bg-[var(--store-primary)] hover:opacity-90 text-white text-sm font-black py-3 px-8 rounded-2xl shadow-xl shadow-[var(--store-primary-soft)] transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
                                     >
                                         <ShoppingCart size={22} />
                                         Tambah ke Keranjang
                                     </button>
                                     <button
-                                        onClick={() => {
-                                            if (navigator.share) {
-                                                navigator.share({
-                                                    title: product.name,
-                                                    text: product.description,
-                                                    url: window.location.href,
-                                                });
-                                            }
-                                        }}
-                                        className="w-16 h-16 rounded-2xl border-2 border-slate-100 text-slate-400 flex items-center justify-center hover:bg-slate-50 transition-colors active:scale-95"
+                                        onClick={handleShareClick}
+                                        disabled={isSharing}
+                                        className="w-16 h-16 rounded-2xl border-2 border-[var(--store-primary)] text-[var(--store-primary)] flex items-center justify-center hover:bg-[var(--store-primary-soft)] transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        <Share2 size={24} />
+                                        {isSharing ? <Loader2 size={24} className="animate-spin" /> : <Share2 size={24} />}
                                     </button>
                                 </div>
                             </div>
@@ -297,6 +353,16 @@ export default function StoreProductDetailPage({ params }: PageProps) {
             </main>
 
             <StoreFooter store={store} />
+
+            <LoginShareCommission
+                open={showShareModal}
+                onOpenChange={setShowShareModal}
+                productId={product?.id?.toString() || ''}
+                productSlug={product?.slug}
+                storeSubdomain={store?.subdomain}
+                storeDomain={store?.domain}
+                onLoginSuccess={handleShareSuccess}
+            />
         </div>
     );
 }

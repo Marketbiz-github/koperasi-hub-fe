@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Search, ShoppingCart, Menu, Store as StoreIcon } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useMounted } from '@/hooks/useMounted';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface StoreHeaderProps {
     store: any;
@@ -14,6 +15,14 @@ interface StoreHeaderProps {
 export default function StoreHeader({ store }: StoreHeaderProps) {
     const mounted = useMounted();
     const itemCount = useCartStore((s) => s.items.reduce((sum, i) => sum + i.quantity, 0));
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const [searchQuery, setSearchQuery] = React.useState(searchParams.get('search') || '');
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.push(`/produk?search=${encodeURIComponent(searchQuery)}`);
+    };
 
     return (
         <header className="sticky top-0 z-50 bg-white border-b border-slate-100 shadow-sm">
@@ -43,14 +52,18 @@ export default function StoreHeader({ store }: StoreHeaderProps) {
 
                     {/* Dynamic Search - Themed */}
                     <div className="hidden md:flex flex-1 max-w-md mx-8">
-                        <div className="relative w-full group">
+                        <form onSubmit={handleSearch} className="relative w-full group">
                             <input
                                 type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder={`Cari di ${store.name}...`}
                                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-[var(--store-primary,#10b981)] focus:bg-white transition-all text-sm font-medium"
                             />
-                            <Search className="absolute left-3 top-2.5 text-slate-400 w-4 h-4" />
-                        </div>
+                            <button type="submit" className="absolute left-3 top-2.5">
+                                <Search className="text-slate-400 w-4 h-4" />
+                            </button>
+                        </form>
                     </div>
 
                     {/* Actions */}

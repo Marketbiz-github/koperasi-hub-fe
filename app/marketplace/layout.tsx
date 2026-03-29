@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ReactNode } from "react";
 
 export const metadata: Metadata = {
-  title: "Marketplace Koperasi",
+  title: "Marketplace",
   description: "Marketplace produk koperasi terpercaya dari seluruh Indonesia.",
 };
 

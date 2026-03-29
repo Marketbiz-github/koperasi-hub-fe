@@ -112,7 +112,7 @@ export default function ProductCard({ product }: { product: Product }) {
           const { affiliatorService } = await import('@/services/apiService');
           const parentShareCode = localStorage.getItem('last_share_code') || undefined;
           const res = await affiliatorService.generateShareLink(product.id, token, parentShareCode);
-          
+
           if (res.data) {
             localStorage.setItem('shared_product_id', res.data.id.toString());
             localStorage.setItem('share_code', res.data.share_code);
@@ -190,7 +190,7 @@ export default function ProductCard({ product }: { product: Product }) {
           className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 text-sm shadow-sm hover:shadow-md"
         >
           {isValidating ? (
-            <><Loader2 className="w-4 h-4 animate-spin" /> Sedang memvalidasi...</>
+            <><Loader2 className="w-4 h-4 animate-spin" /> Memuat...</>
           ) : hasVariants ? (
             <span>Lihat Detail</span>
           ) : (

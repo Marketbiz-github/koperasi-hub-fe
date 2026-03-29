@@ -13,6 +13,13 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription
+} from "@/components/ui/dialog"
+import {
     ShoppingCart,
     ChevronLeft,
     Store,
@@ -23,7 +30,7 @@ import {
     AlertCircle
 } from "lucide-react"
 import { useCartStore } from "@/store/cartStore"
-import { productService, inventoryService, productVariantService, storeService, userService, debtService, orderService } from "@/services/apiService"
+import { productService, inventoryService, productVariantService, storeService, userService, debtService, orderService, affiliationService } from "@/services/apiService"
 import { getAccessToken } from "@/utils/auth"
 import { toast } from "sonner"
 import { useAuthStore } from "@/store/authStore"
@@ -76,6 +83,9 @@ export default function ProductDetailPage() {
     const [isAffiliated, setIsAffiliated] = useState(true) // Default true to prevent flash
     const [hasUnpaidPO, setHasUnpaidPO] = useState(false)
     const [validationMessage, setValidationMessage] = useState("")
+    const [affiliationStatus, setAffiliationStatus] = useState<string>("affiliated")
+    const [showAffiliateDialog, setShowAffiliateDialog] = useState(false)
+    const [isRequestingAffiliation, setIsRequestingAffiliation] = useState(false)
 
     const addItem = useCartStore((s) => s.addItem)
 
@@ -138,16 +148,31 @@ export default function ProductDetailPage() {
             // 2. Check Affiliation
             let affiliated = false
             if (parentId && currentUser?.id) {
-                const userRes = await userService.getUserDetail(token, currentUser.id)
-                const affiliations = userRes.data?.parent_affiliations || []
-                // Check if any affiliation points to the required parentId
-                affiliated = affiliations.some((a: any) => a.user?.id === parentId)
+                const affRes = await userService.checkAffiliation(token, parentId, currentUser.id)
+                affiliated = affRes.data?.is_affiliated === true;
             }
             setIsAffiliated(affiliated)
 
             if (!affiliated) {
-                setValidationMessage("Anda belum terafiliasi dengan vendor ini atau afiliasi belum disetujui.")
+                // Check if request already sent
+                if (parentId) {
+                   const childReqs = await affiliationService.getChild(token, { parent_id: parentId });
+                   const reqList = childReqs.data || [];
+                   const pendingReq = reqList.find((r:any) => r.status === 'pending');
+                   const rejectedReq = reqList.find((r:any) => r.status === 'rejected');
+                   if (pendingReq) {
+                       setValidationMessage("Status afiliasi Anda dengan vendor ini masih menunggu persetujuan.");
+                       setAffiliationStatus('pending');
+                   } else if (rejectedReq) {
+                       setValidationMessage("Pengajuan afiliasi Anda ke vendor ini telah ditolak.");
+                       setAffiliationStatus('rejected');
+                   } else {
+                       setValidationMessage("Anda belum terafiliasi dengan vendor ini. Silakan ajukan terlebih dahulu.");
+                       setAffiliationStatus('unaffiliated');
+                   }
+                }
             } else {
+                setAffiliationStatus('affiliated');
                 // 3. Check unpaid POs / Debts for this specific vendor (new system)
                 const poStatusRes = await debtService.checkPo(token, storeId)
                 const activePo = poStatusRes.data?.has_active_po
@@ -173,11 +198,37 @@ export default function ProductDetailPage() {
         }
     }, [product?.store?.id, validatePurchase])
 
+    const handleRequestAffiliation = async () => {
+        if (!product?.store?.id) return;
+        setIsRequestingAffiliation(true);
+        try {
+            const token = await getAccessToken();
+            const storeRes = await storeService.getDetail(token || '', product.store.id);
+            const parentId = storeRes.data?.user_id;
+
+            if (parentId) {
+                await affiliationService.create(token || '', { parent_id: parentId, type: 'koperasi_vendor' });
+                toast.success('Permintaan afiliasi berhasil dikirim!');
+                setShowAffiliateDialog(false);
+                setAffiliationStatus('pending');
+                setValidationMessage("Status afiliasi Anda dengan vendor ini masih menunggu persetujuan.");
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Gagal mengajukan afiliasi');
+        } finally {
+            setIsRequestingAffiliation(false);
+        }
+    };
+
     const handleAddToCart = () => {
         if (!product) return
 
         if (!isAffiliated || hasUnpaidPO) {
-            toast.error(validationMessage || "Anda tidak dapat membeli produk ini.")
+            if (affiliationStatus === 'unaffiliated') {
+                setShowAffiliateDialog(true);
+            } else {
+                toast.error(validationMessage || "Anda tidak dapat membeli produk ini.")
+            }
             return
         }
 
@@ -384,12 +435,18 @@ export default function ProductDetailPage() {
                                 >+</button>
                             </div>
                             <Button
-                                onClick={handleAddToCart}
-                                disabled={(totalStock !== null && totalStock === 0) || isValidating || !isAffiliated || hasUnpaidPO}
+                                onClick={
+                                    (!isAffiliated && affiliationStatus === 'unaffiliated') 
+                                        ? () => setShowAffiliateDialog(true) 
+                                        : handleAddToCart
+                                }
+                                disabled={(totalStock !== null && totalStock === 0) || isValidating || (affiliationStatus !== 'unaffiliated' ? (!isAffiliated || hasUnpaidPO) : false)}
                                 className="w-fit bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 text-lg gap-2 shadow-md shadow-emerald-100 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isValidating ? (
                                     <><Loader2 className="w-5 h-5 animate-spin" /> Sedang memvalidasi...</>
+                                ) : (!isAffiliated && affiliationStatus === 'unaffiliated') ? (
+                                    <>Ajukan Afiliasi</>
                                 ) : (
                                     <>
                                         <ShoppingCart size={20} />
@@ -414,6 +471,24 @@ export default function ProductDetailPage() {
                     </div>
                 </div>
             </div>
+
+            <Dialog open={showAffiliateDialog} onOpenChange={setShowAffiliateDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Ajukan Afiliasi ke Vendor</DialogTitle>
+                        <DialogDescription>
+                            Anda harus terafiliasi dengan vendor ini sebelum dapat membeli produk mereka. Apakah Anda ingin mengirimkan permintaan afiliasi?
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex justify-end gap-3 mt-4">
+                        <Button variant="outline" onClick={() => setShowAffiliateDialog(false)}>Batal</Button>
+                        <Button onClick={handleRequestAffiliation} disabled={isRequestingAffiliation} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                            {isRequestingAffiliation ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                            Ajukan Afiliasi
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

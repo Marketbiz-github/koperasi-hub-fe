@@ -211,7 +211,7 @@ export default function StorePage({
                 <p className="text-slate-500 font-medium italic">Temukan koleksi produk pilihan terbaik khusus untuk Anda.</p>
               </div>
               <Link
-                href={`/store/${storeId}/product`}
+                href={`/produk`}
                 className="text-[var(--store-primary,#10b981)] font-bold hover:underline flex items-center gap-2 group"
               >
                 Lihat Semua Produk

@@ -9,7 +9,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Eye, EyeOff, Loader2, MailCheck } from 'lucide-react'
 import { useState } from 'react'
-import { authService, affiliatorService } from '@/services/apiService'
+import { authService, affiliatorService, userService, productService, storeService, affiliationService } from '@/services/apiService'
 import { toast } from 'sonner'
 
 interface LoginShareCommissionProps {
@@ -55,7 +55,7 @@ export default function LoginShareCommission({
       const response = await authService.login(email, password)
       const { token, role } = response.data
 
-      if (role !== 'affiliate') {
+      if (role !== 'affiliator') {
         toast.error('Hanya akun Promotor (Affiliate) yang dapat membagikan link komisi ini.')
         setLoading(false)
         return
@@ -64,6 +64,36 @@ export default function LoginShareCommission({
       // Save to localStorage
       localStorage.setItem('affiliate_token', token)
       localStorage.setItem('affiliate_user', JSON.stringify(response.data))
+
+      // Auto check and request affiliation
+      try {
+        const prodRes = await productService.getProductDetail(productId, token);
+        let vendorId = null;
+        let pType = 'affiliator_koperasi';
+        if (prodRes.data) {
+          const sId = prodRes.data.store_id || prodRes.data.store?.id;
+          if (sId) {
+            const storeRes = await storeService.getDetail(token, sId);
+            vendorId = storeRes.data?.user_id;
+            const role = storeRes.data?.user?.role || storeRes.data?.user?.roles?.[0]?.name;
+            if (role === 'koperasi') {
+              pType = 'affiliator_koperasi';
+            } else if (role === 'reseller') {
+              pType = 'affiliator_reseller';
+            }
+          }
+        }
+
+        if (vendorId) {
+          const childId = response.data?.user_id || response.data?.user?.id || response.data?.id;
+          const affRes = await userService.checkAffiliation(token, vendorId, childId);
+          if (affRes.data && !affRes.data.is_affiliated) {
+            await affiliationService.create(token, { parent_id: vendorId, type: pType });
+          }
+        }
+      } catch (err) {
+        console.error('Failed to auto-request affiliation:', err);
+      }
 
       // Generate Share Link (with reshare logic)
       const parentShareCode = localStorage.getItem('last_share_code') || undefined;

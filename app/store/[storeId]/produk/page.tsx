@@ -8,6 +8,7 @@ import StoreHeader from '../components/StoreHeader';
 import StoreFooter from '../components/StoreFooter';
 import StoreProductCard from '../components/StoreProductCard';
 import StoreFilter from '../components/StoreFilter';
+import { useSearchParams } from 'next/navigation';
 
 type PageProps = {
     params: Promise<{
@@ -20,10 +21,18 @@ export default function StoreProductsListPage({ params }: PageProps) {
     const [store, setStore] = React.useState<any>(null);
     const [products, setProducts] = React.useState<any[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
+    const searchParams = useSearchParams();
 
     // States for filtering (Reusing Marketplace logic)
     const [selectedCategory, setSelectedCategory] = React.useState<string>('all');
-    const [searchQuery, setSearchQuery] = React.useState<string>('');
+    const [searchQuery, setSearchQuery] = React.useState<string>(searchParams.get('search') || '');
+
+    React.useEffect(() => {
+        const query = searchParams.get('search') || '';
+        if (query !== searchQuery) {
+            setSearchQuery(query);
+        }
+    }, [searchParams]);
 
     const fetchData = React.useCallback(async () => {
         setIsLoading(true);
@@ -47,7 +56,14 @@ export default function StoreProductsListPage({ params }: PageProps) {
                     prodParams.category_id = selectedCategory;
                 }
 
-                const prodRes = await productService.getProducts(prodParams, token || '');
+                if (searchQuery) {
+                    prodParams.name = searchQuery;
+                }
+
+                const hasFilters = searchQuery !== '';
+                const prodRes = hasFilters
+                    ? await productService.searchProducts(prodParams, token || '')
+                    : await productService.getProducts(prodParams, token || '');
                 setProducts(prodRes.data?.data || []);
             }
         } catch (err) {
@@ -55,7 +71,7 @@ export default function StoreProductsListPage({ params }: PageProps) {
         } finally {
             setIsLoading(false);
         }
-    }, [storeId, selectedCategory]);
+    }, [storeId, selectedCategory, searchQuery]);
 
     React.useEffect(() => {
         fetchData();
@@ -98,7 +114,9 @@ export default function StoreProductsListPage({ params }: PageProps) {
                         <div className="flex-1 px-4">
                             <div className="flex items-center justify-between mb-8">
                                 <div>
-                                    <h1 className="text-2xl font-black text-slate-900 mb-1">Semua Produk</h1>
+                                    <h1 className="text-2xl font-black text-slate-900 mb-1">
+                                        {searchQuery ? `Hasil Pencarian: "${searchQuery}"` : 'Semua Produk'}
+                                    </h1>
                                     <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">{products.length} Produk ditemukan</p>
                                 </div>
                             </div>

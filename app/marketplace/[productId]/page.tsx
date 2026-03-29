@@ -7,7 +7,7 @@ import { Star, Heart, Share2, ShoppingCart, ArrowLeft, Store as StoreIcon, Loade
 import { useCartStore } from '@/store/cartStore';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { productService, inventoryService, productVariantService } from '@/services/apiService';
+import { productService, inventoryService, productVariantService, userService, storeService, affiliationService, affiliatorService } from '@/services/apiService';
 import { getPublicAccessToken } from '@/utils/auth';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
@@ -59,7 +59,7 @@ export default function ProductDetailPage({ params }: PageProps) {
   const [selectedVariant, setSelectedVariant] = React.useState<any>(null);
   const [quantity, setQuantity] = React.useState(1);
   const [isWishlisted, setIsWishlisted] = React.useState(false);
-  const [isValidating, setIsValidating] = React.useState(false);
+  const [isSharing, setIsSharing] = React.useState(false);
   const [showShareModal, setShowShareModal] = React.useState(false);
 
   const handleShareSuccess = (shareUrl: string) => {
@@ -105,6 +105,78 @@ export default function ProductDetailPage({ params }: PageProps) {
   React.useEffect(() => {
     fetchProductDetail();
   }, [fetchProductDetail]);
+
+  const handleShareClick = async () => {
+    const affiliateToken = localStorage.getItem('affiliate_token');
+    const affiliateUserStr = localStorage.getItem('affiliate_user');
+
+    if (!affiliateToken || !affiliateUserStr) {
+      setShowShareModal(true);
+      return;
+    }
+
+    setIsSharing(true);
+    try {
+      const affiliateUser = JSON.parse(affiliateUserStr);
+      let vendorId = null;
+      let pType = 'affiliator_koperasi';
+
+      const storeId = product?.store?.id || (product as any)?.store_id;
+      if (storeId) {
+        const storeRes = await storeService.getDetail(affiliateToken, storeId);
+        vendorId = storeRes.data?.user_id;
+        const role = storeRes.data?.user?.role || storeRes.data?.user?.roles?.[0]?.name;
+        if (role === 'koperasi') pType = 'affiliator_koperasi';
+        else if (role === 'reseller') pType = 'affiliator_reseller';
+      }
+
+      if (vendorId) {
+        const childId = affiliateUser.user_id || affiliateUser.user?.id || affiliateUser.id;
+        const affRes = await userService.checkAffiliation(affiliateToken, vendorId, childId);
+        if (affRes.data && !affRes.data.is_affiliated) {
+          await affiliationService.create(affiliateToken, { parent_id: vendorId, type: pType });
+        }
+      }
+
+      const parentShareCode = localStorage.getItem('last_share_code') || undefined;
+      const shareRes = await affiliatorService.generateShareLink(productId, affiliateToken, parentShareCode);
+
+      if (shareRes.data) {
+        localStorage.setItem('shared_product_id', shareRes.data.id.toString());
+        localStorage.setItem('share_code', shareRes.data.share_code);
+      }
+
+      // Generate final url
+      const finalSlug = (product as any)?.slug || productId.toString();
+      let finalSubdomain = (product as any)?.store?.subdomain || 'www';
+      let finalDomain = (product as any)?.store?.domain || '';
+
+      if ((!finalSubdomain || finalSubdomain === 'www') && !finalDomain && storeId) {
+        try {
+          const sRes = await storeService.getDetail(affiliateToken, storeId);
+          if (sRes.data) {
+            if (sRes.data.subdomain) finalSubdomain = sRes.data.subdomain;
+            if (sRes.data.domain) finalDomain = sRes.data.domain;
+          }
+        } catch (e) { }
+      }
+
+      const baseAppDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || window.location.host.split('.').slice(-2).join('.');
+      const shareUrl = finalDomain
+        ? `https://${finalDomain}/produk/${finalSlug}?sh=${shareRes.data.share_code}`
+        : `https://${finalSubdomain}.${baseAppDomain}/produk/${finalSlug}?sh=${shareRes.data.share_code}`;
+
+      handleShareSuccess(shareUrl);
+
+    } catch (err) {
+      console.error(err);
+      toast.error('Gagal membuat link referal, silakan coba lagi');
+      // show modal as fallback
+      setShowShareModal(true);
+    } finally {
+      setIsSharing(false);
+    }
+  };
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -202,12 +274,13 @@ export default function ProductDetailPage({ params }: PageProps) {
                     {isWishlisted ? 'Tersimpan' : 'Simpan'}
                   </button>
                   <button
-                    onClick={() => setShowShareModal(true)}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg border border-gray-300 text-gray-600 hover:border-emerald-400 hover:text-emerald-600 transition font-medium"
+                    onClick={handleShareClick}
+                    disabled={isSharing}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg border border-gray-300 text-gray-600 hover:border-emerald-400 hover:text-emerald-600 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-label="Share"
                   >
-                    <Share2 size={20} />
-                    Bagikan
+                    {isSharing ? <Loader2 size={20} className="animate-spin" /> : <Share2 size={20} />}
+                    {isSharing ? '' : 'Bagikan'}
                   </button>
                 </div>
               </div>
@@ -379,9 +452,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                       className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 shadow-lg shadow-emerald-600/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ShoppingCart size={20} />
-                      {isValidating ? (
-                        "Sedang memvalidasi..."
-                      ) : totalStock !== null && totalStock === 0 ? (
+                      {totalStock !== null && totalStock === 0 ? (
                         'Stok Habis'
                       ) : (
                         'Tambah ke Keranjang'

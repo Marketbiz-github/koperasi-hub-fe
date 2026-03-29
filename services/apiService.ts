@@ -121,6 +121,12 @@ export const authService = {
 }
 
 export const userService = {
+    async checkAffiliation(token: string, parentId: string | number, childId: string | number) {
+        return apiRequest(`/users/check-affiliation?parent_id=${parentId}&child_id=${childId}`, {
+            token,
+        })
+    },
+
     async getUsers(token: string) {
         return apiRequest('/users', {
             token,
