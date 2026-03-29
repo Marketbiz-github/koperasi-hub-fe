@@ -63,9 +63,9 @@ export default function CartFooter() {
                     </div>
 
                     <div className="flex items-center gap-6 text-xs text-gray-500 font-medium">
-                        <a href="#" className="hover:text-emerald-600 transition-colors">Tentang Kami</a>
-                        <a href="#" className="hover:text-emerald-600 transition-colors">Syarat & Ketentuan</a>
-                        <a href="#" className="hover:text-emerald-600 transition-colors">Kebijakan Privasi</a>
+                        <a href="/tentang-kami" className="hover:text-emerald-600 transition-colors">Tentang Kami</a>
+                        <a href="/syarat-ketentuan" className="hover:text-emerald-600 transition-colors">Syarat & Ketentuan</a>
+                        <a href="/kebijakan-privasi" className="hover:text-emerald-600 transition-colors">Kebijakan Privasi</a>
                     </div>
                 </div>
             </div>

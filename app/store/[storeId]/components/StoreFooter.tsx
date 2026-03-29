@@ -60,7 +60,7 @@ export default function StoreFooter({ store }: StoreFooterProps) {
                         <div>
                             <h4 className="font-bold text-slate-900 mb-6 flex items-center gap-2">
                                 <Phone size={18} className="text-[var(--store-primary,#10b981)]" />
-                                Kontak Bantuan
+                                Kontak
                             </h4>
                             <div className="space-y-4">
                                 {store.phone ? (

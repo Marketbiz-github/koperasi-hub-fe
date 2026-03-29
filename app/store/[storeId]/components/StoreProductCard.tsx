@@ -79,12 +79,17 @@ export default function StoreProductCard({ product }: { product: Product }) {
         (product.variants && product.variants.length > 0);
 
     const productSlug = product.slug || product.id.toString();
-    const storeProductLink = `/store/${storeId}/produk/${productSlug}`;
+    const baseAppDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || (typeof window !== 'undefined' ? window.location.host.split('.').slice(-2).join('.') : 'koperasihub.com');
+    const targetSubdomain = subdomain || product.store?.subdomain || (product as any).store_subdomain || '';
+    
+    // Relative link for same-store navigation on subdomains
+    const storeProductLink = `/produk/${productSlug}`;
 
-    const baseAppDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || window.location.host.split('.').slice(-2).join('.');
     const internalProductLink = customDomain
         ? `https://${customDomain}/produk/${productSlug}`
-        : `https://${subdomain || 'www'}.${baseAppDomain}/produk/${productSlug}`;
+        : targetSubdomain 
+            ? `https://${targetSubdomain}.${baseAppDomain}/produk/${productSlug}`
+            : storeProductLink;
 
     const handleShareClick = async (e: React.MouseEvent) => {
         e.preventDefault();
@@ -181,7 +186,7 @@ export default function StoreProductCard({ product }: { product: Product }) {
 
     return (
         <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col h-full border border-slate-100">
-            <Link href={storeProductLink} className="flex-1">
+            <Link href={internalProductLink} className="flex-1">
                 <div className="relative cursor-pointer overflow-hidden aspect-square">
                     <Image
                         src={primaryImage}

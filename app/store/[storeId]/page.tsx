@@ -11,6 +11,8 @@ import { getPublicAccessToken } from '@/utils/auth';
 import StoreHeader from './components/StoreHeader';
 import StoreFooter from './components/StoreFooter';
 import StoreProductCard from './components/StoreProductCard';
+import InfiniteScrollTrigger from '@/components/ui/InfiniteScrollTrigger';
+import ScrollToTop from '@/components/ui/ScrollToTop';
 
 export default function StorePage({
   params,
@@ -21,9 +23,17 @@ export default function StorePage({
   const [store, setStore] = React.useState<any>(null);
   const [products, setProducts] = React.useState<any[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [isFetchingMore, setIsFetchingMore] = React.useState(false);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [totalPages, setTotalPages] = React.useState(1);
+  const limit = 12;
 
   const fetchData = React.useCallback(async () => {
-    setIsLoading(true);
+    if (currentPage === 1) {
+      setIsLoading(true);
+    } else {
+      setIsFetchingMore(true);
+    }
     try {
       const token = await getPublicAccessToken();
 
@@ -36,30 +46,32 @@ export default function StorePage({
 
         // Fetch Products for this store
         const prodRes = await productService.getProducts({
-          store_id: storeData.id,
-          limit: 12,
+          store_id: Number(storeData.id),
+          page: currentPage,
+          limit: limit,
           target_customer: 'customer'
         }, token || '');
-        setProducts(prodRes.data?.data || []);
+        
+        const fetchedProducts = prodRes.data?.data || (Array.isArray(prodRes.data) ? prodRes.data : []);
+        setProducts(prev => currentPage === 1 ? fetchedProducts : [...prev, ...fetchedProducts]);
+        setTotalPages(Math.ceil((prodRes.data.meta?.total || 0) / limit));
       }
     } catch (err) {
       console.error('Error fetching store data:', err);
     } finally {
       setIsLoading(false);
+      setIsFetchingMore(false);
     }
-  }, [storeId]);
+  }, [storeId, currentPage]);
 
   React.useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  if (isLoading) {
+  if (isLoading && !store) {
     return (
-      <div className="min-h-screen bg-white flex flex-col">
-        <div className="h-20 border-b border-slate-100 animate-pulse" />
-        <div className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
-        </div>
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-slate-200" />
       </div>
     );
   }
@@ -219,7 +231,12 @@ export default function StorePage({
               </Link>
             </div>
 
-            {products.length > 0 ? (
+            {isLoading && currentPage === 1 ? (
+              <div className="flex flex-col items-center justify-center py-24 gap-4">
+                <Loader2 className="w-10 h-10 animate-spin text-[var(--store-primary)]" />
+                <p className="text-slate-400 font-bold text-sm">Memuat katalog...</p>
+              </div>
+            ) : products.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                 {products.map((product) => (
                   <StoreProductCard key={product.id} product={product} />
@@ -237,23 +254,19 @@ export default function StorePage({
               </div>
             )}
 
-            {/* Premium Pagination */}
-            {products.length > 0 && (
-              <div className="flex items-center justify-center gap-3 mt-16">
-                <button className="w-12 h-12 rounded-2xl bg-[var(--store-primary,#10b981)] text-white font-extrabold shadow-lg shadow-[var(--store-primary-soft)] transition-transform active:scale-95">1</button>
-                <button className="w-12 h-12 rounded-2xl bg-white border border-slate-100 text-slate-400 font-bold hover:bg-slate-50 transition-colors hover:text-slate-900">2</button>
-                <button className="w-12 h-12 rounded-2xl bg-white border border-slate-100 text-slate-400 font-bold hover:bg-slate-50 transition-colors hover:text-slate-900">3</button>
-                <div className="w-12 h-12 flex items-center justify-center text-slate-300">...</div>
-                <button className="px-6 h-12 rounded-2xl bg-white border border-slate-100 text-slate-600 font-bold hover:bg-slate-50 transition-colors flex items-center gap-2">
-                  Lanjut →
-                </button>
-              </div>
-            )}
+             {/* Infinite Scroll Trigger */}
+            <InfiniteScrollTrigger
+              onIntersect={() => setCurrentPage((prev: number) => prev + 1)}
+              isLoading={isFetchingMore}
+              hasMore={currentPage < totalPages}
+              loadingText="Memuat lebih banyak produk..."
+            />
           </div>
         </div>
       </main>
 
       <StoreFooter store={store} />
+      <ScrollToTop />
     </div>
   );
 }

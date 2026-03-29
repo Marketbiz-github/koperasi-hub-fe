@@ -21,12 +21,15 @@ import { toast } from "sonner"
 import { getSafeImageSrc } from "@/utils/image"
 import { useAuthStore } from "@/store/authStore"
 import { SearchableSelect } from "@/components/ui/searchable-select"
+import InfiniteScrollTrigger from "@/components/ui/InfiniteScrollTrigger"
+import ScrollToTop from "@/components/ui/ScrollToTop"
 
 import { useRouter } from "next/navigation"
 
 interface Product {
   id: number
   name: string
+  slug: string
   sku: string
   price: string | number
   status: string
@@ -34,6 +37,11 @@ interface Product {
   product_category?: { name: string } | null
   product_variants?: any[] | null
   variants?: any[] | null
+  store?: {
+    id: number | string;
+    subdomain: string;
+    domain?: string | null;
+  };
 }
 
 interface Vendor {
@@ -199,6 +207,7 @@ export default function MarketplaceResellerPage() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [isFetchingMore, setIsFetchingMore] = useState(false)
   const limit = 12
 
   const cartItems = useCartStore((s) => s.items)
@@ -224,7 +233,11 @@ export default function MarketplaceResellerPage() {
   }, [])
 
   const fetchProducts = useCallback(async () => {
-    setIsLoading(true)
+    if (currentPage === 1) {
+      setIsLoading(true)
+    } else {
+      setIsFetchingMore(true)
+    }
     try {
       const token = await getAccessToken()
       const params: any = {
@@ -249,7 +262,8 @@ export default function MarketplaceResellerPage() {
         : await productService.getProducts(params, token || undefined)
 
       if (res.data) {
-        setProducts(res.data.data || [])
+        const fetchedProducts = res.data.data || (Array.isArray(res.data) ? res.data : [])
+        setProducts(prev => currentPage === 1 ? fetchedProducts : [...prev, ...fetchedProducts])
         setTotalPages(Math.ceil((res.data.meta?.total || 0) / limit))
       }
     } catch (error) {
@@ -257,6 +271,7 @@ export default function MarketplaceResellerPage() {
       toast.error('Gagal memuat produk')
     } finally {
       setIsLoading(false)
+      setIsFetchingMore(false)
     }
   }, [currentPage, selectedVendor, searchQuery])
 
@@ -371,49 +386,12 @@ export default function MarketplaceResellerPage() {
                 ))}
               </div>
 
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 pt-4">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(prev => prev - 1)}
-                  >
-                    <ChevronLeft size={18} />
-                  </Button>
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let pageNum = currentPage;
-                      if (currentPage <= 3) pageNum = i + 1;
-                      else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
-                      else pageNum = currentPage - 2 + i;
-
-                      if (pageNum <= 0 || pageNum > totalPages) return null;
-
-                      return (
-                        <Button
-                          key={pageNum}
-                          variant={currentPage === pageNum ? "default" : "outline"}
-                          size="sm"
-                          className={currentPage === pageNum ? "bg-emerald-600 hover:bg-emerald-700" : ""}
-                          onClick={() => setCurrentPage(pageNum)}
-                        >
-                          {pageNum}
-                        </Button>
-                      )
-                    })}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(prev => prev + 1)}
-                  >
-                    <ChevronRight size={18} />
-                  </Button>
-                </div>
-              )}
+              <InfiniteScrollTrigger
+                onIntersect={() => setCurrentPage(prev => prev + 1)}
+                isLoading={isFetchingMore}
+                hasMore={currentPage < totalPages}
+                loadingText="Memuat lebih banyak produk..."
+              />
             </div>
           ) : (
             <Card>
@@ -447,6 +425,7 @@ export default function MarketplaceResellerPage() {
           )}
         </div>
       </div>
+      <ScrollToTop />
     </div>
   )
 }

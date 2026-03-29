@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Loader2, Package, LayoutGrid, List } from 'lucide-react';
+import { Loader2, Package } from 'lucide-react';
 import { storeService, productService } from '@/services/apiService';
 import { getPublicAccessToken } from '@/utils/auth';
 import StoreHeader from '../components/StoreHeader';
@@ -9,6 +9,8 @@ import StoreFooter from '../components/StoreFooter';
 import StoreProductCard from '../components/StoreProductCard';
 import StoreFilter from '../components/StoreFilter';
 import { useSearchParams } from 'next/navigation';
+import InfiniteScrollTrigger from '@/components/ui/InfiniteScrollTrigger';
+import ScrollToTop from '@/components/ui/ScrollToTop';
 
 type PageProps = {
     params: Promise<{
@@ -21,6 +23,10 @@ export default function StoreProductsListPage({ params }: PageProps) {
     const [store, setStore] = React.useState<any>(null);
     const [products, setProducts] = React.useState<any[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
+    const [isFetchingMore, setIsFetchingMore] = React.useState(false);
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const [totalPages, setTotalPages] = React.useState(1);
+    const limit = 12;
     const searchParams = useSearchParams();
 
     // States for filtering (Reusing Marketplace logic)
@@ -31,11 +37,16 @@ export default function StoreProductsListPage({ params }: PageProps) {
         const query = searchParams.get('search') || '';
         if (query !== searchQuery) {
             setSearchQuery(query);
+            setCurrentPage(1);
         }
     }, [searchParams]);
 
     const fetchData = React.useCallback(async () => {
-        setIsLoading(true);
+        if (currentPage === 1) {
+            setIsLoading(true);
+        } else {
+            setIsFetchingMore(true);
+        }
         try {
             const token = await getPublicAccessToken();
 
@@ -46,32 +57,37 @@ export default function StoreProductsListPage({ params }: PageProps) {
 
                 // Fetch Products restricted to this store
                 const prodParams: any = {
-                    store_id: storeRes.data.id,
-                    limit: 20,
+                    store_id: Number(storeRes.data.id),
+                    page: currentPage,
+                    limit: limit,
                     target_customer: 'customer',
                     status: 'active'
                 };
 
                 if (selectedCategory !== 'all') {
-                    prodParams.category_id = selectedCategory;
+                    prodParams.category_id = Number(selectedCategory);
                 }
 
                 if (searchQuery) {
                     prodParams.name = searchQuery;
                 }
 
-                const hasFilters = searchQuery !== '';
+                const hasFilters = searchQuery !== '' || selectedCategory !== 'all';
                 const prodRes = hasFilters
                     ? await productService.searchProducts(prodParams, token || '')
                     : await productService.getProducts(prodParams, token || '');
-                setProducts(prodRes.data?.data || []);
+                
+                const fetchedProducts = prodRes.data?.data || (Array.isArray(prodRes.data) ? prodRes.data : []);
+                setProducts(prev => currentPage === 1 ? fetchedProducts : [...prev, ...fetchedProducts]);
+                setTotalPages(Math.ceil((prodRes.data.meta?.total || 0) / limit));
             }
         } catch (err) {
             console.error('Error fetching data:', err);
         } finally {
             setIsLoading(false);
+            setIsFetchingMore(false);
         }
-    }, [storeId, selectedCategory, searchQuery]);
+    }, [storeId, selectedCategory, searchQuery, currentPage]);
 
     React.useEffect(() => {
         fetchData();
@@ -105,7 +121,10 @@ export default function StoreProductsListPage({ params }: PageProps) {
                             <div className="sticky top-24">
                                 <StoreFilter
                                     selectedCategory={selectedCategory}
-                                    setSelectedCategory={setSelectedCategory}
+                                    setSelectedCategory={(cat) => {
+                                        setSelectedCategory(cat);
+                                        setCurrentPage(1);
+                                    }}
                                 />
                             </div>
                         </div>
@@ -121,17 +140,26 @@ export default function StoreProductsListPage({ params }: PageProps) {
                                 </div>
                             </div>
 
-                            {isLoading ? (
+                            {isLoading && currentPage === 1 ? (
                                 <div className="flex flex-col items-center justify-center py-24 gap-4">
                                     <Loader2 className="w-10 h-10 animate-spin text-[var(--store-primary)]" />
                                     <p className="text-slate-400 font-bold text-sm">Menyaring koleksi terbaik...</p>
                                 </div>
                             ) : products.length > 0 ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                                    {products.map((product) => (
-                                        <StoreProductCard key={product.id} product={product} />
-                                    ))}
-                                </div>
+                                <>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                                        {products.map((product) => (
+                                            <StoreProductCard key={product.id} product={product} />
+                                        ))}
+                                    </div>
+
+                                    <InfiniteScrollTrigger
+                                        onIntersect={() => setCurrentPage(prev => prev + 1)}
+                                        isLoading={isFetchingMore}
+                                        hasMore={currentPage < totalPages}
+                                        loadingText="Memuat lebih banyak produk..."
+                                    />
+                                </>
                             ) : (
                                 <div className="py-24 text-center bg-white rounded-[2rem] border-2 border-dashed border-slate-100 flex flex-col items-center">
                                     <div className="bg-slate-50 p-6 rounded-full mb-6">
@@ -149,6 +177,7 @@ export default function StoreProductsListPage({ params }: PageProps) {
             </main>
 
             <StoreFooter store={store} />
+            <ScrollToTop />
         </div>
     );
 }

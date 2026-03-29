@@ -37,6 +37,8 @@ export default function ProductCard({ product }: { product: Product }) {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [isValidating, setIsValidating] = React.useState(false);
   const [shareUrl, setShareUrl] = React.useState('');
+
+  // Initialize from product if available
   const [subdomain, setSubdomain] = React.useState<string>(product.store?.subdomain || (product as any).store_subdomain || '');
   const [customDomain, setCustomDomain] = React.useState<string>(product.store?.domain || (product as any).store_domain || '');
 
@@ -94,11 +96,12 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   const productSlug = product.slug || product.id.toString();
-  const baseAppDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || window.location.host.split('.').slice(-2).join('.');
+  const baseAppDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || (typeof window !== 'undefined' ? window.location.host.split('.').slice(-2).join('.') : 'koperasihub.com');
+  const targetSubdomain = subdomain || product.store?.subdomain || (product as any).store_subdomain || 'www';
 
   const internalProductLink = customDomain
     ? `https://${customDomain}/produk/${productSlug}`
-    : `https://${subdomain || 'www'}.${baseAppDomain}/produk/${productSlug}`;
+    : `https://${targetSubdomain}.${baseAppDomain}/produk/${productSlug}`;
 
   const handleShareClick = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -196,7 +199,7 @@ export default function ProductCard({ product }: { product: Product }) {
           ) : (
             <>
               <ShoppingCart size={16} />
-              <span>Beli</span>
+              <span>Tambah ke Keranjang</span>
             </>
           )}
         </button>

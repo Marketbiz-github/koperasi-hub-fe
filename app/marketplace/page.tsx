@@ -11,6 +11,8 @@ import { getPublicAccessToken } from '@/utils/auth';
 import { Loader2, Package, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import InfiniteScrollTrigger from '@/components/ui/InfiniteScrollTrigger';
+import ScrollToTop from '@/components/ui/ScrollToTop';
 
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
@@ -18,11 +20,17 @@ import { Suspense } from 'react';
 interface Product {
   id: number;
   name: string;
+  slug: string;
   sku: string;
   price: string | number;
   status: string;
   images?: { image_url: string; is_primary: boolean }[] | null;
   product_category?: { name: string } | null;
+  store?: {
+    id: number;
+    subdomain: string;
+    domain: string | null;
+  };
 }
 
 function MarketplaceContent() {
@@ -31,6 +39,7 @@ function MarketplaceContent() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -47,7 +56,11 @@ function MarketplaceContent() {
   }, [nameParam]);
 
   const fetchProducts = useCallback(async () => {
-    setIsLoading(true);
+    if (currentPage === 1) {
+      setIsLoading(true);
+    } else {
+      setIsFetchingMore(true);
+    }
     try {
       const token = await getPublicAccessToken();
       const params: any = {
@@ -76,7 +89,8 @@ function MarketplaceContent() {
         : await productService.getProducts(params, token || undefined);
 
       if (res.data) {
-        setProducts(res.data.data || []);
+        const fetchedProducts = res.data.data || (Array.isArray(res.data) ? res.data : []);
+        setProducts(prev => currentPage === 1 ? fetchedProducts : [...prev, ...fetchedProducts]);
         setTotalPages(Math.ceil((res.data.meta?.total || 0) / limit));
       }
     } catch (error) {
@@ -84,6 +98,7 @@ function MarketplaceContent() {
       toast.error('Gagal memuat produk');
     } finally {
       setIsLoading(false);
+      setIsFetchingMore(false);
     }
   }, [currentPage, selectedCategory, selectedVendor, searchQuery]);
 
@@ -130,64 +145,13 @@ function MarketplaceContent() {
                       ))}
                     </div>
 
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                      <div className="flex items-center justify-center gap-3 pt-8 border-t border-gray-100">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          disabled={currentPage === 1}
-                          onClick={() => {
-                            setCurrentPage(prev => prev - 1);
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                          }}
-                          className="rounded-xl border-gray-200 hover:border-emerald-500 hover:text-emerald-500"
-                        >
-                          <ChevronLeft className="w-5 h-5" />
-                        </Button>
-
-                        <div className="flex items-center gap-2">
-                          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                            let pageNum = currentPage;
-                            if (currentPage <= 3) pageNum = i + 1;
-                            else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
-                            else pageNum = currentPage - 2 + i;
-
-                            if (pageNum <= 0 || pageNum > totalPages) return null;
-
-                            return (
-                              <Button
-                                key={pageNum}
-                                variant={currentPage === pageNum ? "default" : "outline"}
-                                size="sm"
-                                className={currentPage === pageNum
-                                  ? "bg-emerald-600 hover:bg-emerald-700 rounded-xl"
-                                  : "rounded-xl border-gray-200 hover:border-emerald-500 text-gray-600"}
-                                onClick={() => {
-                                  setCurrentPage(pageNum);
-                                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                                }}
-                              >
-                                {pageNum}
-                              </Button>
-                            );
-                          })}
-                        </div>
-
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          disabled={currentPage === totalPages}
-                          onClick={() => {
-                            setCurrentPage(prev => prev + 1);
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                          }}
-                          className="rounded-xl border-gray-200 hover:border-emerald-500 hover:text-emerald-500"
-                        >
-                          <ChevronRight className="w-5 h-5" />
-                        </Button>
-                      </div>
-                    )}
+                    {/* Infinite Scroll Trigger */}
+                    <InfiniteScrollTrigger
+                      onIntersect={() => setCurrentPage(prev => prev + 1)}
+                      isLoading={isFetchingMore}
+                      hasMore={currentPage < totalPages}
+                      loadingText="Memuat lebih banyak produk..."
+                    />
                   </div>
                 ) : (
                   <div className="py-32 text-center bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center">
@@ -206,6 +170,7 @@ function MarketplaceContent() {
         </main>
       </div>
 
+      <ScrollToTop />
       <Footer />
     </div>
   );
