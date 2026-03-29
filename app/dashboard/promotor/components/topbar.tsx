@@ -14,6 +14,7 @@ import {
 import { User, Settings, LogOut } from "lucide-react"
 import { IconUser } from "@tabler/icons-react"
 import { useAuthStore } from "@/store/authStore"
+import Link from "next/link"
 
 export function SiteHeader() {
   const { user, logout } = useAuthStore()
@@ -52,14 +53,18 @@ export function SiteHeader() {
               </div>
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                Profile
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/promotor/profile" className="flex items-center w-full">
+                  <User className="mr-2 h-4 w-4" />
+                  Profile
+                </Link>
               </DropdownMenuItem>
 
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/promotor/store-settings" className="flex items-center w-full">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Link>
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />

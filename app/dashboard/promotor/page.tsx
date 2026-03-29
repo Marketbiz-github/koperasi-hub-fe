@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react'
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { SectionCards } from "@/components/section-cards";
 import { TopSelling } from "@/components/top-selling";
+import { Loader2 } from 'lucide-react';
 import { affiliatorService } from '@/services/apiService'
 import { getAccessToken } from '@/utils/auth'
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -20,10 +22,20 @@ export default function DashboardPage() {
         }
       } catch (error) {
         console.error('Failed to fetch stats:', error)
+      } finally {
+        setLoading(false)
       }
     }
     fetchStats()
   }, [])
+
+  if (loading) {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -53,6 +65,19 @@ export default function DashboardPage() {
             }
           ]}
         />
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+        <div className="lg:col-span-2">
+            <ChartAreaInteractive />
+        </div>
+        <div>
+          <TopSelling 
+            title="Top Share" 
+            description="Produk yang paling banyak dibagikan"
+            items={[]} // Promotor stats doesn't have top products yet, but consistent UI
+          />
+        </div>
       </div>
 
     </div>

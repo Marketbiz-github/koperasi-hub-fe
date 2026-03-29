@@ -633,6 +633,10 @@ export const storeService = {
         return apiRequest(`/stores/lookup?subdomain=${search}`, {
             token,
         });
+    },
+
+    async getDashboardSummary(token: string, storeId: string | number) {
+        return apiRequest(`/stores/${storeId}/dashboard-summary`, { token });
     }
 }
 

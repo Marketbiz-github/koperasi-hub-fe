@@ -56,11 +56,6 @@ const data = {
       url: "/dashboard/promotor/penarikan",
       icon: IconMoneybag,
     },
-    {
-      title: "Pengaturan Akun",
-      url: "/dashboard/promotor/store-settings",
-      icon: IconSettings,
-    },
   ],
 }
 
@@ -90,7 +85,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className="font-semibold text-base truncate">
                     {store?.name || 'Loading...'}
                   </span>
-                  <span className="text-xs text-muted-foreground uppercase">{user?.role === 'affiliate' ? 'PROMOTOR' : (user?.role || 'VENDOR')}</span>
+                  <span className="text-xs text-muted-foreground uppercase">{user?.role === 'affiliator' ? 'PROMOTOR' : (user?.role || 'VENDOR')}</span>
                 </div>
               </Link>
             </SidebarMenuButton>
