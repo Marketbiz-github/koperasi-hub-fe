@@ -226,7 +226,7 @@ export default function KoperasiHubPage() {
                   : activeTab === 'koperasi'
                     ? 'Koperasi bisa memilih vendor yang sesuai kebutuhan anggotanya (Grosir), menjual produk ke anggota, dan mendapatkan komisi dari setiap transaksi.'
                     : activeTab === 'reseller'
-                      ? 'Reseller individual dapat bergabung untuk mulai berjualan produk berkualitas tanpa stok sendiri. Manfaatkan sistem dropship dan harga grosir untuk keuntungan maksimal.'
+                      ? 'Reseller dapat bergabung untuk mulai berjualan produk berkualitas tanpa stok sendiri. Manfaatkan sistem dropship dan harga grosir untuk keuntungan maksimal.'
                       : 'Promotor atau affiliator dapat menyebarkan link produk dan mendapatkan komisi dari setiap klik atau pembelian yang dihasilkan melalui promosi online.'}
               </p>
               <Link

@@ -90,16 +90,16 @@ export default function Navbar() {
                     Mulai Jualan
                   </Link>
                   <Link
+                    href="/register/reseller"
+                    className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50"
+                  >
+                    Daftar Reseller
+                  </Link>
+                  <Link
                     href="/marketplace"
                     className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50"
                   >
                     Mulai Promosi
-                  </Link>
-                  <Link
-                    href="/register/reseller"
-                    className="block px-4 py-2 text-[10px] text-gray-400 hover:bg-gray-50 italic"
-                  >
-                    Daftar Reseller Individual
                   </Link>
                 </div>
               )}
@@ -171,8 +171,8 @@ export default function Navbar() {
                 <div className="mt-1 ml-4 pl-4 border-l-2 border-green-100 space-y-1 animate-fade-in">
                   <Link href="/register/vendor" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 text-sm text-gray-600 hover:text-green-600 rounded-lg hover:bg-green-50">Jadi Vendor</Link>
                   <Link href="/register/koperasi" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 text-sm text-gray-600 hover:text-green-600 rounded-lg hover:bg-green-50">Mulai Jualan</Link>
+                  <Link href="/register/reseller" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 text-sm text-gray-600 hover:text-green-600 rounded-lg hover:bg-green-50">Daftar Reseller</Link>
                   <Link href="/marketplace" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 text-sm text-gray-600 hover:text-green-600 rounded-lg hover:bg-green-50">Mulai Promosi</Link>
-                  <Link href="/register/reseller" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-2 text-[10px] text-gray-400 italic">Daftar Reseller</Link>
                 </div>
               )}
             </div>

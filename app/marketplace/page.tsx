@@ -39,6 +39,7 @@ function MarketplaceContent() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFilterLoading, setIsFilterLoading] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -46,6 +47,9 @@ function MarketplaceContent() {
   const [selectedVendor, setSelectedVendor] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>(nameParam);
   const limit = 12;
+
+  // Global loading state: true if either products or filters are still loading
+  const isGlobalLoading = isLoading || isFilterLoading;
 
   // Sync searchQuery with nameParam when URL changes
   useEffect(() => {
@@ -129,10 +133,11 @@ function MarketplaceContent() {
                   setSelectedVendor(id);
                   setCurrentPage(1);
                 }}
+                onLoadComplete={() => setIsFilterLoading(false)}
               />
 
               <div className="grow">
-                {isLoading ? (
+                {isGlobalLoading ? (
                   <div className="flex flex-col items-center justify-center py-32 bg-white rounded-2xl shadow-sm border border-gray-100">
                     <Loader2 className="h-12 w-12 animate-spin text-emerald-600 mb-4" />
                     <p className="text-gray-500 font-medium">Memuat koleksi produk terbaik...</p>

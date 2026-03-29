@@ -24,9 +24,10 @@ interface FilterProps {
   setSelectedCategory: (id: string) => void;
   selectedVendor: string;
   setSelectedVendor: (id: string) => void;
+  onLoadComplete?: () => void;
 }
 
-export default function Filter({ selectedCategory, setSelectedCategory, selectedVendor, setSelectedVendor }: FilterProps) {
+export default function Filter({ selectedCategory, setSelectedCategory, selectedVendor, setSelectedVendor, onLoadComplete }: FilterProps) {
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
   const [vendors, setVendors] = useState<{ id: number; name: string }[]>([]);
   const [isLoadingCats, setIsLoadingCats] = useState(true);
@@ -60,8 +61,9 @@ export default function Filter({ selectedCategory, setSelectedCategory, selected
       console.error('Error fetching vendors:', err);
     } finally {
       setIsLoadingVendors(false);
+      if (onLoadComplete) onLoadComplete();
     }
-  }, []);
+  }, [onLoadComplete]);
 
   useEffect(() => {
     fetchFilterData();
