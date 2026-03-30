@@ -268,9 +268,9 @@ export default function StoreProductDetailPage({ params }: PageProps) {
 
                                 <div className="p-6 bg-slate-50/50 rounded-[2rem] border border-slate-100 mb-6">
                                     <h3 className="font-bold text-slate-900 mb-3 text-sm uppercase tracking-wider">Deskripsi Produk</h3>
-                                    <p className="text-slate-500 leading-relaxed font-medium text-sm md:text-base">
-                                        {product.description || 'Tidak ada deskripsi tersedia untuk produk ini.'}
-                                    </p>
+                                    <div className="text-slate-500 leading-relaxed font-medium text-sm md:text-base prose prose-sm max-w-none">
+                                        <div dangerouslySetInnerHTML={{ __html: product.long_description || product.short_description || product.description || 'Tidak ada deskripsi tersedia untuk produk ini.' }} />
+                                    </div>
                                 </div>
 
                                 {variants.length > 0 && (

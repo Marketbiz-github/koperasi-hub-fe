@@ -224,9 +224,9 @@ export default function KoperasiHubPage() {
                 {activeTab === 'vendor'
                   ? 'Vendor dapat bergabung dengan platform untuk memperluas distribusi produk melalui koperasi. Dengan sistem ini, vendor bisa mengelola reseller, memantau pesanan, dan meningkatkan penjualan.'
                   : activeTab === 'koperasi'
-                    ? 'Koperasi bisa memilih vendor yang sesuai kebutuhan anggotanya (Grosir), menjual produk ke anggota, dan mendapatkan komisi dari setiap transaksi.'
+                    ? 'Koperasi bisa memilih vendor yang sesuai kebutuhan anggotanya, menjual produk ke anggota, dan mendapatkan komisi dari setiap transaksi.'
                     : activeTab === 'reseller'
-                      ? 'Reseller dapat bergabung untuk mulai berjualan produk berkualitas tanpa stok sendiri. Manfaatkan sistem dropship dan harga grosir untuk keuntungan maksimal.'
+                      ? 'Reseller dapat bergabung untuk mulai berjualan produk berkualitas tanpa stok sendiri. Manfaatkan sistem dropship untuk keuntungan maksimal.'
                       : 'Promotor atau affiliator dapat menyebarkan link produk dan mendapatkan komisi dari setiap klik atau pembelian yang dihasilkan melalui promosi online.'}
               </p>
               <Link
@@ -412,7 +412,7 @@ export default function KoperasiHubPage() {
               {
                 question: 'Apa syarat untuk koperasi bisa bergabung di platform ini?',
                 answer:
-                  'Daftar sebagai koperasi di Kooperasi.com dengan melengkapi data dan legalitas yang diperlukan.',
+                  'Daftar sebagai koperasi di KoperasiHub dengan melengkapi data yang diperlukan.',
               },
               {
                 question: 'Bagaimana cara vendor mendaftarkan produk?',
@@ -423,11 +423,6 @@ export default function KoperasiHubPage() {
                 question: 'Apakah koperasi bisa memilih lebih dari satu vendor?',
                 answer:
                   'Ya, koperasi bebas memilih dan bekerja sama dengan lebih dari satu vendor sekaligus.',
-              },
-              {
-                question: 'Bagaimana sistem komisi atau keuntungan untuk koperasi?',
-                answer:
-                  'Koperasi akan mendapatkan komisi sesuai kesepakatan dengan vendor dari setiap transaksi yang berhasil.',
               },
             ].map((faq, index) => (
               <div key={index} className="bg-white rounded-xl shadow-sm hover:shadow-md transition">

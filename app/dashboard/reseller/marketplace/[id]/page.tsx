@@ -46,6 +46,8 @@ interface ProductDetail {
     sku: string
     price: string | number
     description: string | null
+    short_description?: string | null
+    long_description?: string | null
     status: string
     stock?: number
     images: ProductImage[]
@@ -465,8 +467,8 @@ export default function ResellerProductDetailPage() {
                     <div className="space-y-4">
                         <h3 className="text-lg font-bold text-gray-900 border-b pb-2">Deskripsi Produk</h3>
                         <div className="prose prose-sm prose-emerald max-w-none text-gray-600 leading-relaxed">
-                            {product.description ? (
-                                <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                            {product.long_description || product.short_description || product.description ? (
+                                <div dangerouslySetInnerHTML={{ __html: product.long_description || product.short_description || product.description || '' }} />
                             ) : (
                                 <p className="italic text-gray-400">Tidak ada deskripsi tersedia untuk produk ini.</p>
                             )}

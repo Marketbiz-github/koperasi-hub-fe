@@ -23,6 +23,8 @@ interface ProductDetail {
   id: string;
   name: string;
   description: string;
+  short_description?: string;
+  long_description?: string;
   price: number;
   stock: number;
   status: string;
@@ -354,7 +356,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                   </div>
 
                   <div className="prose prose-sm max-w-none text-gray-600 leading-relaxed mb-6">
-                    {product.description || 'Tidak ada deskripsi produk.'}
+                    <div dangerouslySetInnerHTML={{ __html: product.long_description || product.short_description || product.description || 'Tidak ada deskripsi produk.' }} />
                   </div>
 
                   {variants.length > 0 && (
