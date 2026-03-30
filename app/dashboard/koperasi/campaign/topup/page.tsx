@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
     Card,
     CardContent,
@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Wallet, Info, Loader2, CreditCard, ChevronRight } from 'lucide-react';
+import { Wallet, Info, Loader2, CreditCard, ChevronRight, ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import { getAccessToken } from '@/utils/auth';
@@ -22,26 +22,43 @@ export default function CampaignTopupPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [isHistoryLoading, setIsHistoryLoading] = useState(true);
     const [history, setHistory] = useState<any[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+    const limit = 10;
 
     // Fetch History Data
+    const fetchHistory = useCallback(async () => {
+        if (!isHydrated || !user) return;
+        setIsHistoryLoading(true);
+        try {
+            const token = await getAccessToken();
+            const res = await campaignService.getTopupHistory(token || '', {
+                page: currentPage,
+                limit: limit
+            });
+
+            // Handle nested data structure: res.data.data
+            const historyData = res.data?.data || [];
+            const total = res.data?.total || 0;
+
+            setHistory(historyData);
+            setTotalItems(total);
+            setTotalPages(Math.ceil(total / limit));
+        } catch (error) {
+            console.error('Error fetching history:', error);
+            // toast.error('Gagal mengambil riwayat topup');
+        } finally {
+            setIsHistoryLoading(false);
+        }
+    }, [user, isHydrated, currentPage]);
+
     useEffect(() => {
-        const fetchHistory = async () => {
-            if (!isHydrated || !user) return;
-            try {
-                const token = await getAccessToken();
-                const res = await campaignService.getTopupHistory(token || '');
-                setHistory(res.data || []);
-            } catch (error) {
-                console.error('Error fetching history:', error);
-            } finally {
-                setIsHistoryLoading(false);
-            }
-        };
         fetchHistory();
         if (isHydrated && user) {
             fetchUserDetail();
         }
-    }, [user, isHydrated, fetchUserDetail]);
+    }, [fetchHistory, isHydrated, user, fetchUserDetail]);
 
     const handleTopup = async () => {
         if (!amount || Number(amount) < 10000) {
@@ -152,7 +169,7 @@ export default function CampaignTopupPage() {
                                 <p className="font-bold mb-1 flex items-center gap-1.5 text-blue-900">
                                     Metode Pembayaran: iPaymu
                                 </p>
-                                <p className="opacity-90">Anda akan diarahkan ke gerbang pembayaran aman iPaymu untuk menyelesaikan transaksi via Transfer Bank, E-Wallet, atau Qris.</p>
+                                <p className="opacity-90">Anda akan diarahkan ke halaman pembayaran aman iPaymu untuk menyelesaikan transaksi via Transfer Bank, E-Wallet, atau Qris.</p>
                             </div>
                         </div>
 
@@ -192,7 +209,7 @@ export default function CampaignTopupPage() {
                                         <th className="px-6 py-4">Tanggal</th>
                                         <th className="px-6 py-4">Nominal</th>
                                         <th className="px-6 py-4">Status</th>
-                                        <th className="px-6 py-4">Aksi</th>
+                                        <th className="px-6 py-4 text-right">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
@@ -212,21 +229,24 @@ export default function CampaignTopupPage() {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${item.status === 'success' ? 'bg-emerald-100 text-emerald-700' :
-                                                        item.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                                                            'bg-red-100 text-red-700'
+                                                    item.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                                                        'bg-red-100 text-red-700'
                                                     }`}>
                                                     {item.status}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                            <td className="px-6 py-4 whitespace-nowrap text-right">
                                                 {item.status === 'pending' && item.payment_url && (
                                                     <Button
                                                         variant="link"
-                                                        className="p-0 h-auto text-emerald-600 font-bold hover:text-emerald-700"
+                                                        className="p-0 h-auto text-emerald-600 font-bold hover:text-emerald-700 text-xs"
                                                         onClick={() => window.open(item.payment_url, '_blank')}
                                                     >
                                                         Bayar Sekarang
                                                     </Button>
+                                                )}
+                                                {item.status === 'success' && (
+                                                    <span className="text-xs text-emerald-600 font-medium italic">Selesai</span>
                                                 )}
                                             </td>
                                         </tr>
@@ -238,6 +258,51 @@ export default function CampaignTopupPage() {
                         <div className="h-32 flex flex-col items-center justify-center text-gray-400">
                             <Info className="w-8 h-8 mb-2 opacity-20" />
                             <p className="text-sm">Belum ada riwayat transaksi</p>
+                        </div>
+                    )}
+
+                    {/* Pagination */}
+                    {!isHistoryLoading && totalPages > 1 && (
+                        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/30">
+                            <p className="text-xs text-gray-500 font-medium">
+                                Menampilkan <span className="text-gray-900">{(currentPage - 1) * limit + 1}</span> - <span className="text-gray-900">{Math.min(currentPage * limit, totalItems)}</span> dari <span className="text-gray-900">{totalItems}</span> transaksi
+                            </p>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 rounded-md border-gray-200"
+                                    disabled={currentPage === 1}
+                                    onClick={() => setCurrentPage(prev => prev - 1)}
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                </Button>
+                                <div className="flex items-center gap-1">
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                        <Button
+                                            key={page}
+                                            variant={currentPage === page ? "default" : "outline"}
+                                            size="sm"
+                                            className={`h-8 w-8 p-0 rounded-md transition-all ${currentPage === page
+                                                    ? "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 shadow-sm"
+                                                    : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                                                }`}
+                                            onClick={() => setCurrentPage(page)}
+                                        >
+                                            {page}
+                                        </Button>
+                                    ))}
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 rounded-md border-gray-200"
+                                    disabled={currentPage === totalPages}
+                                    onClick={() => setCurrentPage(prev => prev + 1)}
+                                >
+                                    <ChevronRight className="w-4 h-4" />
+                                </Button>
+                            </div>
                         </div>
                     )}
                 </CardContent>

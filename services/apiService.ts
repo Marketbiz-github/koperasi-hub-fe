@@ -798,8 +798,15 @@ export const campaignService = {
         });
     },
 
-    async getTopupHistory(token: string) {
-        return apiRequest('/campaigns/topup', { token });
+    async getTopupHistory(token: string, params: { page?: number, limit?: number } = {}) {
+        let query = new URLSearchParams();
+        if (params.page) query.append('page', params.page.toString());
+        if (params.limit) query.append('limit', params.limit.toString());
+
+        const queryString = query.toString();
+        const endpoint = `/campaigns/topup${queryString ? `?${queryString}` : ''}`;
+
+        return apiRequest(endpoint, { token });
     },
 
     async getCampaignShares(token: string, campaignId: number | string) {
