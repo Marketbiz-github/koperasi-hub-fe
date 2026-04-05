@@ -159,6 +159,7 @@ export default function LoginShareCommission({
         role: 'affiliator',
         ipaymu_password: password,
         plan_id: 1,
+        callback_url: (process.env.NEXT_PUBLIC_APP_URL || '') + 'auth/activated'
       }
 
       try {

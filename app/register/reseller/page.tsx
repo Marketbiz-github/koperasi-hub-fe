@@ -187,6 +187,7 @@ function RegisterResellerContent() {
                     ipaymu_password: formData.password, // Use account password
                     captchaToken: token,
                     role: 'reseller',
+                    callback_url: process.env.NEXT_PUBLIC_APP_URL + 'auth/activated',
                 }),
             });
 

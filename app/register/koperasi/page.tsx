@@ -187,6 +187,7 @@ function RegisterKoperasiContent() {
                     ipaymu_password: formData.password, // Use account password
                     captchaToken: token,
                     role: 'koperasi',
+                    callback_url: (process.env.NEXT_PUBLIC_APP_URL || '') + 'auth/activated',
                 }),
             });
 

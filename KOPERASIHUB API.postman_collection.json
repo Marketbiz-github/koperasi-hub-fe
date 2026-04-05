@@ -18,7 +18,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\" : \"affiliator@example.com\",\n    \"password\" : \"password123\"\n}",
+              "raw": "{\n    \"email\" : \"pisogow580@example.com\",\n    \"password\" : \"password123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -175,7 +175,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"New User\",\n    \"email\": \"pisogow580@example.com\",\n    \"password\": \"password123\",\n    \"phone\": \"08123456789\",\n    \"role\": \"vendor\"\n}",
+              "raw": "{\n    \"name\": \"New User\",\n    \"email\": \"pisogow580@example.com\",\n    \"password\": \"password123\",\n    \"phone\": \"08123456789\",\n    \"role\": \"vendor\",\n    \"callback_url\" : \"https://koperasihub.com/login\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -190,7 +190,8 @@
               "path": [
                 "users"
               ]
-            }
+            },
+            "description": "NOTE\n\n-  callback_url (string): URL Redirect Opsional. Jika disematkan, backend akan langsung mengalihkan (HTTP 302) peramban klien ke URL ini setelah link"
           },
           "response": [
             {
@@ -318,7 +319,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"janestore4@gmail.com\",\n  \"password\": \"password123\",\n  \"phone\": \"08123456789\",\n  \"role\": \"vendor\",\n  \"store_name\": \"Toko Jane\",\n  \"store_subdomain\": \"janestore4\",\n  \"store_description\": \"Toko retail serba ada\",\n  \"store_phone\": \"08123456789\",\n  \"store_alamat\": \"Jl. Merdeka No. 10\",\n  \"ipaymu_password\": \"ipaymupassword123\",\n  \"flag_ids\": [1, 2],\n  \"plan_id\": 1\n}",
+              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"janestore4@gmail.com\",\n  \"password\": \"password123\",\n  \"phone\": \"08123456789\",\n  \"role\": \"vendor\",\n  \"store_name\": \"Toko Jane\",\n  \"store_subdomain\": \"janestore4\",\n  \"store_description\": \"Toko retail serba ada\",\n  \"store_phone\": \"08123456789\",\n  \"store_alamat\": \"Jl. Merdeka No. 10\",\n  \"ipaymu_password\": \"ipaymupassword123\",\n  \"flag_ids\": [1, 2],\n  \"plan_id\": 1,\n  \"callback_url\" : \"https://koperasihub.com/login\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -334,7 +335,7 @@
                 "onboarding"
               ]
             },
-            "description": "Digunakan untuk melakukan pendaftaran user baru dengan satu endpoint yang sudah menjalankan beberapa fungsi , Register > create store > SSO Ipaymu > flag > plan. jika gagal user data tidak akan di buat dan akan di rollback  \n  \nPada api ini, token tidak di perlukan"
+            "description": "Digunakan untuk melakukan pendaftaran user baru dengan satu endpoint yang sudah menjalankan beberapa fungsi , Register > create store > SSO Ipaymu > flag > plan. jika gagal user data tidak akan di buat dan akan di rollback\n\nPada api ini, token tidak di perlukan\n\nNOTE\n\n-  callback_url (string): URL Redirect Opsional. Jika disematkan, backend akan langsung mengalihkan (HTTP 302) peramban klien ke URL ini setelah link"
           },
           "response": [
             {
@@ -426,7 +427,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Taufik Affiliator\",\n  \"email\": \"affiliator@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"08123000444\",\n  \"role\": \"affiliator\",\n  \"ipaymu_password\": \"ipaymupassword123\",\n  \"plan_id\": 1,\n  \"flag_ids\": [1]\n}",
+              "raw": "{\n  \"name\": \"Taufik Affiliator\",\n  \"email\": \"haseho6172@fengnu.com\",\n  \"password\": \"password123\",\n  \"phone\": \"08123000444\",\n  \"role\": \"affiliator\",\n  \"ipaymu_password\": \"ipaymupassword123\",\n  \"plan_id\": 1,\n  \"flag_ids\": [1],\n  \"callback_url\" : \"https://koperasihub.com/login\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -442,7 +443,7 @@
                 "onboarding"
               ]
             },
-            "description": "Digunakan untuk melakukan pendaftaran user baru dengan satu endpoint yang sudah menjalankan beberapa fungsi , Register > create store > SSO Ipaymu > flag > plan. jika gagal user data tidak akan di buat dan akan di rollback  \n  \nPada api ini, token tidak di perlukan"
+            "description": "Digunakan untuk melakukan pendaftaran user baru dengan satu endpoint yang sudah menjalankan beberapa fungsi , Register > create store > SSO Ipaymu > flag > plan. jika gagal user data tidak akan di buat dan akan di rollback\n\nPada api ini, token tidak di perlukan\n\nNOTE\n\n-  callback_url (string): URL Redirect Opsional. Jika disematkan, backend akan langsung mengalihkan (HTTP 302) peramban klien ke URL ini setelah link"
           },
           "response": [
             {
@@ -4332,6 +4333,341 @@
         }
       ],
       "description": "Menejemen jaringan afiliasi\n\n**Affiliation Types** :\n\n- **koperasi_vendor** : Koperasi affiliated with a Vendor.\n    \n- **reseller_koperasi** : Reseller affiliated with a Koperasi\n    \n- **affiliator_koperasi** : Affiliator affiliated with a Koperasi\n    \n- **affiliator_vendor** : Affiliator affiliated with a Vendor\n    \n- **affiliator_reseller** : Affiliator affiliated with a Reseller.\n    \n\n**Response Codes** : \\`200\\`, \\`400\\`, \\`403\\`  \n  \n**NOTE :**  \nSelain affiliasi affiliator , semua request affiliasi membutuhkan approval"
+    },
+    {
+      "name": "Koperasi Profiling",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/koperasi-profiles/user/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "koperasi-profiles",
+                "user",
+                "1"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Get Profile",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/koperasi-profiles/user/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "koperasi-profiles",
+                    "user",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 05 Apr 2026 06:34:14 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "634"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Koperasi profile retrieved\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"id\": 1,\n        \"user_id\": 1,\n        \"legality_number\": \"SK-12345/KOP/2026\",\n        \"legality_file_url\": \"https://storage.example.com/file.pdf\",\n        \"description\": \"Koperasi Sejahtera Bersama.\",\n        \"vision\": \"Menjadi yang terbaik...\",\n        \"mission\": \"1. Misi utama\\n2. Misi kedua...\",\n        \"administrators\": [\n            {\n                \"id\": 1,\n                \"koperasi_profile_id\": 1,\n                \"name\": \"Budi Santoso\",\n                \"phone\": \"08123456789\",\n                \"position\": \"Ketua\",\n                \"hierarchy_level\": 1,\n                \"created_at\": \"2026-04-05T06:34:08.145731Z\",\n                \"updated_at\": \"2026-04-05T06:34:08.145731Z\"\n            }\n        ],\n        \"created_at\": \"2026-04-05T06:34:08.138857Z\",\n        \"updated_at\": \"2026-04-05T06:34:08.138857Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzU0NTY2NzAsInVzZXJfaWQiOjF9.JwsMZBV0nNpjwQrCxhZV8BbqvIMsv1j9Bdg8QG2B7V4",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"legality_number\": \"SK-12345/KOP/2026\",\n  \"legality_file_url\": \"https://storage.example.com/file.pdf\",\n  \"description\": \"Koperasi Sejahtera Bersama.\",\n  \"vision\": \"Menjadi yang terbaik...\",\n  \"mission\": \"1. Misi utama\\n2. Misi kedua...\",\n  \"administrators\": [\n    {\n      \"name\": \"Budi Santoso\",\n      \"phone\": \"08123456789\",\n      \"position\": \"Ketua\",\n      \"hierarchy_level\": 1\n    }\n  ]\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/koperasi-profiles",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "koperasi-profiles"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Create Profile",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"legality_number\": \"SK-12345/KOP/2026\",\n  \"legality_file_url\": \"https://storage.example.com/file.pdf\",\n  \"description\": \"Koperasi Sejahtera Bersama.\",\n  \"vision\": \"Menjadi yang terbaik...\",\n  \"mission\": \"1. Misi utama\\n2. Misi kedua...\",\n  \"administrators\": [\n    {\n      \"name\": \"Budi Santoso\",\n      \"phone\": \"08123456789\",\n      \"position\": \"Ketua\",\n      \"hierarchy_level\": 1\n    }\n  ]\n}\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/koperasi-profiles",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "koperasi-profiles"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 05 Apr 2026 06:34:08 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "644"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Koperasi profile created\",\n        \"code\": 201,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"id\": 1,\n        \"user_id\": 1,\n        \"legality_number\": \"SK-12345/KOP/2026\",\n        \"legality_file_url\": \"https://storage.example.com/file.pdf\",\n        \"description\": \"Koperasi Sejahtera Bersama.\",\n        \"vision\": \"Menjadi yang terbaik...\",\n        \"mission\": \"1. Misi utama\\n2. Misi kedua...\",\n        \"administrators\": [\n            {\n                \"id\": 1,\n                \"koperasi_profile_id\": 1,\n                \"name\": \"Budi Santoso\",\n                \"phone\": \"08123456789\",\n                \"position\": \"Ketua\",\n                \"hierarchy_level\": 1,\n                \"created_at\": \"2026-04-05T06:34:08.145731472Z\",\n                \"updated_at\": \"2026-04-05T06:34:08.145731472Z\"\n            }\n        ],\n        \"created_at\": \"2026-04-05T06:34:08.138857805Z\",\n        \"updated_at\": \"2026-04-05T06:34:08.138857805Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzU0NTY2NzAsInVzZXJfaWQiOjF9.JwsMZBV0nNpjwQrCxhZV8BbqvIMsv1j9Bdg8QG2B7V4",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"legality_number\": \"SK-12345/KOP/2026-REV\",\n  \"legality_file_url\": \"https://storage.example.com/file_updated.pdf\",\n  \"description\": \"Koperasi Sejahtera Bersama. (Terupdate)\",\n  \"vision\": \"Visi terbaru...\",\n  \"mission\": \"1. Misi terbaru 1\\n2. Misi terbaru 2\",\n  \"administrators\": [\n    {\n      \"name\": \"Budi Santoso\",\n      \"phone\": \"08123456789\",\n      \"position\": \"Ketua\",\n      \"hierarchy_level\": 1\n    },\n    {\n      \"name\": \"Siti Aminah\",\n      \"phone\": \"08199999999\",\n      \"position\": \"Bendahara Baru\",\n      \"hierarchy_level\": 2\n    }\n  ]\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/koperasi-profiles",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "koperasi-profiles"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Update Profile",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"legality_number\": \"SK-12345/KOP/2026-REV\",\n  \"legality_file_url\": \"https://storage.example.com/file_updated.pdf\",\n  \"description\": \"Koperasi Sejahtera Bersama. (Terupdate)\",\n  \"vision\": \"Visi terbaru...\",\n  \"mission\": \"1. Misi terbaru 1\\n2. Misi terbaru 2\",\n  \"administrators\": [\n    {\n      \"name\": \"Budi Santoso\",\n      \"phone\": \"08123456789\",\n      \"position\": \"Ketua\",\n      \"hierarchy_level\": 1\n    },\n    {\n      \"name\": \"Siti Aminah\",\n      \"phone\": \"08199999999\",\n      \"position\": \"Bendahara Baru\",\n      \"hierarchy_level\": 2\n    }\n  ]\n}\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/koperasi-profiles",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "koperasi-profiles"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "POST, GET, OPTIONS, PUT, DELETE"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self'"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "strict-origin-when-cross-origin"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "X-Xss-Protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 05 Apr 2026 06:35:12 GMT"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "863"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"meta\": {\n        \"message\": \"Koperasi profile updated\",\n        \"code\": 200,\n        \"status\": \"success\"\n    },\n    \"data\": {\n        \"id\": 1,\n        \"user_id\": 1,\n        \"legality_number\": \"SK-12345/KOP/2026-REV\",\n        \"legality_file_url\": \"https://storage.example.com/file_updated.pdf\",\n        \"description\": \"Koperasi Sejahtera Bersama. (Terupdate)\",\n        \"vision\": \"Visi terbaru...\",\n        \"mission\": \"1. Misi terbaru 1\\n2. Misi terbaru 2\",\n        \"administrators\": [\n            {\n                \"id\": 2,\n                \"koperasi_profile_id\": 1,\n                \"name\": \"Budi Santoso\",\n                \"phone\": \"08123456789\",\n                \"position\": \"Ketua\",\n                \"hierarchy_level\": 1,\n                \"created_at\": \"2026-04-05T06:35:12.207044Z\",\n                \"updated_at\": \"2026-04-05T06:35:12.207044Z\"\n            },\n            {\n                \"id\": 3,\n                \"koperasi_profile_id\": 1,\n                \"name\": \"Siti Aminah\",\n                \"phone\": \"08199999999\",\n                \"position\": \"Bendahara Baru\",\n                \"hierarchy_level\": 2,\n                \"created_at\": \"2026-04-05T06:35:12.207044Z\",\n                \"updated_at\": \"2026-04-05T06:35:12.207044Z\"\n            }\n        ],\n        \"created_at\": \"2026-04-05T06:34:08.138857Z\",\n        \"updated_at\": \"2026-04-05T06:35:12.203206Z\"\n    }\n}"
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "Ipaymu SSO",

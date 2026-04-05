@@ -12,6 +12,7 @@ export async function POST(req: Request) {
             captchaToken,
             // role is hardcoded
             // Affiliation fields removed
+            callback_url
         } = body
 
         // 1. Verify CAPTCHA
@@ -40,7 +41,8 @@ export async function POST(req: Request) {
             store_subdomain: subdomain,
             ipaymu_password: password,
             flag_ids: Array.isArray(flag_ids) ? flag_ids.map(Number) : (flag_ids ? [Number(flag_ids)] : []),
-            plan_id: plan_id ? Number(plan_id) : 1
+            plan_id: plan_id ? Number(plan_id) : 1,
+            callback_url
         };
 
         console.log('[DEBUG] Calling Onboarding API for Koperasi with:', JSON.stringify(onboardingPayload, null, 2));

@@ -14,7 +14,8 @@ export async function POST(req: Request) {
             role,
             // Affiliation fields
             parent_id,
-            affiliation_type
+            affiliation_type,
+            callback_url
         } = body
 
         // 1. Verify CAPTCHA
@@ -46,7 +47,8 @@ export async function POST(req: Request) {
             store_subdomain: subdomain, // Mapping subdomain -> store_subdomain
             ipaymu_password: password, // Default to account password if not provided? Or make it required? User request showed it in JSON.
             flag_ids: Array.isArray(flag_ids) ? flag_ids.map(Number) : (flag_ids ? [Number(flag_ids)] : []),
-            plan_id: plan_id ? Number(plan_id) : 1 // Default to 1 as requested
+            plan_id: plan_id ? Number(plan_id) : 1, // Default to 1 as requested
+            callback_url
         };
 
         console.log('[DEBUG] Calling Onboarding API with:', JSON.stringify(onboardingPayload, null, 2));
