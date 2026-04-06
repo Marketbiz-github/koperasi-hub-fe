@@ -866,3 +866,27 @@ export const affiliatorService = {
     }
 }
 
+export const koperasiProfilingService = {
+    async getProfile(token: string | undefined, userId: string | number) {
+        return apiRequest(`/koperasi-profiles/user/${userId}`, {
+            token,
+        })
+    },
+
+    async createProfile(token: string, data: any) {
+        return apiRequest('/koperasi-profiles', {
+            method: 'POST',
+            body: data,
+            token,
+        })
+    },
+
+    async updateProfile(token: string, data: any) {
+        return apiRequest('/koperasi-profiles', {
+            method: 'PUT',
+            body: data,
+            token,
+        })
+    }
+}
+

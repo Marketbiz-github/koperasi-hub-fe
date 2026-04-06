@@ -1,5 +1,5 @@
-import ProfileView from "@/components/ProfileView";
+import KoperasiProfileForm from "@/components/KoperasiProfileForm";
 
 export default function KoperasiProfilePage() {
-    return <ProfileView />;
+    return <KoperasiProfileForm />;
 }

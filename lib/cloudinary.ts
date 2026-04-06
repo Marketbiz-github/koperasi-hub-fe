@@ -28,8 +28,14 @@ export async function uploadToCloudinary(
 
         if (fileName) {
             // Remove extension and special characters from filename for public_id
-            const publicId = fileName.split('.')[0].replace(/[^a-zA-Z0-9]/g, '-');
+            const parts = fileName.split('.');
+            const extension = parts.pop()?.toLowerCase();
+            const publicId = parts.join('.').replace(/[^a-zA-Z0-9]/g, '-');
             uploadOptions.public_id = publicId;
+
+            if (extension === 'pdf') {
+                uploadOptions.resource_type = 'image'; // Cloudinary treats PDF as image for transformations
+            }
         }
 
         const uploadStream = cloudinary.uploader.upload_stream(

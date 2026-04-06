@@ -14,8 +14,27 @@ import {
     MapPin,
     Building2,
     Phone,
-    Info
+    Info,
+    FileText,
+    Target,
+    Users as UsersIcon,
+    ChevronRight,
+    ExternalLink
 } from 'lucide-react';
+import { koperasiProfilingService } from '@/services/apiService';
+
+interface KoperasiProfile {
+    legality_number: string;
+    legality_file_url: string;
+    description: string;
+    vision: string;
+    mission: string;
+    administrators: Array<{
+        name: string;
+        phone: string;
+        position: string;
+    }>;
+}
 
 interface Affiliation {
     id: number;
@@ -53,8 +72,10 @@ export default function IncomingAffiliationsPage() {
     // Search & Detail States
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedStore, setSelectedStore] = useState<StoreDetail | null>(null);
+    const [selectedProfile, setSelectedProfile] = useState<KoperasiProfile | null>(null);
     const [isDetailLoading, setIsDetailLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState<'store' | 'profile'>('store');
 
     const fetchAffiliations = useCallback(async () => {
         if (!token) return;
@@ -113,17 +134,32 @@ export default function IncomingAffiliationsPage() {
         setIsDetailLoading(true);
         setIsModalOpen(true);
         setSelectedStore(null);
+        setSelectedProfile(null);
+        setActiveTab('store');
         try {
-            const response = await storeService.getStoreByUserId(token, userId);
-            if (response.data && response.data.length > 0) {
-                setSelectedStore(response.data[0]);
-            } else {
+            // Fetch Store
+            const storeRes = await storeService.getStoreByUserId(token, userId);
+            if (storeRes.data && storeRes.data.length > 0) {
+                setSelectedStore(storeRes.data[0]);
+            }
+
+            // Fetch Profile
+            try {
+                const profileRes = await koperasiProfilingService.getProfile(token, userId);
+                if (profileRes.data) {
+                    setSelectedProfile(profileRes.data);
+                }
+            } catch (err) {
+                console.error('Profile not found or error:', err);
+            }
+
+            if (!storeRes.data || storeRes.data.length === 0) {
                 setMessage({ type: 'error', text: 'Data toko tidak ditemukan' });
                 setIsModalOpen(false);
             }
         } catch (error) {
             console.error(error);
-            setMessage({ type: 'error', text: 'Gagal memuat detail toko' });
+            setMessage({ type: 'error', text: 'Gagal memuat detail' });
             setIsModalOpen(false);
         } finally {
             setIsDetailLoading(false);
@@ -286,8 +322,8 @@ export default function IncomingAffiliationsPage() {
 
             {/* Detail Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl my-auto overflow-hidden animate-in fade-in zoom-in duration-200 focus:outline-none flex flex-col max-h-[90vh]">
                         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                             <h3 className="font-bold text-slate-900 flex items-center gap-2">
                                 <Building2 className="w-5 h-5 text-emerald-600" />
@@ -298,62 +334,176 @@ export default function IncomingAffiliationsPage() {
                             </button>
                         </div>
 
-                        <div className="p-6">
+                        <div className="p-0 flex flex-col max-h-[80vh] overflow-hidden">
                             {isDetailLoading ? (
-                                <div className="flex flex-col items-center justify-center py-10 gap-3">
+                                <div className="flex flex-col items-center justify-center py-20 gap-3">
                                     <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
-                                    <p className="text-sm text-slate-500 font-medium font-mono">Memuat data...</p>
+                                    <p className="text-sm text-slate-500 font-medium">Memuat data...</p>
                                 </div>
                             ) : selectedStore ? (
-                                <div className="space-y-6">
-                                    <div className="flex items-center gap-4">
-                                        <img src={selectedStore.logo || ''} alt="Logo" className="w-16 h-16 object-cover rounded-lg" />
-                                        <div>
-                                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nama Toko</div>
-                                            <div className="text-lg font-bold text-slate-900 leading-tight">{selectedStore.name}</div>
-                                        </div>
+                                <>
+                                    {/* Tabs */}
+                                    <div className="flex border-b border-slate-100 bg-slate-50/50">
+                                        <button
+                                            onClick={() => setActiveTab('store')}
+                                            className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-all border-b-2 ${activeTab === 'store' ? 'border-emerald-500 text-emerald-600 bg-white' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+                                        >
+                                            Informasi Toko
+                                        </button>
+                                        <button
+                                            onClick={() => setActiveTab('profile')}
+                                            className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-all border-b-2 ${activeTab === 'profile' ? 'border-emerald-500 text-emerald-600 bg-white' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+                                        >
+                                            Profil Institusi
+                                        </button>
                                     </div>
 
-                                    <div className="grid grid-cols-1 gap-4">
-                                        <div className="flex gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
-                                                <MapPin className="w-4 h-4 text-emerald-600" />
-                                            </div>
-                                            <div>
-                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Alamat</div>
-                                                <div className="text-sm text-slate-600 leading-relaxed">
-                                                    {selectedStore.alamat}
-                                                    {selectedStore.city && `, ${selectedStore.city}`}
-                                                    {selectedStore.province && `, ${selectedStore.province}`}
+                                    <div className="p-6 overflow-y-auto">
+                                        {activeTab === 'store' ? (
+                                            <div className="space-y-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center">
+                                                        {selectedStore.logo ? (
+                                                            <img src={selectedStore.logo} alt="Logo" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <Building2 className="w-8 h-8 text-slate-300" />
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nama Toko</div>
+                                                        <div className="text-lg font-bold text-slate-900 leading-tight">{selectedStore.name}</div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div>
 
-                                        {selectedStore.phone && (
-                                            <div className="flex gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
-                                                    <Phone className="w-4 h-4 text-emerald-600" />
+                                                <div className="grid grid-cols-1 gap-4">
+                                                    <div className="flex gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                                        <div className="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0">
+                                                            <MapPin className="w-5 h-5 text-emerald-600" />
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Alamat</div>
+                                                            <div className="text-sm text-slate-600 leading-relaxed">
+                                                                {selectedStore.alamat}
+                                                                {selectedStore.city && `, ${selectedStore.city}`}
+                                                                {selectedStore.province && `, ${selectedStore.province}`}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {selectedStore.phone && (
+                                                        <div className="flex gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                                            <div className="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0">
+                                                                <Phone className="w-5 h-5 text-emerald-600" />
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Kontak</div>
+                                                                <div className="text-sm text-slate-600">{selectedStore.phone}</div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="flex gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                                        <div className="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0">
+                                                            <Info className="w-5 h-5 text-emerald-600" />
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Deskripsi</div>
+                                                            <div className="text-sm text-slate-600 leading-relaxed italic">
+                                                                {selectedStore.description || 'Tidak ada deskripsi.'}
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Kontak</div>
-                                                    <div className="text-sm text-slate-600">{selectedStore.phone}</div>
-                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-6">
+                                                {selectedProfile ? (
+                                                    <>
+                                                        {/* Legalitas */}
+                                                        <div className="p-4 bg-emerald-50/50 border border-emerald-100 rounded-2xl">
+                                                            <div className="flex items-center gap-2 mb-3 text-emerald-700">
+                                                                <FileText className="w-4 h-4" />
+                                                                <span className="text-xs font-bold uppercase tracking-wider">Legalitas</span>
+                                                            </div>
+                                                            <div className="flex items-center justify-between">
+                                                                <div>
+                                                                    <div className="text-[10px] text-emerald-600/60 font-bold uppercase mb-0.5">No. SK / Legalitas</div>
+                                                                    <div className="text-sm font-bold text-emerald-900">{selectedProfile.legality_number}</div>
+                                                                </div>
+                                                                {selectedProfile.legality_file_url && (
+                                                                    <a
+                                                                        href={selectedProfile.legality_file_url}
+                                                                        target="_blank"
+                                                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white text-[10px] font-bold rounded-lg hover:bg-emerald-700 transition-all shadow-sm"
+                                                                        rel="noopener noreferrer"
+                                                                    >
+                                                                        Lihat Dokumen
+                                                                        <ExternalLink className="w-3 h-3" />
+                                                                    </a>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Visi & Misi */}
+                                                        <div className="grid grid-cols-1 gap-4">
+                                                            <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                                                                <div className="flex items-center gap-2 mb-2 text-slate-400">
+                                                                    <Target className="w-4 h-4" />
+                                                                    <span className="text-[10px] font-bold uppercase tracking-wider">Visi</span>
+                                                                </div>
+                                                                <div className="text-sm text-slate-700 italic leading-relaxed">
+                                                                    &quot;{selectedProfile.vision}&quot;
+                                                                </div>
+                                                            </div>
+                                                            <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                                                                <div className="flex items-center gap-2 mb-2 text-slate-400">
+                                                                    <Info className="w-4 h-4" />
+                                                                    <span className="text-[10px] font-bold uppercase tracking-wider">Misi</span>
+                                                                </div>
+                                                                <div className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+                                                                    {selectedProfile.mission}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Pengurus */}
+                                                        <div>
+                                                            <div className="flex items-center gap-2 mb-4 text-slate-900">
+                                                                <UsersIcon className="w-4 h-4 text-emerald-600" />
+                                                                <span className="text-xs font-bold uppercase tracking-wider">Daftar Pengurus</span>
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                {selectedProfile.administrators?.map((admin, idx) => (
+                                                                    <div key={idx} className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
+                                                                        <div>
+                                                                            <div className="text-sm font-bold text-slate-800">{admin.name}</div>
+                                                                            <div className="text-[10px] text-slate-400 font-medium uppercase">{admin.position}</div>
+                                                                        </div>
+                                                                        <a 
+                                                                            href={`https://wa.me/${admin.phone.replace(/[^0-9]/g, '').startsWith('0') ? '62' + admin.phone.replace(/[^0-9]/g, '').substring(1) : admin.phone.replace(/[^0-9]/g, '')}`}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="text-[10px] font-mono bg-slate-50 px-2 py-1 rounded text-emerald-600 font-bold hover:bg-emerald-50 transition-colors"
+                                                                        >
+                                                                            {admin.phone}
+                                                                        </a>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <div className="flex flex-col items-center justify-center py-10 text-center">
+                                                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                                                            <Building2 className="w-8 h-8 text-slate-200" />
+                                                        </div>
+                                                        <p className="text-slate-500 text-sm font-medium">Koperasi belum melengkapi profil institusi.</p>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
-
-                                        <div className="flex gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
-                                                <Info className="w-4 h-4 text-emerald-600" />
-                                            </div>
-                                            <div>
-                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Deskripsi</div>
-                                                <div className="text-sm text-slate-600 leading-relaxed italic">
-                                                    {selectedStore.description || 'Tidak ada deskripsi.'}
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
-                                </div>
+                                </>
                             ) : (
                                 <div className="text-center py-10">
                                     <Info className="w-12 h-12 text-slate-200 mx-auto mb-3" />

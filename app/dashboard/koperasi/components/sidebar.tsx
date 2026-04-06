@@ -47,6 +47,11 @@ const data = {
       icon: IconDashboard,
     },
     {
+      title: "Profil Koperasi",
+      url: "/dashboard/koperasi/profile",
+      icon: IconBuildingCommunity,
+    },
+    {
       title: "Marketplace",
       url: "/dashboard/koperasi/marketplace",
       icon: IconBuildingStore,
