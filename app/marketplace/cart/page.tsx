@@ -236,20 +236,44 @@ function CartContent() {
       }, 0);
   }, [filteredItems, selectedItems, cartDetails]);
 
-  const tax = Math.round(subtotal * 0.1);
+  const tax = selectedItems.size > 0 ? 3000 : 0;
   const baseShippingCost = selectedRate?.price || 0;
 
   const shippingDiscount = useMemo(() => {
     if (baseShippingCost <= 0) return 0;
+    
+    // 1. Check Store-wide Free Shipping
     const isStoreGratis = storeDetail?.is_gratis_ongkir === "1" || storeDetail?.is_gratis_ongkir === 1;
     const minOrder = Number(storeDetail?.gratis_ongkir_min_order || 0);
     const isStoreThresholdMet = isStoreGratis && subtotal >= minOrder;
+    
+    // 2. Check Per-product Free Shipping
     const freeShippingItem = filteredItems
       .filter(it => selectedItems.has(it.id))
       .find(it => cartDetails[it.id]?.is_gratis_ongkir);
 
     if (!isStoreThresholdMet && !freeShippingItem) return 0;
-    return baseShippingCost; // Full discount
+
+    // Determine discount value
+    let discountVal = 0;
+    if (isStoreThresholdMet) {
+      if (storeDetail?.gratis_ongkir_unit === 'percent') {
+        const percent = Number(storeDetail?.gratis_ongkir_value || 0);
+        discountVal = baseShippingCost * (percent / 100);
+      } else {
+        discountVal = Number(storeDetail?.gratis_ongkir_value || baseShippingCost);
+      }
+    } else if (freeShippingItem) {
+      const detail = cartDetails[freeShippingItem.id];
+      if (detail?.gratis_ongkir_unit === 'percent') {
+        const percent = Number(detail?.gratis_ongkir_value || 0);
+        discountVal = baseShippingCost * (percent / 100);
+      } else {
+        discountVal = Number(detail?.gratis_ongkir_value || baseShippingCost);
+      }
+    }
+
+    return Math.min(baseShippingCost, discountVal || 0);
   }, [baseShippingCost, storeDetail, subtotal, filteredItems, selectedItems, cartDetails]);
 
   const finalShippingCost = baseShippingCost - shippingDiscount;
@@ -705,8 +729,8 @@ function CartContent() {
                       </div>
                     )}
                     <div className="flex justify-between text-gray-600">
-                      <span>PPN (10%)</span>
-                      <span>Rp{tax.toLocaleString('id-ID')}</span>
+                      <span>Fee Platform</span>
+                      <span>{formatCurrency(tax)}</span>
                     </div>
                     <div className="flex justify-between text-gray-600">
                       <span className="flex items-center gap-1"><Truck size={14} /> Biaya Ongkir</span>

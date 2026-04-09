@@ -229,7 +229,7 @@ function CartContent() {
       }, 0)
   }, [filteredItems, selectedItems, cartDetails])
 
-  const tax = Math.round(subtotal * 0.1)
+  const tax = selectedItems.size > 0 ? 3000 : 0
   const baseShippingCost = selectedRate?.price || 0
 
   const shippingDiscount = useMemo(() => {
@@ -686,7 +686,7 @@ function CartContent() {
               </div>
 
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600">Pajak (10%)</span>
+                <span className="text-gray-600">Fee Platform</span>
                 <span className="font-semibold">{formatCurrency(tax)}</span>
               </div>
 
