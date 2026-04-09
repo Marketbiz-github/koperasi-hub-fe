@@ -13,9 +13,14 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
     try {
         const body = await request.json()
-        // Assuming body contains { feature_ids: number[] }
-        const data = await featureService.assignFeatureToPlan({ plan_id: Number(id), feature_ids: body.feature_ids }, token)
-        return NextResponse.json(data)
+        const feature_ids: number[] = body.feature_ids || []
+        
+        const results = await Promise.all(
+            feature_ids.map(featureId => 
+                featureService.assignFeatureToPlan(Number(id), featureId, token)
+            )
+        )
+        return NextResponse.json({ message: 'Berhasil meng-assign fitur', data: results })
     } catch (error: any) {
         return NextResponse.json({ message: error.message || 'Gagal meng-assign fitur ke paket' }, { status: error.status || 500 })
     }
