@@ -35,7 +35,30 @@ async function fetchWithRetry(url: string, options: RequestInit, retries: number
 export async function getLatLong(params: GeocodeParams): Promise<{ lat: string; lon: string } | null> {
     try {
         const country = params.country || 'Indonesia';
+        // Strategy 1: Use internal API bridge to Google Maps (Secure)
+        const address = [
+            params.street,
+            params.county,
+            params.city,
+            params.state,
+            country,
+            params.postalcode
+        ].filter(Boolean).join(', ');
 
+        try {
+            const internalUrl = `/api/geocode?address=${encodeURIComponent(address)}`;
+            const response = await fetch(internalUrl);
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                return { lat: String(data.lat), lon: String(data.lng) };
+            }
+            console.warn('Internal geocoding bridge failed:', data.error);
+        } catch (err) {
+            console.error('Error calling internal geocoding bridge:', err);
+        }
+
+        // Strategy 2: Fallback to Nominatim (OpenStreetMap)
         // Sanitize street: remove 'Jl.', 'Jalan', 'Gg.', etc. for better Nominatim matching
         const sanitizedStreet = params.street
             ? params.street.replace(/^(jl\.?|jalan|gg\.?|gang)\s+/i, '').trim()
@@ -57,33 +80,12 @@ export async function getLatLong(params: GeocodeParams): Promise<{ lat: string; 
         qParams.append('limit', '1');
 
         const qUrl = `https://nominatim.openstreetmap.org/search?${qParams.toString()}`;
-        const data = await fetchWithRetry(qUrl, {
+        const dataOsm = await fetchWithRetry(qUrl, {
             headers: { 'User-Agent': 'KoperasiHub-FE/1.0' }
         });
 
-        if (data && Array.isArray(data) && data.length > 0) {
-            return { lat: data[0].lat, lon: data[0].lon };
-        }
-
-        // Strategy 2: Fallback to structured parameters if 'q' failed
-        const queryParams = new URLSearchParams();
-        if (params.street) queryParams.append('street', params.street);
-        if (params.city) queryParams.append('city', params.city);
-        if (params.county) queryParams.append('county', params.county);
-        if (params.state) queryParams.append('state', params.state);
-        queryParams.append('country', country);
-        if (params.postalcode) queryParams.append('postalcode', params.postalcode);
-
-        queryParams.append('format', 'jsonv2');
-        queryParams.append('limit', '1');
-
-        const url = `https://nominatim.openstreetmap.org/search?${queryParams.toString()}`;
-        const dataFallback = await fetchWithRetry(url, {
-            headers: { 'User-Agent': 'KoperasiHub-FE/1.0' }
-        });
-
-        if (dataFallback && Array.isArray(dataFallback) && dataFallback.length > 0) {
-            return { lat: dataFallback[0].lat, lon: dataFallback[0].lon };
+        if (dataOsm && Array.isArray(dataOsm) && dataOsm.length > 0) {
+            return { lat: dataOsm[0].lat, lon: dataOsm[0].lon };
         }
 
         return null;

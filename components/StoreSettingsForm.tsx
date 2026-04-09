@@ -322,6 +322,8 @@ export default function StoreSettingsForm() {
             { key: 'district_id', label: 'Kecamatan' },
             { key: 'area_id', label: 'Kelurahan' },
             { key: 'logo', label: 'Logo Toko' },
+            { key: 'latitude', label: 'Latitude' },
+            { key: 'longitude', label: 'Longitude' },
         ];
 
         const missing = requiredFields.filter(f => !formData[f.key as keyof typeof formData]);
@@ -674,63 +676,73 @@ export default function StoreSettingsForm() {
                             )}
                         </div>
 
-                        <div className="md:col-span-2">
-                            <div className="grid grid-cols-3 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Kode Pos</label>
+                        <div className="md:col-span-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <div className="flex items-center justify-between mb-4">
+                                <Label className="text-emerald-700 font-bold flex items-center gap-2">
+                                    <MapPin className="h-4 w-4" /> Koordinat Lokasi <span className="text-red-500">*</span>
+                                </Label>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsHelpDialogOpen(true)}
+                                    className="text-[10px] text-emerald-600 border border-emerald-200 hover:bg-emerald-50 px-3 py-1 rounded-lg font-medium transition-colors flex items-center gap-1"
+                                >
+                                    <HelpCircle className="w-3 h-3" /> Bantuan Koordinat Manual
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="grid gap-1.5 md:col-span-1">
+                                    <Label className="text-[10px] text-slate-500 uppercase font-bold">Kode Pos</Label>
                                     <input
                                         type="text"
                                         value={formData.zipcode}
                                         readOnly
-                                        className="w-full px-4 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-500 outline-none cursor-not-allowed"
+                                        className="w-full h-8 px-4 rounded-xl border border-slate-300 bg-slate-100/50 text-slate-500 text-xs outline-none cursor-not-allowed"
+                                        placeholder="Otomatis"
                                     />
                                 </div>
 
-                                <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <label className="block text-sm font-medium text-slate-700">Latitude</label>
-                                        <button
-                                            type="button"
-                                            onClick={() => setIsHelpDialogOpen(true)}
-                                            className="text-[10px] text-emerald-600 hover:text-emerald-700 flex items-center gap-1 font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 transition-colors"
-                                        >
-                                            <HelpCircle className="w-3 h-3" /> Google Maps
-                                        </button>
-                                    </div>
+                                <div className="grid gap-1.5 md:col-span-1">
+                                    <Label className="text-[10px] text-slate-500 uppercase font-bold">Latitude</Label>
                                     <div className="relative">
                                         <input
                                             type="text"
                                             value={formData.latitude}
                                             onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                                            className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
-                                            placeholder="Otomatis / Manual"
+                                            className="w-full h-8 px-4 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs font-mono outline-none"
+                                            placeholder="Auto-filled"
+                                            required
                                         />
                                         {isGeocoding && (
                                             <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                                <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+                                                <Loader2 className="h-3 w-3 animate-spin text-emerald-600" />
                                             </div>
                                         )}
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Longitude</label>
+                                <div className="grid gap-1.5 md:col-span-1">
+                                    <Label className="text-[10px] text-slate-500 uppercase font-bold">Longitude</Label>
                                     <div className="relative">
                                         <input
                                             type="text"
                                             value={formData.longitude}
                                             onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                                            className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
-                                            placeholder="Otomatis / Manual"
+                                            className="w-full h-8 px-4 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs font-mono outline-none"
+                                            placeholder="Auto-filled"
+                                            required
                                         />
                                         {isGeocoding && (
                                             <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                                <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+                                                <Loader2 className="h-3 w-3 animate-spin text-emerald-600" />
                                             </div>
                                         )}
                                     </div>
                                 </div>
                             </div>
+                            <p className="text-[10px] text-slate-500 mt-3 italic">
+                                Info: Koordinat akan terisi otomatis saat Anda memilih area di atas. Jika tidak akurat, silakan gunakan tombol bantuan di atas.
+                            </p>
                         </div>
                     </div>
                 </section>

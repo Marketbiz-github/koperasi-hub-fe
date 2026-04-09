@@ -127,8 +127,6 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
         is_cashback: false,
         cashback_unit: 'fixed',
         cashback_value: '',
-        dropshiper_unit: (rolePath === 'koperasi' || rolePath === 'reseller') ? 'fixed' : '',
-        dropshiper_value: '',
     });
 
     const [images, setImages] = useState<ImageItem[]>([]);
@@ -214,8 +212,6 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                         is_cashback: !!prod.is_cashback,
                         cashback_unit: prod.cashback_unit || 'fixed',
                         cashback_value: prod.cashback_value?.toString() || '',
-                        dropshiper_unit: prod.dropshiper_unit || 'fixed',
-                        dropshiper_value: prod.dropshiper_value?.toString() || '',
                     });
 
                     if (prod.images) {
@@ -537,6 +533,11 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
             return;
         }
 
+        if (formData.general_category_id === '') {
+            toast.error('Kategori Umum wajib dipilih');
+            return;
+        }
+
         if (!hasVariants && simpleStocks.length === 0) {
             toast.error('Silakan pilih gudang untuk mengisi stok');
             return;
@@ -587,8 +588,6 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                 is_cashback: formData.is_cashback,
                 cashback_unit: formData.cashback_unit,
                 cashback_value: String(formData.cashback_value),
-                dropshiper_unit: (rolePath === 'koperasi' || rolePath === 'reseller') ? formData.dropshiper_unit : null,
-                dropshiper_value: (rolePath === 'koperasi' || rolePath === 'reseller') ? String(formData.dropshiper_value) : null,
             };
 
             if (imagesChanged) {
@@ -783,7 +782,7 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="general_category">Kategori Umum</Label>
+                                    <Label htmlFor="general_category">Kategori Umum <span className="text-red-500">*</span></Label>
                                     <Select
                                         value={formData.general_category_id}
                                         onValueChange={val => setFormData({ ...formData, general_category_id: val })}
@@ -1378,27 +1377,6 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                                 </div>
                             )}
 
-                            {(rolePath === 'koperasi' || rolePath === 'reseller') && (
-                                <div className="p-3 rounded-xl border border-emerald-100 bg-emerald-50/30 space-y-3">
-                                    <Label className="text-emerald-800 font-semibold">Komisi Dropshipper <span className="text-red-500">*</span></Label>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="space-y-1">
-                                            <Label className="text-[10px]">Tipe</Label>
-                                            <Select value={formData.dropshiper_unit} onValueChange={val => setFormData({ ...formData, dropshiper_unit: val })}>
-                                                <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="fixed">Nominal (Rp)</SelectItem>
-                                                    <SelectItem value="percentage">Persen (%)</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <Label className="text-[10px]">Nilai</Label>
-                                            <Input className="h-8" type="number" required value={formData.dropshiper_value} onChange={e => setFormData({ ...formData, dropshiper_value: e.target.value })} />
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
                         </CardContent>
                     </Card>
                 </div >

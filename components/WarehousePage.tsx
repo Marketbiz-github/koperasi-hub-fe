@@ -367,6 +367,10 @@ export default function WarehousePageShared({ title, description }: WarehousePag
             toast.error('Informasi toko tidak ditemukan');
             return;
         }
+        if (formData.latitude === 0 || formData.longitude === 0) {
+            toast.error('Koordinat lokasi (Lat/Long) wajib diisi melalui peta atau manual');
+            return;
+        }
 
         setIsSaving(true);
 
@@ -713,10 +717,10 @@ export default function WarehousePageShared({ title, description }: WarehousePag
                         <div className="grid gap-2">
                             <Label htmlFor="alamat">
                                 Alamat Lengkap <span className="text-red-500">*</span>
-                                <span className="block text-sm font-normal text-muted-foreground mt-1 italic">
-                                    Tips: Masukkan nama jalan dan nomor saja (tanpa &quot;Jl.&quot; atau &quot;Gg.&quot;) untuk hasil koordinat yang lebih akurat melalui sistem.
-                                </span>
                             </Label>
+                            <div className="block text-sm font-normal text-muted-foreground mt-1 italic">
+                                Tips: Masukkan nama jalan dan nomor saja (tanpa &quot;Jl.&quot; atau &quot;Gg.&quot;) untuk hasil koordinat yang lebih akurat melalui sistem.
+                            </div>
                             <Input
                                 id="alamat"
                                 value={formData.alamat}
@@ -788,9 +792,63 @@ export default function WarehousePageShared({ title, description }: WarehousePag
                                     id="zipcode"
                                     value={formData.zipcode}
                                     readOnly
-                                    className="bg-muted"
+                                    className="bg-muted h-8 text-xs"
                                 />
                             </div>
+                        </div>
+
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <div className="flex items-center justify-between mb-4">
+                                <Label className="text-emerald-700 font-bold flex items-center gap-2">
+                                    <MapPin className="h-4 w-4" /> Koordinat Lokasi <span className="text-red-500">*</span>
+                                </Label>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setIsHelpDialogOpen(true)}
+                                    className="h-7 text-[10px] text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                                >
+                                    <HelpCircle className="w-3 h-3 mr-1" /> Bantuan Koordinat Manual
+                                </Button>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="grid gap-1.5">
+                                    <Label htmlFor="latitude" className="text-[10px] text-slate-500 uppercase font-bold">Latitude</Label>
+                                    <div className="relative">
+                                        <Input
+                                            id="latitude"
+                                            value={formData.latitude}
+                                            onChange={(e) => setFormData({ ...formData, latitude: Number(e.target.value) || 0 })}
+                                            className="h-8 text-xs font-mono"
+                                            placeholder="Auto-filled"
+                                            required
+                                        />
+                                        {isGeocoding && <div className="absolute right-2 top-1/2 -translate-y-1/2"><Loader2 className="h-3 w-3 animate-spin text-emerald-600" /></div>}
+                                    </div>
+                                </div>
+                                <div className="grid gap-1.5">
+                                    <Label htmlFor="longitude" className="text-[10px] text-slate-500 uppercase font-bold">Longitude</Label>
+                                    <div className="relative">
+                                        <Input
+                                            id="longitude"
+                                            value={formData.longitude}
+                                            onChange={(e) => setFormData({ ...formData, longitude: Number(e.target.value) || 0 })}
+                                            className="h-8 text-xs font-mono"
+                                            placeholder="Auto-filled"
+                                            required
+                                        />
+                                        {isGeocoding && <div className="absolute right-2 top-1/2 -translate-y-1/2"><Loader2 className="h-3 w-3 animate-spin text-emerald-600" /></div>}
+                                    </div>
+                                </div>
+                            </div>
+                            <p className="text-[10px] text-slate-500 mt-3 italic">
+                                Info: Koordinat akan terisi otomatis saat Anda memilih area di atas. Jika tidak muncul, silakan tekan tombol bantuan di atas.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
                             <div className="grid gap-2">
                                 <Label htmlFor="status">Status</Label>
                                 <Select
@@ -805,49 +863,6 @@ export default function WarehousePageShared({ title, description }: WarehousePag
                                         <SelectItem value="0">Non-aktif</SelectItem>
                                     </SelectContent>
                                 </Select>
-                            </div>
-                            <div className="grid gap-2">
-                                <div className="flex items-center justify-between">
-                                    <Label htmlFor="latitude">Latitude</Label>
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsHelpDialogOpen(true)}
-                                        className="text-[10px] text-emerald-600 hover:text-emerald-700 flex items-center gap-1 font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 transition-colors"
-                                    >
-                                        <HelpCircle className="w-3 h-3" /> Maps
-                                    </button>
-                                </div>
-                                <div className="relative">
-                                    <Input
-                                        id="latitude"
-                                        type="text"
-                                        value={formData.latitude}
-                                        onChange={(e) => setFormData({ ...formData, latitude: Number(e.target.value) || 0 })}
-                                        placeholder="Otomatis"
-                                    />
-                                    {isGeocoding && (
-                                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                            <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="longitude">Longitude</Label>
-                                <div className="relative">
-                                    <Input
-                                        id="longitude"
-                                        type="text"
-                                        value={formData.longitude}
-                                        onChange={(e) => setFormData({ ...formData, longitude: Number(e.target.value) || 0 })}
-                                        placeholder="Otomatis"
-                                    />
-                                    {isGeocoding && (
-                                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                            <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
-                                        </div>
-                                    )}
-                                </div>
                             </div>
                         </div>
 
