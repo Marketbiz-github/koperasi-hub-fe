@@ -52,21 +52,6 @@ const data = {
       icon: IconBuildingStore,
     },
     {
-      title: "Pembelian",
-      url: "/dashboard/reseller/marketplace/pembelian",
-      icon: IconShoppingCart,
-    },
-    {
-      title: "Pesanan",
-      url: "/dashboard/reseller/marketplace/pesanan",
-      icon: IconFileInvoice,
-    },
-    // {
-    //   title: "Piutang",
-    //   url: "/dashboard/reseller/marketplace/piutang",
-    //   icon: IconCash,
-    // },
-    {
       title: "Afiliasi",
       url: "#",
       icon: IconUsersGroup,
@@ -76,6 +61,16 @@ const data = {
           url: "/dashboard/reseller/afiliasi/request",
         },
       ],
+    },
+    {
+      title: "Pembelian",
+      url: "/dashboard/reseller/marketplace/pembelian",
+      icon: IconShoppingCart,
+    },
+    {
+      title: "Gudang",
+      url: "/dashboard/reseller/gudang",
+      icon: IconBuildingCommunity,
     },
     {
       title: "Produk",
@@ -92,57 +87,10 @@ const data = {
         },
       ],
     },
-    // {
-    //   title: "Word-of-mouth",
-    //   url: "#",
-    //   icon: IconMessageHeart,
-    //   items: [
-    //     {
-    //       title: "Campaign",
-    //       url: "/dashboard/reseller/wom/campaign",
-    //     },
-    //     {
-    //       title: "Data Transaksi",
-    //       url: "/dashboard/reseller/wom/data-transaksi",
-    //     },
-    //   ],
-    // },
-    // {
-    //   title: "Penjualan",
-    //   url: "/dashboard/reseller/penjualan",
-    //   icon: IconCashRegister,
-    // },
-    // {
-    //   title: "Fitur",
-    //   url: "#",
-    //   icon: IconGift,
-    //   items: [
-    //     {
-    //       title: "Produk Unggulan",
-    //       url: "/dashboard/reseller/fitur/produk-unggulan",
-    //     },
-    //     {
-    //       title: "Produk Diminati",
-    //       url: "/dashboard/reseller/fitur/produk-diminati",
-    //     },
-    //     {
-    //       title: "Voucher",
-    //       url: "/dashboard/reseller/fitur/voucher",
-    //     },
-    //     {
-    //       title: "Manajemen Stok",
-    //       url: "/dashboard/reseller/fitur/manajemen-stok",
-    //     },
-    //     {
-    //       title: "Flash Sale",
-    //       url: "/dashboard/reseller/fitur/flash-sale",
-    //     },
-    //   ],
-    // },
     {
-      title: "Gudang",
-      url: "/dashboard/reseller/gudang",
-      icon: IconBuildingCommunity,
+      title: "Pesanan",
+      url: "/dashboard/reseller/marketplace/pesanan",
+      icon: IconFileInvoice,
     },
     {
       title: "Campaign",

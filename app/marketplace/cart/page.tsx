@@ -314,20 +314,28 @@ function CartContent() {
         shared_code: localStorage.getItem('last_share_code') || undefined,
       };
 
-      const res = await orderService.createOrder(orderData, token || "");
+      const returnUrl = `${window.location.origin}/marketplace/thankyou`;
+      const orderDataWithReturn = {
+        ...orderData,
+        return_url: returnUrl
+      };
+
+      const res = await orderService.createOrder(orderDataWithReturn, token || "");
       if (res.data) {
         toast.success("Pesanan berhasil dibuat!");
         removeItems(Array.from(selectedItems));
 
-        // Immediate redirect if payment_url exists
-        if (res.data.payment_url) {
-          window.location.href = res.data.payment_url;
+        // Use standard 'url' or 'payment_url' field from response
+        const paymentUrl = res.data.url || res.data.payment_url;
+        
+        if (paymentUrl) {
+          window.location.href = paymentUrl;
           return;
         }
 
         setCheckoutSuccessData({
           orderId: res.data.order?.id || res.data.id || 0,
-          paymentUrl: res.data.payment_url || null
+          paymentUrl: paymentUrl || null
         });
       }
     } catch (error: any) {

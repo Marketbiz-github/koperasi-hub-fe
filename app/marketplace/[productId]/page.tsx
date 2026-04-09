@@ -73,19 +73,46 @@ export default function ProductDetailPage({ params }: PageProps) {
     setIsLoading(true);
     try {
       const token = await getPublicAccessToken();
-      const res = await productService.getProductDetail(productId, token || '');
-      if (res.data) {
-        setProduct(res.data);
+      let productData = null;
 
-        // Fetch Stock and Variants
+      // Check if productId looks like a numeric ID or a slug
+      const isNumeric = /^\d+$/.test(productId);
+
+      if (isNumeric) {
         try {
-          const vRes = await productVariantService.getList(token || "", productId);
+          const res = await productService.getProductDetail(productId, token || '');
+          if (res.data) productData = res.data;
+        } catch (e: any) {
+          console.warn('ID fetch failed, trying slug fallback');
+        }
+      }
+
+      // If ID fetch failed or it's clearly a slug, try getProductDetailBySlug
+      if (!productData) {
+        try {
+          const res = await productService.getProductDetailBySlug(productId, token || '');
+          if (res.data) {
+            const searchList = res.data.data || (Array.isArray(res.data) ? res.data : []);
+            productData = searchList.find((p: any) => p.slug === productId || String(p.id) === String(productId)) || searchList[0];
+          }
+        } catch (e: any) {
+          console.error('Slug fetch failed:', e);
+        }
+      }
+
+      if (productData) {
+        setProduct(productData);
+        const resolvedId = productData.id;
+
+        // Fetch Stock and Variants using resolved ID
+        try {
+          const vRes = await productVariantService.getList(token || "", resolvedId);
           if (vRes.data && vRes.data.length > 0) {
             setVariants(vRes.data);
             const sumStock = vRes.data.reduce((acc: number, curr: any) => acc + (curr.total_stock || 0), 0);
             setTotalStock(sumStock);
           } else {
-            const sRes = await inventoryService.getStockByProduct(token || "", productId);
+            const sRes = await inventoryService.getStockByProduct(token || "", resolvedId);
             if (Array.isArray(sRes.data)) {
               setTotalStock(sRes.data.reduce((acc: number, curr: any) => acc + (curr.stock || 0), 0));
             } else {
@@ -95,6 +122,8 @@ export default function ProductDetailPage({ params }: PageProps) {
         } catch (stockErr) {
           console.error('Error fetching stock:', stockErr);
         }
+      } else {
+        setProduct(null);
       }
     } catch (err) {
       console.error('Error fetching product detail:', err);

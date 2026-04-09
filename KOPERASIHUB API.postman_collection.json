@@ -1618,7 +1618,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA5NTQzODEsInVzZXJfaWQiOjExfQ.AsaILR48ELJPaNOQ8UhaqCq21b45RRV_o_c-9cZeV5Y",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzU3MDIwNTgsInVzZXJfaWQiOjF9.VztQqvbsKb7dqsy31vooOXxOLLUdsshLKcTFXsXv54E",
                   "type": "string"
                 }
               ]
@@ -1627,7 +1627,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"plan_id\": 1\n}",
+              "raw": "{\n  \"plan_id\": 1,\n  \"return_url\": \"https://frontend.example.com/profile\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1644,7 +1644,7 @@
                 "order"
               ]
             },
-            "description": "Setelah user membayar otomatis ipaymu mengirim callback ke webhook, setelah itu plan dan expired at user akan berubah sesuai dengan yang di order  \n  \nOrder plan user id di sesuaikan dengan token yang di gunakan saat hit endpoint"
+            "description": "Setelah user membayar otomatis ipaymu mengirim callback ke webhook, setelah itu plan dan expired at user akan berubah sesuai dengan yang di order\n\nOrder plan user id di sesuaikan dengan token yang di gunakan saat hit endpoint\n\nNOTE :  \nreturn_url : di isi oleh FE untuk memberi tahu kemana redirect thankyou page di arahkan setelah BE selesai memproses hasil pembayaran dari ipaymu"
           },
           "response": [
             {
@@ -11148,7 +11148,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE5NDYxOTYsInVzZXJfaWQiOjExfQ.MofI4QzvArAn6goZKcgTCJntUzASUKWKYq4Gs5rmemo",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzU3MDIwNTgsInVzZXJfaWQiOjF9.VztQqvbsKb7dqsy31vooOXxOLLUdsshLKcTFXsXv54E",
                   "type": "string"
                 }
               ]
@@ -11545,7 +11545,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"kop\",\n        \"email\": \"pranatayeye18@gmail.com\",\n        \"phone\": \"543545135781\",\n        \"address\": \"jl letda reta\",\n        \"province\": \"Bali\",\n        \"city\": \"Denpasar\",\n        \"district\": \"Denpasar Utara\",\n        \"subdistrict\": \"\",\n        \"zipcode\": \"80111\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 1\n        }\n    ],\n    \"shipping_cost\": 10800,\n    \"courier_name\": \"GRAB\",\n    \"courier_code\": \"grab\",\n    \"courier_service\": \"Instant\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"da\",\n    \"payment_category\": \"instant\"\n}",
+              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"kop\",\n        \"email\": \"pranatayeye18@gmail.com\",\n        \"phone\": \"543545135781\",\n        \"address\": \"jl letda reta\",\n        \"province\": \"Bali\",\n        \"city\": \"Denpasar\",\n        \"district\": \"Denpasar Utara\",\n        \"subdistrict\": \"\",\n        \"zipcode\": \"80111\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 1\n        }\n    ],\n    \"shipping_cost\": 10800,\n    \"courier_name\": \"GRAB\",\n    \"courier_code\": \"grab\",\n    \"courier_service\": \"Instant\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"da\",\n    \"payment_category\": \"instant\",\n    \"return_url\": \"https://frontend.example.com/thankyou\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -11561,7 +11561,7 @@
                 "orders"
               ]
             },
-            "description": "**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category`: `instant` (default) atau `piutang`\n    \n- `debt_type`: `tenor` atau po (wajib jika `piutang`)\n    \n- `tenor_months`: Jumlah bulan (wajib jika `tenor`)\n    \n\nNOTE\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login."
+            "description": "**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category`: `instant` (default) atau `piutang`\n    \n- `debt_type`: `tenor` atau po (wajib jika `piutang`)\n    \n- `tenor_months`: Jumlah bulan (wajib jika `tenor`)\n    \n\nNOTE\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login.\n    \n- return_url : di isi oleh FE untuk memberi tahu kemana redirect thankyou page di arahkan setelah BE selesai memproses hasil pembayaran dari ipaymu"
           },
           "response": [
             {
@@ -11699,7 +11699,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"tenor\",\n    \"tenor_months\": 3,\n    \"buyer_id\" : 11\n}",
+              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"tenor\",\n    \"tenor_months\": 3,\n    \"buyer_id\" : 11,\n    \"return_url\": \"https://frontend.example.com/thankyou\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -11715,7 +11715,7 @@
                 "orders"
               ]
             },
-            "description": "**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category`: `instant` (default) atau `piutang`\n    \n- `debt_type`: `tenor` atau po (wajib jika `piutang`)\n    \n- `tenor_months`: Jumlah bulan (wajib jika `tenor`)\n    \n\nNOTE\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login."
+            "description": "**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category`: `instant` (default) atau `piutang`\n    \n- `debt_type`: `tenor` atau po (wajib jika `piutang`)\n    \n- `tenor_months`: Jumlah bulan (wajib jika `tenor`)\n    \n\nNOTE\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login.\n    \n- return_url : di isi oleh FE untuk memberi tahu kemana redirect thankyou page di arahkan setelah BE selesai memproses hasil pembayaran dari ipaymu"
           },
           "response": [
             {
@@ -11817,7 +11817,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"po\" \n}",
+              "raw": "{\n    \"store_id\": 1,\n    \"shipping_address\": {\n        \"name\": \"Budi\",\n        \"email\": \"budi@example.com\",\n        \"phone\": \"08123456789\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"province\": \"DKI Jakarta\",\n        \"city\": \"Jakarta Selatan\",\n        \"district\": \"Tebet\",\n        \"subdistrict\": \"Tebet Barat\",\n        \"zipcode\": \"12810\"\n    },\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 2,\n            \"quantity\": 2\n        },\n        {\n            \"product_id\": 1,\n            \"product_variant_id\": 3,\n            \"quantity\": 2\n        }\n    ],\n    \"shipping_cost\": 10000,\n    \"courier_name\": \"JNE\",\n    \"courier_code\": \"jne\",\n    \"courier_service\": \"Reguler\",\n    \"warehouse_id\": 1,\n    \"customer_notes\": \"Packing kayu\",\n    \"payment_category\": \"piutang\",\n    \"debt_type\": \"po\",\n    \"return_url\": \"https://frontend.example.com/thankyou\" \n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -11833,7 +11833,7 @@
                 "orders"
               ]
             },
-            "description": "**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category`: `instant` (default) atau `piutang`\n    \n- `debt_type`: `tenor` atau po (wajib jika `piutang`)\n    \n- `tenor_months`: Jumlah bulan (wajib jika `tenor`)\n    \n\nNOTE\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login."
+            "description": "**Request Body (Common Fields):**\n\n- `store_id`: ID toko\n    \n- `items`: Array item (product_id, quantity)\n    \n- `shipping_address`: Data pengiriman\n    \n- `payment_category`: `instant` (default) atau `piutang`\n    \n- `debt_type`: `tenor` atau po (wajib jika `piutang`)\n    \n- `tenor_months`: Jumlah bulan (wajib jika `tenor`)\n    \n\nNOTE\n\n**Internal IDs:**\n\n- `user_id` (Store Owner) akan diisi secara otomatis dari sistem berdasarkan pemilik toko.\n    \n- `buyer_id` (Buyer) akan diisi secara otomatis dari ID user yang sedang login.\n    \n- return_url : di isi oleh FE untuk memberi tahu kemana redirect thankyou page di arahkan setelah BE selesai memproses hasil pembayaran dari ipaymu"
           },
           "response": [
             {
@@ -13465,7 +13465,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE0NzY5OTAsInVzZXJfaWQiOjExfQ.v2fkObmWSaaTllIxIptGhRCAsgWTNDkVQ_mlRdq1YRc",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzU3MDIwNTgsInVzZXJfaWQiOjF9.VztQqvbsKb7dqsy31vooOXxOLLUdsshLKcTFXsXv54E",
                       "type": "string"
                     }
                   ]
@@ -13474,7 +13474,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"amount\": 100000\n}",
+                  "raw": "{\n    \"amount\": 100000,\n    \"return_url\": \"https://frontend.example.com/thankyou\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -13490,7 +13490,8 @@
                     "campaigns",
                     "topup"
                   ]
-                }
+                },
+                "description": "NOTE :  \nreturn_url : di isi oleh FE untuk memberi tahu kemana redirect thankyou page di arahkan setelah BE selesai memproses hasil pembayaran dari ipaymu"
               },
               "response": [
                 {
@@ -14045,7 +14046,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzMxNTI2NjAsInVzZXJfaWQiOjE1fQ.vBsu_p6Q-lJ7H9RxqMqFItCMrlHzalYrqkZ1YWnCTUs",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzU3MDIwNTgsInVzZXJfaWQiOjF9.VztQqvbsKb7dqsy31vooOXxOLLUdsshLKcTFXsXv54E",
                       "type": "string"
                     }
                   ]

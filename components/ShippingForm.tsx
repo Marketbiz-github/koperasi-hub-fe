@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,12 +38,31 @@ export default function ShippingForm({ onSelectRate, onAddressLocked, items, sto
     const [searchQuery, setSearchQuery] = useState("");
     const [suggestions, setSuggestions] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
-    const [rates, setRates] = useState<any[]>([]);
+    const [allRates, setAllRates] = useState<any[]>([]);
     const [isLoadingRates, setIsLoadingRates] = useState(false);
     const [selectedRateCode, setSelectedRateCode] = useState<string | null>(null);
     const [warehouseId, setWarehouseId] = useState<number | null>(null);
     const [warehouseInfo, setWarehouseInfo] = useState<any>(null);
     const [isLoadingWarehouse, setIsLoadingWarehouse] = useState(false);
+
+    // Filter rates berdasarkan storeCouriers jika ada (Reactive)
+    const filteredRates = useMemo(() => {
+        const allowedCouriers = Array.isArray(storeCouriers)
+            ? storeCouriers
+            : typeof storeCouriers === 'string' && storeCouriers
+                ? storeCouriers.split(',')
+                : [];
+
+        if (allowedCouriers.length === 0) return allRates;
+
+        return allRates.filter((rate: any) =>
+            allowedCouriers.some((c: string) => {
+                const normalizedStore = c.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+                const normalizedRate = rate.courier_code?.toLowerCase().replace(/[^a-z0-9]/g, '');
+                return normalizedStore === normalizedRate;
+            })
+        );
+    }, [allRates, storeCouriers]);
 
     // Auto-populate from user store details
     useEffect(() => {
@@ -129,26 +148,9 @@ export default function ShippingForm({ onSelectRate, onAddressLocked, items, sto
             };
 
             const res = await shippingService.getRates(payload, token || undefined);
-            const allRates = res.data.rates || [];
+            const fetchedRates = res.data.rates || [];
 
-            // Filter rates berdasarkan storeCouriers jika ada
-            const allowedCouriers = Array.isArray(storeCouriers)
-                ? storeCouriers
-                : typeof storeCouriers === 'string' && storeCouriers
-                    ? storeCouriers.split(',')
-                    : [];
-
-            const filteredRates = allowedCouriers.length > 0
-                ? allRates.filter((rate: any) =>
-                    allowedCouriers.some((c: string) => {
-                        const normalizedStore = c.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-                        const normalizedRate = rate.courier_code?.toLowerCase().replace(/[^a-z0-9]/g, '');
-                        return normalizedStore === normalizedRate;
-                    })
-                )
-                : allRates;
-
-            setRates(filteredRates);
+            setAllRates(fetchedRates);
             setWarehouseId(res.data.warehouse_id);
 
             // Fetch warehouse info if warehouse_id is returned
@@ -156,11 +158,25 @@ export default function ShippingForm({ onSelectRate, onAddressLocked, items, sto
                 fetchWarehouseDetail(res.data.warehouse_id, token || undefined);
             }
 
-            if (filteredRates.length === 0) {
-                if (allRates.length > 0 && allowedCouriers.length > 0) {
-                    toast.warning("Kurir dari toko ini tidak tersedia untuk wilayah tujuan. (Tersedia di toko: " + allowedCouriers.join(', ') + ")");
-                } else {
-                    toast.warning("Tidak ada kurir tersedia untuk wilayah ini");
+            // Post-fetch check: if filtering results in 0 but we have raw rates
+            const allowedCouriers = Array.isArray(storeCouriers)
+                ? storeCouriers
+                : typeof storeCouriers === 'string' && storeCouriers
+                    ? storeCouriers.split(',')
+                    : [];
+
+            if (fetchedRates.length === 0) {
+                toast.warning("Tidak ada kurir tersedia untuk wilayah ini");
+            } else if (allowedCouriers.length > 0) {
+                const hasMatch = fetchedRates.some((rate: any) =>
+                    allowedCouriers.some((c: string) => {
+                        const normalizedStore = c.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+                        const normalizedRate = rate.courier_code?.toLowerCase().replace(/[^a-z0-9]/g, '');
+                        return normalizedStore === normalizedRate;
+                    })
+                );
+                if (!hasMatch) {
+                    toast.warning("Kurir dari toko ini tidak tersedia untuk wilayah tujuan. (Kurir aktif: " + allowedCouriers.join(', ') + ")");
                 }
             }
         } catch (error: any) {
@@ -312,11 +328,11 @@ export default function ShippingForm({ onSelectRate, onAddressLocked, items, sto
                         </div>
                     )}
 
-                    {!isLoadingRates && rates.length > 0 && (
+                    {!isLoadingRates && filteredRates.length > 0 && (
                         <div className="space-y-3 pt-2">
                             <Label>Pilih Layanan Kurir</Label>
                             <div className="grid gap-2">
-                                {rates.map((rate, idx) => {
+                                {filteredRates.map((rate, idx) => {
                                     const code = `${rate.courier_code}-${rate.courier_service_code}`;
                                     const isSelected = selectedRateCode === code;
                                     return (

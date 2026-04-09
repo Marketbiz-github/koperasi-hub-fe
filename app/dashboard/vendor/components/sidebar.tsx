@@ -36,6 +36,11 @@ const vendorNav = [
     icon: IconDashboard,
   },
   {
+    title: "Gudang",
+    url: "/dashboard/vendor/gudang",
+    icon: IconBuildingCommunity,
+  },
+  {
     title: "Produk",
     url: "#",
     icon: IconBox,
@@ -49,11 +54,6 @@ const vendorNav = [
         url: "/dashboard/vendor/produk",
       },
     ],
-  },
-  {
-    title: "Gudang",
-    url: "/dashboard/vendor/gudang",
-    icon: IconBuildingCommunity,
   },
   {
     title: "Afiliasi",
@@ -81,38 +81,6 @@ const vendorNav = [
       },
     ],
   },
-  // {
-  //   title: "Penjualan",
-  //   url: "/dashboard/vendor/penjualan",
-  //   icon: IconCashRegister,
-  // },
-  // {
-  //   title: "Fitur",
-  //   url: "#",
-  //   icon: IconGift,
-  //   items: [
-  //     {
-  //       title: "Produk Unggulan",
-  //       url: "/dashboard/vendor/fitur/produk-unggulan",
-  //     },
-  //     {
-  //       title: "Produk Diminati",
-  //       url: "/dashboard/vendor/fitur/produk-diminati",
-  //     },
-  //     {
-  //       title: "Voucher",
-  //       url: "/dashboard/vendor/fitur/voucher",
-  //     },
-  //     {
-  //       title: "Manajemen Stok",
-  //       url: "/dashboard/vendor/fitur/manajemen-stok",
-  //     },
-  //     {
-  //       title: "Flash Sale",
-  //       url: "/dashboard/vendor/fitur/flash-sale",
-  //     },
-  //   ],
-  // },
   {
     title: "Pengaturan Toko",
     url: "/dashboard/vendor/store-settings",

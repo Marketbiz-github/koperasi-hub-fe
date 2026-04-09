@@ -303,6 +303,7 @@ function CartContent() {
       const firstItemDetail = cartDetails[selectedCartItems[0]?.id]
       const hasFreeShipping = selectedCartItems.some(it => cartDetails[it.id]?.is_gratis_ongkir)
 
+      const returnUrl = `${window.location.origin}/dashboard/reseller/thankyou`
       const orderData = {
         store_id: firstItemDetail?.store_id || selectedCartItems[0]?.storeId || 1,
         shipping_address: {
@@ -328,7 +329,8 @@ function CartContent() {
         warehouse_id: warehouseId,
         customer_notes: customerNotes,
         payment_category: paymentCategory,
-        is_gratis_ongkir: hasFreeShipping
+        is_gratis_ongkir: hasFreeShipping,
+        return_url: returnUrl
       }
 
       const response = await fetch('/api/orders', {
@@ -348,11 +350,9 @@ function CartContent() {
       toast.success("Pesanan berhasil dibuat!")
 
       if (paymentCategory === "instant" && result.data?.payment_url) {
-        window.open(result.data.payment_url, '_blank')
-        setCheckoutSuccessData({
-          orderId: result.data?.order?.id || 0,
-          paymentUrl: result.data.payment_url
-        })
+        // Use current window for better redirection flow
+        window.location.href = result.data.payment_url
+        return
       } else {
         setCheckoutSuccessData({
           orderId: result.data?.order?.id || result.data?.id || 0,

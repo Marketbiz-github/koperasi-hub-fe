@@ -57,21 +57,6 @@ const data = {
       icon: IconBuildingStore,
     },
     {
-      title: "Pembelian",
-      url: "#",
-      icon: IconShoppingCart,
-      items: [
-        {
-          title: "Daftar Pembelian",
-          url: "/dashboard/koperasi/marketplace/pembelian",
-        },
-        {
-          title: "Daftar Piutang",
-          url: "/dashboard/koperasi/marketplace/piutang",
-        },
-      ]
-    },
-    {
       title: "Afiliasi",
       url: "#",
       icon: IconUsersGroup,
@@ -87,6 +72,26 @@ const data = {
       ],
     },
     {
+      title: "Pembelian",
+      url: "#",
+      icon: IconShoppingCart,
+      items: [
+        {
+          title: "Daftar Pembelian",
+          url: "/dashboard/koperasi/marketplace/pembelian",
+        },
+        {
+          title: "Daftar Piutang",
+          url: "/dashboard/koperasi/marketplace/piutang",
+        },
+      ]
+    },
+    {
+      title: "Gudang",
+      url: "/dashboard/koperasi/gudang",
+      icon: IconBuildingCommunity,
+    },
+    {
       title: "Produk",
       url: "#",
       icon: IconBox,
@@ -100,58 +105,6 @@ const data = {
           url: "/dashboard/koperasi/produk",
         },
       ],
-    },
-    // {
-    //   title: "Word-of-mouth",
-    //   url: "#",
-    //   icon: IconMessageHeart,
-    //   items: [
-    //     {
-    //       title: "Campaign",
-    //       url: "/dashboard/koperasi/wom/campaign",
-    //     },
-    //     {
-    //       title: "Data Transaksi",
-    //       url: "/dashboard/koperasi/wom/data-transaksi",
-    //     },
-    //   ],
-    // },
-    // {
-    //   title: "Penjualan",
-    //   url: "/dashboard/koperasi/penjualan",
-    //   icon: IconCashRegister,
-    // },
-    // {
-    //   title: "Fitur",
-    //   url: "#",
-    //   icon: IconGift,
-    //   items: [
-    //     {
-    //       title: "Produk Unggulan",
-    //       url: "/dashboard/koperasi/fitur/produk-unggulan",
-    //     },
-    //     {
-    //       title: "Produk Diminati",
-    //       url: "/dashboard/koperasi/fitur/produk-diminati",
-    //     },
-    //     {
-    //       title: "Voucher",
-    //       url: "/dashboard/koperasi/fitur/voucher",
-    //     },
-    //     {
-    //       title: "Manajemen Stok",
-    //       url: "/dashboard/koperasi/fitur/manajemen-stok",
-    //     },
-    //     {
-    //       title: "Flash Sale",
-    //       url: "/dashboard/koperasi/fitur/flash-sale",
-    //     },
-    //   ],
-    // },
-    {
-      title: "Gudang",
-      url: "/dashboard/koperasi/gudang",
-      icon: IconBuildingCommunity,
     },
     {
       title: "Pesanan Masuk",

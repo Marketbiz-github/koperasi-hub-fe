@@ -732,8 +732,12 @@ export const debtService = {
         return apiRequest(endpoint, { token });
     },
 
-    async getPaymentUrl(debtId: string | number, type: 'installment' | 'po', token: string) {
-        return apiRequest(`/debts/${debtId}/pay?type=${type}`, {
+    async getPaymentUrl(debtId: string | number, type: 'installment' | 'po', token: string, return_url?: string) {
+        let endpoint = `/debts/${debtId}/pay?type=${type}`;
+        if (return_url) {
+            endpoint += `&return_url=${encodeURIComponent(return_url)}`;
+        }
+        return apiRequest(endpoint, {
             token,
         });
     },
@@ -790,10 +794,13 @@ export const campaignService = {
         });
     },
 
-    async topupSaldo(token: string, amount: number) {
+    async topupSaldo(token: string, amount: number, return_url?: string) {
+        const body: any = { amount };
+        if (return_url) body.return_url = return_url;
+        
         return apiRequest('/campaigns/topup', {
             method: 'POST',
-            body: { amount },
+            body: body,
             token,
         });
     },

@@ -307,6 +307,7 @@ function CartContent() {
       const firstItemDetail = cartDetails[selectedCartItems[0]?.id]
       const hasFreeShipping = selectedCartItems.some(it => cartDetails[it.id]?.is_gratis_ongkir)
 
+      const returnUrl = `${window.location.origin}/dashboard/koperasi/thankyou`
       const orderData = {
         store_id: firstItemDetail?.store_id || selectedCartItems[0]?.storeId || 1,
         shipping_address: {
@@ -336,6 +337,7 @@ function CartContent() {
         customer_notes: customerNotes,
         payment_category: paymentCategory,
         is_gratis_ongkir: hasFreeShipping,
+        return_url: returnUrl,
         ...(paymentCategory === "piutang" && {
           debt_type: debtType,
           ...(debtType === "tenor" && { tenor_months: parseInt(tenorMonths) })
@@ -362,11 +364,9 @@ function CartContent() {
       removeItems(selectedCartItems.map(it => it.id))
 
       if (paymentCategory === "instant" && result.data?.payment_url) {
-        window.open(result.data.payment_url, '_blank')
-        setCheckoutSuccessData({
-          orderId: result.data?.order?.id || 0,
-          paymentUrl: result.data.payment_url
-        })
+        // Use current window for better redirection flow
+        window.location.href = result.data.payment_url
+        return
       } else {
         router.push("/dashboard/koperasi/marketplace/pembelian")
       }

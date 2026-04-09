@@ -16,7 +16,11 @@ import { useAuthStore } from '@/store/authStore';
 import { getAccessToken } from '@/utils/auth';
 import { campaignService, apiRequest } from '@/services/apiService';
 
+import { usePathname } from 'next/navigation';
+
 export default function CampaignTopupPage() {
+    const pathname = usePathname();
+    const isReseller = pathname?.includes('/reseller');
     const { user, userDetail, fetchUserDetail, isHydrated } = useAuthStore();
     const [amount, setAmount] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -69,11 +73,14 @@ export default function CampaignTopupPage() {
         setIsLoading(true);
         try {
             const token = await getAccessToken();
-            const res = await campaignService.topupSaldo(token || '', Number(amount));
+            const targetDashboard = isReseller ? 'reseller' : 'koperasi';
+            const returnUrl = `${window.location.origin}/dashboard/${targetDashboard}/thankyou?type=topup`;
+            const res = await campaignService.topupSaldo(token || '', Number(amount), returnUrl);
 
-            if (res.data?.payment_url) {
+            const paymentUrl = res.data?.url || res.data?.payment_url;
+            if (paymentUrl) {
                 toast.success('Mengalihkan ke halaman pembayaran...');
-                window.location.href = res.data.payment_url;
+                window.location.href = paymentUrl;
             } else {
                 toast.error('Gagal mendapatkan URL pembayaran');
             }

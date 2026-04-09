@@ -43,23 +43,27 @@ export default function StoreProductDetailPage({ params }: PageProps) {
         setIsLoading(true);
         try {
             const token = await getPublicAccessToken();
+            let productData = null;
 
-            // Fetch Product Detail by Slug
+            // 1. Try fetch by slug first (Standard for this route)
             const prodRes = await productService.getProductDetailBySlug(slug, token || '');
             if (prodRes.data) {
-                // The search API returns { data: [...], meta: {...} } in the 'data' field of the response
                 const searchList = prodRes.data.data || (Array.isArray(prodRes.data) ? prodRes.data : []);
-                const productData = searchList.find((p: any) => p.slug === slug) || searchList[0];
+                productData = searchList.find((p: any) => p.slug === slug || String(p.id) === String(slug)) || searchList[0];
+            }
 
-                if (!productData) {
-                    toast.error('Produk tidak ditemukan');
-                    setIsLoading(false);
-                    return;
-                }
+            // 2. Fallback to numeric ID fetch if slug-based resolution failed and it looks like an ID
+            if (!productData && /^\d+$/.test(slug)) {
+                try {
+                    const idRes = await productService.getProductDetail(slug, token || '');
+                    if (idRes.data) productData = idRes.data;
+                } catch (e) { }
+            }
 
+            if (productData) {
                 setProduct(productData);
                 setSelectedImage(productData.images?.find((img: any) => img.is_primary)?.image_url || productData.images?.[0]?.image_url || '/images/placeholder.png');
-
+                
                 const productId = productData.id;
 
                 // Fetch Stock and Variants

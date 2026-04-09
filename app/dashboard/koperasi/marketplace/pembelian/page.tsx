@@ -38,7 +38,7 @@ import {
 import { IconBuildingStore } from '@tabler/icons-react';
 import { useAuthStore } from '@/store/authStore';
 import { getAccessToken } from '@/utils/auth';
-import { orderService, storeService } from '@/services/apiService';
+import { debtService, orderService, storeService } from '@/services/apiService';
 import { ORDER_STATUS_CONFIG, getOrderStatusLabel } from '@/utils/constants';
 import { Input } from '@/components/ui/input';
 import {
@@ -110,10 +110,12 @@ export default function PembelianPage() {
 
         if (!targetId) throw new Error('Debt ID tidak ditemukan');
 
-        const { debtService } = await import('@/services/apiService');
-        const res = await debtService.getPaymentUrl(targetId, type, token || '');
-        if (res.data?.payment_url) {
-          window.open(res.data.payment_url, '_blank');
+        const returnUrl = `${window.location.origin}/dashboard/koperasi/thankyou?type=po&ref=${order.order_number || order.id}`;
+        const res = await debtService.getPaymentUrl(targetId, type, token || '', returnUrl);
+
+        const paymentUrl = res.data?.url || res.data?.payment_url;
+        if (paymentUrl) {
+          window.location.href = paymentUrl;
         } else {
           throw new Error('Gagal mendapatkan URL pembayaran');
         }

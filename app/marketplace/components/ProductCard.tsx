@@ -96,18 +96,18 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   const productSlug = product.slug || product.id.toString();
+
   const baseAppDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || (typeof window !== 'undefined' ? window.location.host.split('.').slice(-2).join('.') : 'koperasihub.com');
   
-  // Use initialized state, then fallback to props, then fallback to nothing (empty string)
-  // If we have nothing, we should NOT construct the link yet to avoid "www" bug
   const currentSubdomain = subdomain || product.store?.subdomain || (product as any).store_subdomain;
   const currentCustomDomain = customDomain || product.store?.domain || (product as any).store_domain;
 
+  // Optimize link selection - keeping slug-based routing as requested
   const internalProductLink = currentCustomDomain
     ? `https://${currentCustomDomain}/produk/${productSlug}`
     : currentSubdomain 
       ? `https://${currentSubdomain}.${baseAppDomain}/produk/${productSlug}`
-      : `/marketplace/${productSlug}`; // Fallback to internal route if subdomain is missing
+      : `/marketplace/${productSlug}`; 
 
   const handleShareClick = async (e: React.MouseEvent) => {
     e.preventDefault();

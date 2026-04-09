@@ -167,9 +167,12 @@ export default function KoperasiPurchasesDetailPage() {
 
                 if (!targetId) throw new Error('Debt ID tidak ditemukan');
 
-                const res = await debtService.getPaymentUrl(targetId, type, token || '');
-                if (res.data?.payment_url) {
-                    window.open(res.data.payment_url, '_blank');
+                const returnUrl = `${window.location.origin}/dashboard/koperasi/thankyou?type=po&ref=${order.order_number || order.id}`;
+                const res = await debtService.getPaymentUrl(targetId, type, token || '', returnUrl);
+                
+                const paymentUrl = res.data?.url || res.data?.payment_url;
+                if (paymentUrl) {
+                    window.location.href = paymentUrl;
                 } else {
                     throw new Error('Gagal mendapatkan URL pembayaran');
                 }
