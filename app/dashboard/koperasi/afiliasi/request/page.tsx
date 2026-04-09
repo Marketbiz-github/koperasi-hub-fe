@@ -3,12 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { affiliationService, userService, storeService } from '@/services/apiService';
-import { Search, UserPlus, Loader2, Check, AlertCircle, Building2, Mail, ExternalLink, Info, X, MapPin, Phone, Globe } from 'lucide-react';
+import { Search, UserPlus, Loader2, Check, AlertCircle, Building2, Mail, ExternalLink, Info, X, MapPin, Phone, Globe, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
 import Image from 'next/image';
 
 export default function RequestAffiliationPage() {
-    const { token } = useAuthStore();
+    const { token, user } = useAuthStore();
     const [searchTerm, setSearchTerm] = useState('');
     const [items, setItems] = useState<any[]>([]); // This will hold our merged data
     const [isLoading, setIsLoading] = useState(false);
@@ -16,11 +16,35 @@ export default function RequestAffiliationPage() {
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [hasSearched, setHasSearched] = useState(false);
     const [selectedStore, setSelectedStore] = useState<any | null>(null);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [affiliatedIds, setAffiliatedIds] = useState<Record<number, boolean>>({});
 
     const debouncedSearch = useDebounce(searchTerm, 500);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
 
-    const fetchItems = useCallback(async (search: string = '') => {
+    const checkAffiliationsBatch = async (vendors: any[]) => {
+        if (!token || !user?.id) return;
+
+        const newAffiliates: Record<number, boolean> = {};
+
+        await Promise.allSettled(
+            vendors.map(async (vendor) => {
+                try {
+                    const res = await userService.checkAffiliation(token, vendor.id, user.id);
+                    if (res?.data?.is_affiliated) {
+                        newAffiliates[vendor.id] = true;
+                    }
+                } catch (e) {
+                    // ignore errors for individual checks
+                }
+            })
+        );
+
+        setAffiliatedIds(prev => ({ ...prev, ...newAffiliates }));
+    };
+
+    const fetchItems = useCallback(async (search: string = '', currentPage: number = 1) => {
         if (!token) return;
 
         setIsLoading(true);
@@ -31,12 +55,18 @@ export default function RequestAffiliationPage() {
             const response = await userService.search(token, {
                 role: 'vendor',
                 store_name: search,
-                page: 1,
-                limit: 50
+                page: currentPage,
+                limit: 10,
+                sort: 'created_at',
+                order: 'desc'
             });
 
-            if (response.data && response.data.data) {
-                const usersList = response.data.data;
+            if (response.data) {
+                const usersList = response.data.data || [];
+                setTotalPages(Math.ceil((response.data.total || usersList.length) / 10) || 1);
+
+                checkAffiliationsBatch(usersList);
+
                 const newItemsArray: any[] = [];
 
                 // Step 2: Loop through users to get stores
@@ -81,23 +111,25 @@ export default function RequestAffiliationPage() {
         }
     }, [token]);
 
-    // Initial fetch
+    // Live search on debounce
     useEffect(() => {
         if (token) {
-            fetchItems('');
+            fetchItems('', page);
         }
-    }, [token, fetchItems]);
+    }, [token, page]);
 
     // Live search on debounce
     useEffect(() => {
         if (hasSearched && !isInitialLoading) {
-            fetchItems(debouncedSearch);
+            setPage(1);
+            fetchItems(debouncedSearch, 1);
         }
-    }, [debouncedSearch, fetchItems]);
+    }, [debouncedSearch]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        fetchItems(searchTerm);
+        setPage(1);
+        fetchItems(searchTerm, 1);
     };
 
     const handleRequest = async (parentId: number) => {
@@ -111,6 +143,7 @@ export default function RequestAffiliationPage() {
                 type: 'koperasi_vendor'
             });
             setMessage({ type: 'success', text: 'Permintaan afiliasi berhasil dikirim' });
+            setAffiliatedIds(prev => ({ ...prev, [parentId]: true }));
         } catch (error: any) {
             const errorMsg = error.message === 'affiliation already exists or is pending'
                 ? 'Permintaan afiliasi sudah ada atau sedang menunggu persetujuan'
@@ -175,63 +208,75 @@ export default function RequestAffiliationPage() {
                         </thead>
                         <tbody className="divide-y divide-slate-200">
                             {items.length > 0 ? (
-                                items.map((item, index) => (
-                                    <tr key={item.id} className="hover:bg-slate-50/50 transition-colors text-sm">
-                                        <td className="px-6 py-4 text-center font-medium text-slate-400">
-                                            {index + 1}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 overflow-hidden relative">
-                                                    {item.store?.logo ? (
-                                                        <Image
-                                                            src={item.store.logo}
-                                                            alt={item.store.name}
-                                                            fill
-                                                            className="object-cover"
-                                                        />
+                                items.map((item, index) => {
+                                    const isAffiliated = affiliatedIds[item.id] === true;
+
+                                    return (
+                                        <tr key={item.id} className="hover:bg-slate-50/50 transition-colors text-sm">
+                                            <td className="px-6 py-4 text-center font-medium text-slate-400">
+                                                {(page - 1) * 10 + index + 1}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-12 h-12 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 overflow-hidden relative">
+                                                        {item.store?.logo ? (
+                                                            <Image
+                                                                src={item.store.logo}
+                                                                alt={item.store.name}
+                                                                fill
+                                                                className="object-cover"
+                                                            />
+                                                        ) : (
+                                                            <Building2 className="w-6 h-6 text-emerald-600" />
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-bold text-slate-900">{item.store?.name || item.name}</div>
+                                                        <div className="text-[10px] text-slate-500 uppercase tracking-tight font-medium">Vendor</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="font-medium text-slate-700">{item.email || '-'}</div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="font-medium text-slate-700">{item.phone || '-'}</div>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="flex justify-end gap-2 items-center">
+                                                    <button
+                                                        onClick={() => setSelectedStore(item.store)}
+                                                        disabled={!item.store}
+                                                        title="Detail Toko"
+                                                        className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors border border-slate-200 disabled:opacity-50"
+                                                    >
+                                                        <Info className="w-4 h-4" />
+                                                    </button>
+
+                                                    {!isAffiliated ? (
+                                                        <button
+                                                            onClick={() => handleRequest(item.id)}
+                                                            disabled={requestingId === item.id}
+                                                            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-500 text-white text-xs font-semibold rounded-lg transition-all shadow-sm shadow-emerald-100 hover:shadow-md whitespace-nowrap"
+                                                        >
+                                                            {requestingId === item.id ? (
+                                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                            ) : (
+                                                                <UserPlus className="w-4 h-4" />
+                                                            )}
+                                                            Request Afiliasi
+                                                        </button>
                                                     ) : (
-                                                        <Building2 className="w-6 h-6 text-emerald-600" />
+                                                        <div className="px-3 py-1.5 bg-slate-100 text-slate-600 border border-slate-200 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 whitespace-nowrap">
+                                                            <Check className="w-3.5 h-3.5 text-slate-500" />
+                                                            Terafiliasi
+                                                        </div>
                                                     )}
                                                 </div>
-                                                <div>
-                                                    <div className="font-bold text-slate-900">{item.store?.name || item.name}</div>
-                                                    <div className="text-[10px] text-slate-500 uppercase tracking-tight font-medium">Vendor</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="font-medium text-slate-700">{item.email || '-'}</div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="font-medium text-slate-700">{item.phone || '-'}</div>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="flex justify-end gap-2">
-                                                <button
-                                                    onClick={() => setSelectedStore(item.store)}
-                                                    disabled={!item.store}
-                                                    title="Detail Toko"
-                                                    className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors border border-slate-200 disabled:opacity-50"
-                                                >
-                                                    <Info className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleRequest(item.id)}
-                                                    disabled={requestingId === item.id}
-                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-500 text-white text-xs font-semibold rounded-lg transition-all shadow-sm shadow-emerald-100 hover:shadow-md"
-                                                >
-                                                    {requestingId === item.id ? (
-                                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                                    ) : (
-                                                        <UserPlus className="w-4 h-4" />
-                                                    )}
-                                                    Request Afiliasi
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
+                                            </td>
+                                        </tr>
+                                    )
+                                })
                             ) : (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-12 text-center text-slate-400">
@@ -252,6 +297,33 @@ export default function RequestAffiliationPage() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="p-4 border-t border-slate-200 flex items-center justify-between text-sm text-slate-500 bg-slate-50">
+                        <div>
+                            Halaman <span className="font-bold text-slate-700">{page}</span> dari <span className="font-bold text-slate-700">{totalPages}</span>
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setPage(p => Math.max(1, p - 1))}
+                                disabled={page === 1}
+                                className="p-1 px-3 bg-white border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-white flex items-center gap-1 font-medium transition-colors"
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                                <span className="hidden sm:inline">Sebelumnya</span>
+                            </button>
+                            <button
+                                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                disabled={page === totalPages}
+                                className="p-1 px-3 bg-white border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-white flex items-center gap-1 font-medium transition-colors"
+                            >
+                                <span className="hidden sm:inline">Selanjutnya</span>
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Store Detail Modal */}

@@ -147,12 +147,12 @@ export const userService = {
         })
     },
 
-    async search(token: string, params: { role?: string, store_name?: string, page?: number, limit?: number }) {
+    async search(token: string, params: { role?: string, store_name?: string, page?: number, limit?: number, sort?: string, order?: string }) {
         return apiRequest('/users/search', {
             method: 'POST',
             body: params,
-            token,
-        })
+            token
+        });
     },
 
     async updateUser(id: string | number, data: any, token: string) {

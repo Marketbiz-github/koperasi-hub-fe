@@ -16,6 +16,8 @@ import {
     Phone,
     Info
 } from 'lucide-react';
+import { useAffiliationNotificationStore } from '@/store/affiliationNotificationStore';
+import { Badge } from '@/components/ui/badge';
 
 interface Affiliation {
     id: number;
@@ -45,6 +47,7 @@ interface StoreDetail {
 
 export default function IncomingAffiliationsPage() {
     const { token } = useAuthStore();
+    const { readAffiliationIds, markAsRead } = useAffiliationNotificationStore();
     const [affiliations, setAffiliations] = useState<Affiliation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [processingId, setProcessingId] = useState<number | null>(null);
@@ -82,6 +85,7 @@ export default function IncomingAffiliationsPage() {
         if (!token) return;
         setProcessingId(id);
         setMessage(null);
+        markAsRead(id);
         try {
             await affiliationService.approve(token, id);
             setMessage({ type: 'success', text: 'Permintaan afiliasi disetujui' });
@@ -97,6 +101,7 @@ export default function IncomingAffiliationsPage() {
         if (!token) return;
         setProcessingId(id);
         setMessage(null);
+        markAsRead(id);
         try {
             await affiliationService.reject(token, id);
             setMessage({ type: 'success', text: 'Permintaan afiliasi ditolak' });
@@ -108,8 +113,9 @@ export default function IncomingAffiliationsPage() {
         }
     };
 
-    const handleViewDetail = async (userId: number) => {
+    const handleViewDetail = async (userId: number, affiliationId: number) => {
         if (!token) return;
+        markAsRead(affiliationId);
         setIsDetailLoading(true);
         setIsModalOpen(true);
         setSelectedStore(null);
@@ -190,8 +196,10 @@ export default function IncomingAffiliationsPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-200">
-                                    {filteredAffiliations.map((affiliation, index) => (
-                                        <tr key={affiliation.id} className="hover:bg-slate-50/50 transition-colors text-sm">
+                                    {filteredAffiliations.map((affiliation, index) => {
+                                        const isUnread = !readAffiliationIds.includes(affiliation.id.toString());
+                                        return (
+                                        <tr key={affiliation.id} className={`hover:bg-slate-50/50 transition-colors text-sm ${isUnread ? 'bg-slate-100' : ''}`}>
                                             <td className="px-6 py-4 text-center font-medium text-slate-400">
                                                 {index + 1}
                                             </td>
@@ -201,14 +209,19 @@ export default function IncomingAffiliationsPage() {
                                                         {affiliation.child?.name?.charAt(0) || '?'}
                                                     </div>
                                                     <div>
-                                                        <div className="font-bold text-slate-900">{affiliation.child?.name || 'Unknown'}</div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="font-bold text-slate-900">{affiliation.child?.name || 'Unknown'}</div>
+                                                            {isUnread && (
+                                                                <Badge className="bg-emerald-500 text-white text-[10px] h-4 px-1 border-0">NEW</Badge>
+                                                            )}
+                                                        </div>
                                                         <div className="text-xs text-slate-500">{affiliation.child?.email}</div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 <button
-                                                    onClick={() => handleViewDetail(affiliation.child.id)}
+                                                    onClick={() => handleViewDetail(affiliation.child.id, affiliation.id)}
                                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors border border-emerald-100"
                                                 >
                                                     <Eye className="w-3.5 h-3.5" />
@@ -268,7 +281,7 @@ export default function IncomingAffiliationsPage() {
                                                 </div>
                                             </td>
                                         </tr>
-                                    ))}
+                                    )})}
                                 </tbody>
                             </table>
                         </div>
