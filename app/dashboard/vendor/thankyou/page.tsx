@@ -1,4 +1,4 @@
-// app/dashboard/reseller/thankyou/page.tsx
+// app/dashboard/vendor/thankyou/page.tsx
 'use client';
 
 import React, { Suspense } from 'react';
@@ -14,7 +14,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useMounted } from '@/hooks/useMounted';
 import { useAuthStore } from '@/store/authStore';
 
-function ThankYouResellerContent() {
+function ThankYouVendorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const type = searchParams.get('type');
@@ -45,7 +45,7 @@ function ThankYouResellerContent() {
             <p className="text-gray-500 mb-8">
               {isPlan
                 ? 'Pembayaran paket langganan Anda telah diterima dan sedang diproses. Silakan refresh dashboard Anda beberapa saat lagi.'
-                : 'Pembayaran pesanan Reseller Anda telah diterima dan sedang diproses.'}
+                : 'Pembayaran transaksi Vendor Anda telah diterima dan sedang diproses.'}
             </p>
 
             {refId && (
@@ -56,20 +56,10 @@ function ThankYouResellerContent() {
             )}
 
             <div className="grid grid-cols-1 gap-3">
-              {!isPlan && (
-                <Button
-                  onClick={() => router.push('/dashboard/reseller/marketplace/pembelian')}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 h-12 font-bold shadow-lg shadow-emerald-100"
-                >
-                  <ShoppingBag className="mr-2 w-5 h-5" />
-                  Lihat Daftar Pembelian
-                </Button>
-              )}
-
               <Button
-                variant="outline"
-                onClick={() => router.push('/dashboard/reseller')}
-                className="h-12 font-bold text-gray-600"
+                variant="default"
+                onClick={() => router.push('/dashboard/vendor')}
+                className="h-12 font-bold bg-emerald-600 hover:bg-emerald-700 w-full shadow-lg shadow-emerald-100 text-white"
               >
                 <LayoutDashboard className="mr-2 w-5 h-5" />
                 Kembali ke Dashboard
@@ -77,22 +67,15 @@ function ThankYouResellerContent() {
             </div>
           </CardContent>
         </Card>
-
-        <button
-          onClick={() => router.back()}
-          className="mt-8 flex items-center gap-2 text-gray-400 hover:text-emerald-600 mx-auto transition-colors text-sm font-medium"
-        >
-          <ArrowLeft size={16} /> Kembali
-        </button>
       </div>
     </div>
   );
 }
 
-export default function ThankYouResellerPage() {
+export default function ThankYouVendorPage() {
   return (
     <Suspense fallback={null}>
-      <ThankYouResellerContent />
+      <ThankYouVendorContent />
     </Suspense>
   );
 }

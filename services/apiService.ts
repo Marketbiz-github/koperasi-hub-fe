@@ -924,22 +924,15 @@ export const planService = {
             token,
         });
     },
-    async assignPlanUser(data: { user_id: number; plan_id: number }, token: string) {
-        return apiRequest('/plans/assign', {
+    async orderPlan(data: { plan_id: number; return_url?: string }, token: string) {
+        return apiRequest('/subscriptions/order', {
             method: 'POST',
             body: data,
             token,
         });
     },
-    async getUserSubscriptionHistory(token: string) {
-        return apiRequest('/plans/history', { token });
-    },
-    async orderPlan(data: { plan_id: number }, token: string) {
-        return apiRequest('/plans/order', {
-            method: 'POST',
-            body: data,
-            token,
-        });
+    async getUserSubscriptionHistory(userId: number, token: string) {
+        return apiRequest(`/users/${userId}/subscription-history`, { token });
     }
 }
 

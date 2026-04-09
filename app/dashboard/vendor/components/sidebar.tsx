@@ -10,7 +10,8 @@ import {
   IconSettings,
   IconUsers,
   IconInnerShadowTop,
-  IconUsersGroup
+  IconUsersGroup,
+  IconCrown
 } from "@tabler/icons-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -81,6 +82,11 @@ const vendorNav = [
         url: "/dashboard/vendor/piutang",
       },
     ],
+  },
+  {
+    title: "Langganan",
+    url: "/dashboard/vendor/langganan",
+    icon: IconCrown,
   },
   {
     title: "Pengaturan Toko",

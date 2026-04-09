@@ -16,6 +16,7 @@ import {
   IconShoppingCart,
   IconFileInvoice,
   IconCash,
+  IconCrown,
 } from "@tabler/icons-react"
 import { useNotificationStore } from "@/store/notificationStore"
 import { useAffiliationNotificationStore } from "@/store/affiliationNotificationStore"
@@ -126,6 +127,11 @@ const data = {
           url: "/dashboard/koperasi/campaign/topup",
         },
       ],
+    },
+    {
+      title: "Langganan",
+      url: "/dashboard/koperasi/langganan",
+      icon: IconCrown,
     },
     {
       title: "Pengaturan Toko",

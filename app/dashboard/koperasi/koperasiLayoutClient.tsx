@@ -7,6 +7,8 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { AccessDenied } from "@/components/access-denied";
+import { SubscriptionBanner } from "@/components/SubscriptionBanner";
+import { PlanAccessGuard } from "@/components/PlanAccessGuard";
 
 export function KoperasiLayoutClient({ children }: { children: ReactNode }) {
   const { user, store, hydrate, isHydrated } = useAuthStore();
@@ -53,10 +55,13 @@ export function KoperasiLayoutClient({ children }: { children: ReactNode }) {
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
+        <SubscriptionBanner role="koperasi" />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-6">
-              {children}
+              <PlanAccessGuard role="koperasi">
+                {children}
+              </PlanAccessGuard>
             </div>
           </div>
         </div>

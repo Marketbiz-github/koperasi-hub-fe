@@ -14,16 +14,25 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMounted } from '@/hooks/useMounted';
+import { useAuthStore } from '@/store/authStore';
 
 function ThankYouDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const type = searchParams.get('type'); // 'topup' or 'order' or 'po'
+  const type = searchParams.get('type'); // 'topup' or 'order' or 'po' or 'plan'
   const refId = searchParams.get('ref');
+  const { hydrate } = useAuthStore();
+
+  React.useEffect(() => {
+    if (type === 'plan') {
+      hydrate();
+    }
+  }, [type, hydrate]);
 
   if (!useMounted()) return null;
 
   const isTopup = type === 'topup';
+  const isPlan = type === 'plan';
   const isOrder = type === 'order' || type === 'po';
 
   return (
@@ -40,7 +49,9 @@ function ThankYouDashboardContent() {
             <p className="text-gray-500 mb-8">
               {isTopup
                 ? 'Saldo campaign Anda akan segera diperbarui setelah sistem memproses pembayaran.'
-                : 'Pembayaran pesanan Anda telah diterima dan sedang diproses.'}
+                : isPlan
+                  ? 'Pembayaran paket langganan Anda telah diterima dan sedang diproses. Silakan refresh dashboard Anda beberapa saat lagi.'
+                  : 'Pembayaran pesanan Anda telah diterima dan sedang diproses.'}
             </p>
 
             {refId && (
