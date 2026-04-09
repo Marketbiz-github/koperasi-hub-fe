@@ -18,6 +18,8 @@ import {
     IconInnerShadowTop,
     IconUserHeart,
     IconCategory,
+    IconPackage,
+    IconListDetails,
 } from "@tabler/icons-react"
 
 const superAdminNav = [
@@ -25,6 +27,16 @@ const superAdminNav = [
         title: "Dashboard",
         url: "/dashboard/super_admin",
         icon: IconDashboard,
+    },
+    {
+        title: "Kelola Paket (Plan)",
+        url: "/dashboard/super_admin/plans",
+        icon: IconPackage,
+    },
+    {
+        title: "Kelola Fitur",
+        url: "/dashboard/super_admin/features",
+        icon: IconListDetails,
     },
     {
         title: "Kelola User",

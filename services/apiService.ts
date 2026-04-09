@@ -897,3 +897,83 @@ export const koperasiProfilingService = {
     }
 }
 
+export const planService = {
+    async getPlans(token?: string) {
+        return apiRequest('/plans', { token });
+    },
+    async getPlanDetail(id: string | number, token?: string) {
+        return apiRequest(`/plans/${id}`, { token });
+    },
+    async createPlan(data: any, token: string) {
+        return apiRequest('/plans', {
+            method: 'POST',
+            body: data,
+            token,
+        });
+    },
+    async updatePlan(id: string | number, data: any, token: string) {
+        return apiRequest(`/plans/${id}`, {
+            method: 'PUT',
+            body: data,
+            token,
+        });
+    },
+    async deletePlan(id: string | number, token: string) {
+        return apiRequest(`/plans/${id}`, {
+            method: 'DELETE',
+            token,
+        });
+    },
+    async assignPlanUser(data: { user_id: number; plan_id: number }, token: string) {
+        return apiRequest('/plans/assign', {
+            method: 'POST',
+            body: data,
+            token,
+        });
+    },
+    async getUserSubscriptionHistory(token: string) {
+        return apiRequest('/plans/history', { token });
+    },
+    async orderPlan(data: { plan_id: number }, token: string) {
+        return apiRequest('/plans/order', {
+            method: 'POST',
+            body: data,
+            token,
+        });
+    }
+}
+
+export const featureService = {
+    async getFeatures(token?: string) {
+        return apiRequest('/features', { token });
+    },
+    async getFeatureDetail(id: string | number, token?: string) {
+        return apiRequest(`/features/${id}`, { token });
+    },
+    async createFeature(data: any, token: string) {
+        return apiRequest('/features', {
+            method: 'POST',
+            body: data,
+            token,
+        });
+    },
+    async updateFeature(id: string | number, data: any, token: string) {
+        return apiRequest(`/features/${id}`, {
+            method: 'PUT',
+            body: data,
+            token,
+        });
+    },
+    async deleteFeature(id: string | number, token: string) {
+        return apiRequest(`/features/${id}`, {
+            method: 'DELETE',
+            token,
+        });
+    },
+    async assignFeatureToPlan(planId: number, featureId: number, token: string) {
+        return apiRequest(`/plans/${planId}/features/${featureId}`, {
+            method: 'POST',
+            token,
+        });
+    }
+}
