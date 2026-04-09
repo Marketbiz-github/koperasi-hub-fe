@@ -18,6 +18,7 @@ import {
   IconCash,
 } from "@tabler/icons-react"
 import { useNotificationStore } from "@/store/notificationStore"
+import { useAffiliationNotificationStore } from "@/store/affiliationNotificationStore"
 import { getAccessToken } from "@/utils/auth"
 import { useEffect, useMemo } from "react"
 
@@ -137,12 +138,14 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user, store } = useAuthStore();
   const { unreadOrderCounts, fetchUnreadCounts } = useNotificationStore();
+  const { unreadAffiliationCounts, fetchUnreadCounts: fetchUnreadAffiliationCounts } = useAffiliationNotificationStore();
 
   useEffect(() => {
     const fetch = async () => {
       const token = await getAccessToken();
       if (token && store?.id) {
         fetchUnreadCounts('koperasi', { store_id: store.id }, token);
+        fetchUnreadAffiliationCounts(token, ['reseller_koperasi']);
       }
     };
     fetch();
@@ -155,9 +158,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       if (item.title === "Pesanan Masuk") {
         return { ...item, badge: unreadOrderCounts };
       }
+      if (item.title === "Afiliasi") {
+        return {
+          ...item,
+          badge: unreadAffiliationCounts,
+          items: item.items?.map(subItem => {
+            if (subItem.title === "Permintaan Masuk") {
+              return { ...subItem, badge: unreadAffiliationCounts };
+            }
+            return subItem;
+          })
+        };
+      }
       return item;
     });
-  }, [unreadOrderCounts]);
+  }, [unreadOrderCounts, unreadAffiliationCounts]);
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
