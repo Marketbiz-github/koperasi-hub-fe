@@ -109,11 +109,6 @@ const data = {
       ],
     },
     {
-      title: "Langganan",
-      url: "/dashboard/reseller/langganan",
-      icon: IconCrown,
-    },
-    {
       title: "Pengaturan Toko",
       url: "/dashboard/reseller/store-settings",
       icon: IconSettings,

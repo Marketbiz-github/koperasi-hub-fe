@@ -906,8 +906,9 @@ export const koperasiProfilingService = {
 }
 
 export const planService = {
-    async getPlans(token?: string) {
-        return apiRequest('/plans', { token });
+    async getPlans(token?: string, role?: string) {
+        const query = role ? `?role=${encodeURIComponent(role)}` : '';
+        return apiRequest(`/plans${query}`, { token });
     },
     async getPlanDetail(id: string | number, token?: string) {
         return apiRequest(`/plans/${id}`, { token });

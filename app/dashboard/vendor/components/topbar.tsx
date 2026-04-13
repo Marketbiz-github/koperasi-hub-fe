@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { User, Settings, LogOut } from "lucide-react"
+import { User, Settings, LogOut, CreditCard } from "lucide-react"
 import { IconUser } from "@tabler/icons-react"
 import { useAuthStore } from "@/store/authStore"
 import Link from "next/link"
@@ -57,6 +57,13 @@ export function SiteHeader() {
                 <Link href="/dashboard/vendor/profile" className="flex items-center w-full">
                   <User className="mr-2 h-4 w-4" />
                   Profile
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/vendor/langganan" className="flex items-center w-full">
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Subscription
                 </Link>
               </DropdownMenuItem>
 

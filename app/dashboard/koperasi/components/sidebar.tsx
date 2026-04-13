@@ -129,11 +129,6 @@ const data = {
       ],
     },
     {
-      title: "Langganan",
-      url: "/dashboard/koperasi/langganan",
-      icon: IconCrown,
-    },
-    {
       title: "Pengaturan Toko",
       url: "/dashboard/koperasi/store-settings",
       icon: IconSettings,

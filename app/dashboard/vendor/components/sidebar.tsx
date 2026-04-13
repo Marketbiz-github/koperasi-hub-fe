@@ -84,11 +84,6 @@ const vendorNav = [
     ],
   },
   {
-    title: "Langganan",
-    url: "/dashboard/vendor/langganan",
-    icon: IconCrown,
-  },
-  {
     title: "Pengaturan Toko",
     url: "/dashboard/vendor/store-settings",
     icon: IconSettings,

@@ -1,3 +1,5 @@
+'use client';
+
 import DashboardSummaryView from "@/components/DashboardSummaryView";
 
 export default function KoperasiDashboardPage() {

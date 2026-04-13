@@ -12,6 +12,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, Plus, Edit, Trash2, Search, Link as LinkIcon } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import {
     Dialog,
     DialogContent,
@@ -37,9 +39,22 @@ interface Plan {
     name: string;
     price: string;
     duration_days: number;
+    role?: string;
     created_at: string;
     features?: Feature[];
 }
+
+const ROLE_OPTIONS = [
+    { value: 'vendor', label: 'Vendor' },
+    { value: 'koperasi', label: 'Koperasi' },
+    { value: 'reseller', label: 'Reseller' },
+];
+
+const ROLE_BADGE_COLORS: Record<string, string> = {
+    vendor: 'bg-blue-100 text-blue-700 border-blue-200',
+    koperasi: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    reseller: 'bg-purple-100 text-purple-700 border-purple-200',
+};
 
 export default function PlansPage() {
     const [plans, setPlans] = useState<Plan[]>([]);
@@ -64,6 +79,7 @@ export default function PlansPage() {
         name: '',
         price: '',
         duration_days: '',
+        role: '',
     });
 
     const fetchData = useCallback(async () => {
@@ -103,6 +119,7 @@ export default function PlansPage() {
             name: '',
             price: '',
             duration_days: '',
+            role: '',
         });
         setIsDialogOpen(true);
     };
@@ -113,6 +130,7 @@ export default function PlansPage() {
             name: plan.name,
             price: plan.price.toString(),
             duration_days: plan.duration_days.toString(),
+            role: plan.role || '',
         });
         setIsDialogOpen(true);
     };
@@ -133,8 +151,9 @@ export default function PlansPage() {
         
         const payload = {
             name: formData.name,
-            price: formData.price, // API mengharapkan string, bukan number
+            price: formData.price,
             duration_days: Number(formData.duration_days),
+            ...(formData.role ? { role: formData.role } : {}),
         }
 
         try {
@@ -280,6 +299,7 @@ export default function PlansPage() {
                                     <TableRow>
                                         <TableHead className="w-16">ID</TableHead>
                                         <TableHead>Nama Paket</TableHead>
+                                        <TableHead>Role</TableHead>
                                         <TableHead>Harga</TableHead>
                                         <TableHead>Durasi (Hari)</TableHead>
                                         <TableHead className="text-right">Aksi</TableHead>
@@ -288,7 +308,7 @@ export default function PlansPage() {
                                 <TableBody>
                                     {filteredPlans.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="h-24 text-center">
+                                            <TableCell colSpan={6} className="h-24 text-center">
                                                 Tidak ada paket ditemukan.
                                             </TableCell>
                                         </TableRow>
@@ -297,6 +317,15 @@ export default function PlansPage() {
                                             <TableRow key={p.id} className="hover:bg-muted/30 transition-colors">
                                                 <TableCell className="font-mono text-xs text-muted-foreground">#{p.id}</TableCell>
                                                 <TableCell className="font-medium">{p.name}</TableCell>
+                                                <TableCell>
+                                                    {p.role ? (
+                                                        <Badge variant="outline" className={`capitalize text-xs font-medium ${ROLE_BADGE_COLORS[p.role] || 'bg-gray-100 text-gray-600'}`}>
+                                                            {p.role}
+                                                        </Badge>
+                                                    ) : (
+                                                        <span className="text-xs text-muted-foreground italic">—</span>
+                                                    )}
+                                                </TableCell>
                                                 <TableCell>Rp {Number(p.price).toLocaleString('id-ID')}</TableCell>
                                                 <TableCell>{p.duration_days} Hari</TableCell>
                                                 <TableCell className="text-right">
@@ -384,6 +413,24 @@ export default function PlansPage() {
                                 placeholder="Contoh: 30"
                                 required
                             />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label>Role</Label>
+                            <Select
+                                value={formData.role}
+                                onValueChange={(val) => setFormData({ ...formData, role: val })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Pilih role..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {ROLE_OPTIONS.map(opt => (
+                                        <SelectItem key={opt.value} value={opt.value}>
+                                            {opt.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                         <DialogFooter className="pt-4">
                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>

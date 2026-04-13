@@ -5,7 +5,8 @@ import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Check, Loader2, History, Info } from 'lucide-react';
+import { Check, Loader2, History, Info, Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 
 interface Plan {
@@ -35,12 +36,19 @@ export function SharedLanggananPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isHistoryLoading, setIsHistoryLoading] = useState(true);
     const [isProcessing, setIsProcessing] = useState<number | null>(null);
+    const [historySearch, setHistorySearch] = useState('');
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch Plans
-                const resPlans = await fetch('/api/plans');
+                // Determine role from pathname (e.g. /dashboard/vendor/langganan)
+                const roleMatch = pathname?.match(/\/dashboard\/([^\/]+)/);
+                const currentRole = roleMatch ? roleMatch[1] : user?.role;
+                
+                // Fetch Plans with role filter
+                const plansUrl = currentRole ? `/api/plans?role=${currentRole}` : '/api/plans';
+                
+                const resPlans = await fetch(plansUrl);
                 const dataPlans = await resPlans.json();
                 if (resPlans.ok) {
                     setPlans(dataPlans.data || []);
@@ -49,10 +57,12 @@ export function SharedLanggananPage() {
                 }
 
                 // Fetch History
-                const resHistory = await fetch(`/api/subscriptions/history?user_id=${user?.id}`);
-                const dataHistory = await resHistory.json();
-                if (resHistory.ok) {
-                    setHistory(dataHistory.data || []);
+                if (user?.id) {
+                    const resHistory = await fetch(`/api/users/${user.id}/subscription-history`);
+                    const dataHistory = await resHistory.json();
+                    if (resHistory.ok) {
+                        setHistory(dataHistory.data || []);
+                    }
                 }
             } catch (error) {
                 toast.error('Terjadi kesalahan memuat data langganan');
@@ -63,7 +73,7 @@ export function SharedLanggananPage() {
         };
 
         fetchData();
-    }, []);
+    }, [pathname, user?.id]);
 
     const handleSelectPlan = async (planId: number) => {
         if (!user?.id) return;
@@ -109,6 +119,10 @@ export function SharedLanggananPage() {
     }
 
     const currentPlanId = user?.plan?.id;
+
+    const filteredHistory = history.length > 0 ? history.filter(h => 
+        h.plan.name.toLowerCase().includes(historySearch.toLowerCase())
+    ) : [];
 
     return (
         <div className="space-y-6">
@@ -162,12 +176,32 @@ export function SharedLanggananPage() {
             </div>
 
             <div className="mt-12">
-                <div className="mb-6 flex flex-col gap-1">
-                    <h2 className="text-xl font-bold flex items-center gap-2">
-                        <History className="h-5 w-5" />
-                        Riwayat Langganan
-                    </h2>
-                    <p className="text-sm text-muted-foreground">Catatan paket langganan yang pernah Anda beli.</p>
+                <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex flex-col gap-1">
+                        <h2 className="text-xl font-bold flex items-center gap-2">
+                            <History className="h-5 w-5 text-primary" />
+                            Riwayat Langganan
+                        </h2>
+                        <p className="text-sm text-muted-foreground">Catatan paket langganan yang pernah Anda beli.</p>
+                    </div>
+
+                    <div className="relative w-full sm:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Cari paket..."
+                            className="pl-9 pr-8"
+                            value={historySearch}
+                            onChange={(e) => setHistorySearch(e.target.value)}
+                        />
+                        {historySearch && (
+                            <button 
+                                onClick={() => setHistorySearch('')}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full transition-colors"
+                            >
+                                <X className="h-3 w-3 text-muted-foreground" />
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 <Card className="border-none shadow-sm ring-1 ring-gray-200">
@@ -176,37 +210,52 @@ export function SharedLanggananPage() {
                             <div className="flex h-32 items-center justify-center">
                                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
                             </div>
-                        ) : history.length > 0 ? (
+                        ) : filteredHistory.length > 0 ? (
                             <div className="overflow-x-auto">
-                                <table className="w-full text-sm text-left">
-                                    <thead className="text-xs font-bold uppercase tracking-wider text-gray-500 bg-gray-50/50">
+                                <table className="w-full text-sm text-left border-collapse">
+                                    <thead className="text-xs font-bold uppercase tracking-wider text-gray-500 bg-gray-50/80 sticky top-0">
                                         <tr>
-                                            <th className="px-6 py-4">Tanggal Pembelian</th>
-                                            <th className="px-6 py-4">Paket</th>
-                                            <th className="px-6 py-4">Durasi</th>
-                                            <th className="px-6 py-4 text-right">Nominal</th>
+                                            <th className="px-6 py-4 border-b">Tanggal Pembelian</th>
+                                            <th className="px-6 py-4 border-b">Paket</th>
+                                            <th className="px-6 py-4 border-b">Durasi</th>
+                                            <th className="px-6 py-4 border-b text-right">Nominal</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
-                                        {history.map((h, i) => (
-                                            <tr key={i} className="hover:bg-gray-50/50 transition-colors">
+                                        {filteredHistory.map((h, i) => (
+                                            <tr key={i} className="hover:bg-primary/5 transition-colors group">
                                                 <td className="px-6 py-4 whitespace-nowrap text-gray-600">
-                                                    {new Date(h.renewed_at).toLocaleDateString('id-ID', {
-                                                        day: '2-digit',
-                                                        month: 'long',
-                                                        year: 'numeric',
-                                                        hour: '2-digit',
-                                                        minute: '2-digit'
-                                                    })}
+                                                    <div className="flex flex-col">
+                                                        <span className="font-medium text-gray-900">
+                                                            {new Date(h.renewed_at).toLocaleDateString('id-ID', {
+                                                                day: '2-digit',
+                                                                month: 'long',
+                                                                year: 'numeric'
+                                                            })}
+                                                        </span>
+                                                        <span className="text-xs text-gray-400">
+                                                            Pukul {new Date(h.renewed_at).toLocaleTimeString('id-ID', {
+                                                                hour: '2-digit',
+                                                                minute: '2-digit'
+                                                            })}
+                                                        </span>
+                                                    </div>
                                                 </td>
-                                                <td className="px-6 py-4 font-medium text-gray-900">
-                                                    {h.plan.name}
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="h-2 w-2 rounded-full bg-green-500" />
+                                                        <span className="font-semibold text-gray-900">{h.plan.name}</span>
+                                                    </div>
                                                 </td>
                                                 <td className="px-6 py-4 text-gray-600">
-                                                    {h.duration_days} Hari
+                                                    <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-xs font-medium">
+                                                        {h.duration_days} Hari
+                                                    </span>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900 text-right">
-                                                    Rp {parseInt(h.price_paid || "0").toLocaleString('id-ID')}
+                                                <td className="px-6 py-4 whitespace-nowrap text-right">
+                                                    <span className="font-bold text-gray-900">
+                                                        Rp {parseInt(h.price_paid || "0").toLocaleString('id-ID')}
+                                                    </span>
                                                 </td>
                                             </tr>
                                         ))}
@@ -214,9 +263,21 @@ export function SharedLanggananPage() {
                                 </table>
                             </div>
                         ) : (
-                            <div className="flex h-32 flex-col items-center justify-center text-gray-400">
+                            <div className="flex h-32 flex-col items-center justify-center text-gray-400 bg-gray-50/50 rounded-lg">
                                 <Info className="h-8 w-8 mb-2 opacity-20" />
-                                <p className="text-sm">Belum ada riwayat langganan</p>
+                                <p className="text-sm font-medium">
+                                    {historySearch ? `Tidak ada paket "${historySearch}" ditemukan` : 'Belum ada riwayat langganan'}
+                                </p>
+                                {historySearch && (
+                                    <Button 
+                                        variant="ghost" 
+                                        size="sm" 
+                                        className="mt-2 text-xs"
+                                        onClick={() => setHistorySearch('')}
+                                    >
+                                        Hapus pencarian
+                                    </Button>
+                                )}
                             </div>
                         )}
                     </CardContent>
