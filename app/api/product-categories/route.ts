@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { productCategoryService } from '@/services/apiService'
 
-export async function GET() {
+export async function GET(req: Request) {
     const cookieStore = await cookies()
     const token = cookieStore.get('access_token')?.value
 
@@ -10,8 +10,17 @@ export async function GET() {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
 
+    const { searchParams } = new URL(req.url)
+    const store_id = searchParams.get('store_id')
+    const page = searchParams.get('page')
+    const limit = searchParams.get('limit')
+
     try {
-        const data = await productCategoryService.getList(token)
+        const data = await productCategoryService.getList(token, {
+            store_id: store_id || undefined,
+            page: page ? parseInt(page) : undefined,
+            limit: limit ? parseInt(limit) : undefined
+        })
         return NextResponse.json(data)
     } catch (error: any) {
         return NextResponse.json({ message: error.message }, { status: error.status || 500 })

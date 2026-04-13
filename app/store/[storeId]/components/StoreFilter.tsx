@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import { useParams } from 'next/navigation';
 import {
     ListFilter,
     SlidersHorizontal,
@@ -12,9 +13,14 @@ import { getPublicAccessToken } from '@/utils/auth';
 interface StoreFilterProps {
     selectedCategory: string;
     setSelectedCategory: (id: string) => void;
+    storeId?: string | number;
 }
 
-export default function StoreFilter({ selectedCategory, setSelectedCategory }: StoreFilterProps) {
+export default function StoreFilter({ selectedCategory, setSelectedCategory, storeId: propStoreId }: StoreFilterProps) {
+    const params = useParams();
+    const storeIdFromParams = params.storeId;
+    const finalStoreId = propStoreId || storeIdFromParams;
+
     const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
     const [isLoadingCats, setIsLoadingCats] = useState(true);
 
@@ -22,18 +28,16 @@ export default function StoreFilter({ selectedCategory, setSelectedCategory }: S
         try {
             const activeToken = await getPublicAccessToken();
 
-            // Fetch Categories
-            const catRes = await productCategoryService.getList(activeToken || '');
-            if (catRes.data) {
-                const catList = Array.isArray(catRes.data) ? catRes.data : (catRes.data.data || []);
-                setCategories(catList);
-            }
+            // Fetch Categories - filter by finalStoreId
+            const catRes = await productCategoryService.getList(activeToken || '', { store_id: finalStoreId as string });
+            const catList = catRes.data?.data || catRes.data || [];
+            setCategories(Array.isArray(catList) ? catList : []);
         } catch (err) {
             console.error('Error fetching categories:', err);
         } finally {
             setIsLoadingCats(false);
         }
-    }, []);
+    }, [finalStoreId]);
 
     useEffect(() => {
         fetchFilterData();
@@ -64,8 +68,8 @@ export default function StoreFilter({ selectedCategory, setSelectedCategory }: S
                                 <button
                                     onClick={() => setSelectedCategory('all')}
                                     className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${selectedCategory === 'all'
-                                            ? 'bg-[var(--store-primary-soft)] text-[var(--store-primary)]'
-                                            : 'text-slate-500 hover:bg-slate-50'
+                                        ? 'bg-[var(--store-primary-soft)] text-[var(--store-primary)]'
+                                        : 'text-slate-500 hover:bg-slate-50'
                                         }`}
                                 >
                                     Semua Produk
@@ -75,8 +79,8 @@ export default function StoreFilter({ selectedCategory, setSelectedCategory }: S
                                         key={cat.id}
                                         onClick={() => setSelectedCategory(cat.id.toString())}
                                         className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${selectedCategory === cat.id.toString()
-                                                ? 'bg-[var(--store-primary-soft)] text-[var(--store-primary)]'
-                                                : 'text-slate-500 hover:bg-slate-50'
+                                            ? 'bg-[var(--store-primary-soft)] text-[var(--store-primary)]'
+                                            : 'text-slate-500 hover:bg-slate-50'
                                             }`}
                                     >
                                         {cat.name}
@@ -87,12 +91,6 @@ export default function StoreFilter({ selectedCategory, setSelectedCategory }: S
                     </div>
                 </div>
 
-                {/* Price Range Placeholder (If needed later) */}
-                <div className="pt-6 border-t border-slate-50">
-                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest text-center">
-                        Brand Focused Filtering
-                    </p>
-                </div>
             </div>
         </aside>
     );

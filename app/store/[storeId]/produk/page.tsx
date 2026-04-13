@@ -125,6 +125,7 @@ export default function StoreProductsListPage({ params }: PageProps) {
                                         setSelectedCategory(cat);
                                         setCurrentPage(1);
                                     }}
+                                    storeId={store.id}
                                 />
                             </div>
                         </div>

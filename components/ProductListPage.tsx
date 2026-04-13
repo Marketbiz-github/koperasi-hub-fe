@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useParams } from 'next/navigation';
 import {
     Table,
     TableBody,
@@ -23,7 +24,7 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
-import { apiRequest, productService } from '@/services/apiService';
+import { apiRequest, productCategoryService, productService } from '@/services/apiService';
 import { getAccessToken } from '@/utils/auth';
 import Image from 'next/image';
 
@@ -42,10 +43,15 @@ interface ProductListPageProps {
     title: string;
     description: string;
     rolePath: string; // e.g., 'vendor', 'koperasi', 'reseller'
+    storeId?: string | number;
 }
 
-export default function ProductListPage({ title, description, rolePath }: ProductListPageProps) {
+export default function ProductListPage({ title, description, rolePath, storeId: propStoreId }: ProductListPageProps) {
     const { user, isHydrated, hydrate } = useAuthStore();
+    const params = useParams();
+    const storeIdFromParams = params.storeId;
+    const finalStoreId = propStoreId || storeIdFromParams;
+
     const [store, setStore] = useState<any>(null);
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<{ id: number, name: string }[]>([]);
@@ -94,19 +100,21 @@ export default function ProductListPage({ title, description, rolePath }: Produc
 
     // Fetch Categories for dropdown
     const fetchCategories = useCallback(async () => {
+        const targetStoreId = store?.id || finalStoreId;
+        if (!targetStoreId) return;
         try {
-            const response = await fetch('/api/product-categories');
-            const result = await response.json();
-            if (response.ok) {
-                setCategories(result.data?.data || result.data || []);
-            }
+            const token = await getAccessToken();
+            const catRes = await productCategoryService.getList(token || '', { store_id: targetStoreId.toString() });
+            const catList = catRes.data?.data || catRes.data || [];
+            setCategories(Array.isArray(catList) ? catList : []);
         } catch (error) {
             console.error('Failed to load categories:', error);
         }
-    }, []);
+    }, [store?.id, finalStoreId]);
 
     const fetchProducts = useCallback(async () => {
-        if (!store?.id) return;
+        const targetStoreId = store?.id || finalStoreId;
+        if (!targetStoreId) return;
         setIsLoading(true);
         try {
             const params = new URLSearchParams({

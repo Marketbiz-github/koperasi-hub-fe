@@ -109,9 +109,10 @@ export default function ProductCategoryPageShared({ title, description }: Produc
     }, [user, isHydrated]);
 
     const fetchCategories = useCallback(async () => {
+        if (!store?.id) return;
         setIsLoading(true);
         try {
-            const response = await fetch('/api/product-categories');
+            const response = await fetch(`/api/product-categories?store_id=${store.id}`);
             const result = await response.json();
             if (response.ok) {
                 const list = result.data?.data || result.data || [];
@@ -124,7 +125,7 @@ export default function ProductCategoryPageShared({ title, description }: Produc
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [store?.id]);
 
     useEffect(() => {
         if (!isStoreLoading && store) {

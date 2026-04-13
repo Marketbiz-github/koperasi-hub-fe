@@ -177,9 +177,9 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
 
                 // Fetch Categories and Warehouses
                 const [pcRes, gcRes, whRes] = await Promise.all([
-                    productCategoryService.getList(token),
+                    productCategoryService.getList(token, { store_id: currentStore?.id }),
                     generalCategoryService.getList(token),
-                    gudangService.getList(token, { store_id: currentStore.id })
+                    gudangService.getList(token, { store_id: currentStore?.id })
                 ]);
 
                 setProductCategories(pcRes.data?.data || pcRes.data || []);

@@ -259,8 +259,16 @@ export const generalCategoryService = {
 }
 
 export const productCategoryService = {
-    async getList(token: string) {
-        return apiRequest('/product-categories', {
+    async getList(token: string, params: { store_id?: string | number, page?: number, limit?: number } = {}) {
+        let query = new URLSearchParams();
+        if (params.page !== undefined && params.page !== null) query.append('page', params.page.toString());
+        if (params.limit !== undefined && params.limit !== null) query.append('limit', params.limit.toString());
+        if (params.store_id !== undefined && params.store_id !== null) query.append('store_id', params.store_id.toString());
+
+        const queryString = query.toString();
+        const endpoint = `/product-categories${queryString ? `?${queryString}` : ''}`;
+
+        return apiRequest(endpoint, {
             token,
         })
     },
