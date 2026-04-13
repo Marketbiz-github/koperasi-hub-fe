@@ -281,8 +281,8 @@ export default function RegisterVendorPage() {
                   {errors.phone && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.phone}</p>}
                 </div>
 
-                </div>
               </div>
+            </div>
 
             {/* Section 2: Data Toko */}
             <div className="space-y-5 pt-4">
@@ -406,7 +406,7 @@ export default function RegisterVendorPage() {
                   className="mt-1 w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                 />
                 <label htmlFor="agreeTerms" className="text-sm text-slate-600">
-                  Saya menyetujui <Link href="#" className="font-bold text-emerald-600 hover:underline">Syarat & Ketentuan</Link> serta <Link href="#" className="font-bold text-emerald-600 hover:underline">Kebijakan Privasi</Link> KoperasiHub.
+                  Saya menyetujui <Link href="/syarat-ketentuan" target="_blank" className="font-bold text-emerald-600 hover:underline">Syarat & Ketentuan</Link> serta <Link href="/kebijakan-privasi" target="_blank" className="font-bold text-emerald-600 hover:underline">Kebijakan Privasi</Link> KoperasiHub.
                 </label>
               </div>
               {errors.agreeTerms && <p className="mt-2 text-xs font-medium text-red-500">{errors.agreeTerms}</p>}

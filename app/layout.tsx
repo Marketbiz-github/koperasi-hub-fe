@@ -64,6 +64,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://koperasi.hub",
   },
+  icons: {
+    icon: "/images/favicon.png",
+    shortcut: "/images/favicon.png",
+    apple: "/images/favicon.png",
+  },
 };
 
 import { CaptchaProvider } from "@/components/providers/CaptchaProvider";
@@ -81,7 +86,6 @@ export default function RootLayout({
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#16a34a" />
-        <link rel="icon" href="/images/favicon.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>

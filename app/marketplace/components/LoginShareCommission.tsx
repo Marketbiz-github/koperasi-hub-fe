@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import {
   Dialog,
   DialogContent,
@@ -306,8 +307,13 @@ export default function LoginShareCommission({
 
         {/* Footer */}
         <div className="flex items-center justify-between px-6 py-4 border-t">
-          <div className="text-xs text-gray-400 font-semibold uppercase">
-            koperasi<span className="text-blue-600">hub</span>
+          <div className="relative w-32 h-8">
+            <Image
+              src="/images/koperasihub-dark2.png"
+              alt="KoperasiHub"
+              fill
+              className="object-contain"
+            />
           </div>
 
           <button
