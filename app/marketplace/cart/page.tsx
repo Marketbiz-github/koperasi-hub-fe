@@ -78,6 +78,8 @@ function CartContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checkoutSuccessData, setCheckoutSuccessData] = useState<{ orderId: number, paymentUrl: string | null } | null>(null);
   const [itemToRemove, setItemToRemove] = useState<string | null>(null);
+  const [platformFeeData, setPlatformFeeData] = useState<{ nominal: number; charge_type: "customer" | "merchant" } | null>(null);
+  const [isLoadingFee, setIsLoadingFee] = useState(false);
 
   // --- Logic ---
 
@@ -188,6 +190,27 @@ function CartContent() {
     fetchData();
   }, [filteredItems]);
 
+  // Fetch platform fee for selected store
+  useEffect(() => {
+    if (!storeIdParam) return;
+
+    const fetchFee = async () => {
+      setIsLoadingFee(true);
+      try {
+        const token = await getPublicAccessToken();
+        const res = await storeService.getStorePlatformFee(token || "", storeIdParam);
+        if (res.data) {
+          setPlatformFeeData(res.data);
+        }
+      } catch (err) {
+        console.error("Error fetching platform fee:", err);
+      } finally {
+        setIsLoadingFee(false);
+      }
+    };
+    fetchFee();
+  }, [storeIdParam]);
+
   // --- Calculations ---
   const totalOriginalPrice = useMemo(() => {
     return filteredItems
@@ -236,17 +259,22 @@ function CartContent() {
       }, 0);
   }, [filteredItems, selectedItems, cartDetails]);
 
-  const tax = selectedItems.size > 0 ? 3000 : 0;
+  const dynamicPlatformFee = useMemo(() => {
+    if (selectedItems.size === 0) return 0;
+    if (!platformFeeData) return 3000; // Fallback to 3000 if not loaded or failed
+    return platformFeeData.charge_type === "customer" ? platformFeeData.nominal : 0;
+  }, [selectedItems.size, platformFeeData]);
+
   const baseShippingCost = selectedRate?.price || 0;
 
   const shippingDiscount = useMemo(() => {
     if (baseShippingCost <= 0) return 0;
-    
+
     // 1. Check Store-wide Free Shipping
     const isStoreGratis = storeDetail?.is_gratis_ongkir === "1" || storeDetail?.is_gratis_ongkir === 1;
     const minOrder = Number(storeDetail?.gratis_ongkir_min_order || 0);
     const isStoreThresholdMet = isStoreGratis && subtotal >= minOrder;
-    
+
     // 2. Check Per-product Free Shipping
     const freeShippingItem = filteredItems
       .filter(it => selectedItems.has(it.id))
@@ -277,7 +305,7 @@ function CartContent() {
   }, [baseShippingCost, storeDetail, subtotal, filteredItems, selectedItems, cartDetails]);
 
   const finalShippingCost = baseShippingCost - shippingDiscount;
-  const finalTotal = subtotal + tax + finalShippingCost;
+  const finalTotal = subtotal + dynamicPlatformFee + finalShippingCost;
 
   const isShippingValid = useMemo(() => {
     if (!shippingAddress) return false;
@@ -351,7 +379,7 @@ function CartContent() {
 
         // Use standard 'url' or 'payment_url' field from response
         const paymentUrl = res.data.url || res.data.payment_url;
-        
+
         if (paymentUrl) {
           window.location.href = paymentUrl;
           return;
@@ -728,10 +756,12 @@ function CartContent() {
                         <span className="text-rose-600 font-medium">-Rp{totalDiscount.toLocaleString('id-ID')}</span>
                       </div>
                     )}
-                    <div className="flex justify-between text-gray-600">
-                      <span>Fee Platform</span>
-                      <span>{formatCurrency(tax)}</span>
-                    </div>
+                    {platformFeeData?.charge_type !== "merchant" && (
+                      <div className="flex justify-between text-gray-600">
+                        <span>Platform Fee</span>
+                        <span>{formatCurrency(dynamicPlatformFee)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-gray-600">
                       <span className="flex items-center gap-1"><Truck size={14} /> Biaya Ongkir</span>
                       <span>{selectedRate ? `Rp${baseShippingCost.toLocaleString('id-ID')}` : '-'}</span>

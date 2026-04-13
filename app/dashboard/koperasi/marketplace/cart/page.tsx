@@ -68,6 +68,8 @@ function CartContent() {
   const [variantDetailMap, setVariantDetailMap] = useState<Record<string, any[]>>({})
   const [productStockMap, setProductStockMap] = useState<Record<string, number>>({})
   const [checkoutSuccessData, setCheckoutSuccessData] = useState<{ orderId: number, paymentUrl: string | null } | null>(null)
+  const [platformFeeData, setPlatformFeeData] = useState<{ nominal: number; charge_type: "customer" | "merchant" } | null>(null)
+  const [isLoadingFee, setIsLoadingFee] = useState(false)
 
   // Filter items by store
   const filteredItems = useMemo(() => {
@@ -185,6 +187,28 @@ function CartContent() {
     fetchData()
   }, [filteredItems])
 
+  // Fetch platform fee for selected store
+  useEffect(() => {
+    const activeStoreId = storeIdParam || (filteredItems.length > 0 ? filteredItems[0].storeId : null);
+    if (!activeStoreId) return;
+
+    const fetchFee = async () => {
+      setIsLoadingFee(true);
+      try {
+        const token = await getAccessToken();
+        const res = await storeService.getStorePlatformFee(token || "", activeStoreId);
+        if (res.data) {
+          setPlatformFeeData(res.data);
+        }
+      } catch (err) {
+        console.error("Error fetching platform fee:", err);
+      } finally {
+        setIsLoadingFee(false);
+      }
+    };
+    fetchFee();
+  }, [storeIdParam, filteredItems]);
+
   const totalOriginalPrice = useMemo(() => {
     return filteredItems
       .filter((it) => selectedItems.has(it.id))
@@ -229,7 +253,12 @@ function CartContent() {
       }, 0)
   }, [filteredItems, selectedItems, cartDetails])
 
-  const tax = selectedItems.size > 0 ? 3000 : 0
+  const dynamicPlatformFee = useMemo(() => {
+    if (selectedItems.size === 0) return 0;
+    if (!platformFeeData) return 3000; // Fallback
+    return platformFeeData.charge_type === "customer" ? platformFeeData.nominal : 0;
+  }, [selectedItems.size, platformFeeData]);
+
   const baseShippingCost = selectedRate?.price || 0
 
   const shippingDiscount = useMemo(() => {
@@ -272,7 +301,7 @@ function CartContent() {
   }, [filteredItems, selectedItems, cartDetails, storeDetail, baseShippingCost, subtotal])
 
   const shippingCost = Math.max(0, baseShippingCost - shippingDiscount)
-  const total = subtotal + tax + shippingCost
+  const total = subtotal + dynamicPlatformFee + shippingCost
 
   const isAllSelected = filteredItems.length > 0 && filteredItems.every(it => selectedItems.has(it.id))
 
@@ -685,10 +714,12 @@ function CartContent() {
                 <span className="text-gray-900">{formatCurrency(subtotal)}</span>
               </div>
 
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600">Fee Platform</span>
-                <span className="font-semibold">{formatCurrency(tax)}</span>
-              </div>
+              {platformFeeData?.charge_type !== "merchant" && (
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600">Platform Fee</span>
+                  <span className="font-semibold">{formatCurrency(dynamicPlatformFee)}</span>
+                </div>
+              )}
 
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600">Total Ongkos Kirim</span>

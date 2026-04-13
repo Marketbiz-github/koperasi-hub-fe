@@ -645,6 +645,10 @@ export const storeService = {
 
     async getDashboardSummary(token: string, storeId: string | number) {
         return apiRequest(`/stores/${storeId}/dashboard-summary`, { token });
+    },
+
+    async getStorePlatformFee(token: string, storeId: string | number) {
+        return apiRequest(`/stores/${storeId}/platform-fee`, { token });
     }
 }
 
@@ -975,6 +979,32 @@ export const featureService = {
     async assignFeatureToPlan(planId: number, featureId: number, token: string) {
         return apiRequest(`/plans/${planId}/features/${featureId}`, {
             method: 'POST',
+            token,
+        });
+    }
+}
+
+export const platformFeeService = {
+    async getList(token: string) {
+        return apiRequest('/admin/platform-fee', { token });
+    },
+    async create(token: string, data: { nominal: number; store_id?: number | null }) {
+        return apiRequest('/admin/platform-fee', {
+            method: 'POST',
+            body: data,
+            token,
+        });
+    },
+    async update(token: string, id: string | number, data: { nominal: number; store_id?: number | null }) {
+        return apiRequest(`/admin/platform-fee/${id}`, {
+            method: 'PUT',
+            body: data,
+            token,
+        });
+    },
+    async delete(token: string, id: string | number) {
+        return apiRequest(`/admin/platform-fee/${id}`, {
+            method: 'DELETE',
             token,
         });
     }

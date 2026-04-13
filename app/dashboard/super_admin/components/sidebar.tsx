@@ -48,7 +48,13 @@ const superAdminNav = [
         url: "/dashboard/super_admin/general-category",
         icon: IconCategory,
     },
+    {
+        title: "Platform Fee",
+        url: "/dashboard/super_admin/platform-fee",
+        icon: IconInnerShadowTop,
+    },
 ];
+
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { user, userDetail } = useAuthStore();
