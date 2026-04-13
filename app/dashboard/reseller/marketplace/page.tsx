@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   Card,
   CardContent,
@@ -13,9 +14,16 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { ShoppingCart, Star, Loader2, Search, Package, ChevronLeft, ChevronRight } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription
+} from "@/components/ui/dialog"
+import { ShoppingCart, Star, Loader2, Search, Package, ChevronLeft, ChevronRight, ShieldCheck } from "lucide-react"
 import { useCartStore } from "@/store/cartStore"
-import { productService, storeService, userService, debtService, orderService } from "@/services/apiService"
+import { productService, storeService, userService, debtService, orderService, affiliationService } from "@/services/apiService"
 import { getAccessToken } from "@/utils/auth"
 import { toast } from "sonner"
 import { getSafeImageSrc } from "@/utils/image"
@@ -23,8 +31,6 @@ import { useAuthStore } from "@/store/authStore"
 import { SearchableSelect } from "@/components/ui/searchable-select"
 import InfiniteScrollTrigger from "@/components/ui/InfiniteScrollTrigger"
 import ScrollToTop from "@/components/ui/ScrollToTop"
-
-import { useRouter } from "next/navigation"
 
 interface Product {
   id: number
@@ -53,9 +59,43 @@ interface Vendor {
 
 function ProductCardComponent({ product }: { product: Product }) {
   const router = useRouter()
-  const addItem = useCartStore((s) => s.addItem)
+  const addItem = useCartStore((s: any) => s.addItem)
   const currentUser = useAuthStore((s) => s.user)
+  const { token } = useAuthStore()
   const [isValidating, setIsValidating] = useState(false)
+  const [showAffiliateDialog, setShowAffiliateDialog] = useState(false)
+  const [isRequestingAffiliation, setIsRequestingAffiliation] = useState(false)
+  const [isAffiliated, setIsAffiliated] = useState(false)
+
+  const handleRequestAffiliation = async () => {
+    if (!token) {
+      toast.error("Anda harus login terlebih dahulu")
+      return
+    }
+
+    const storeId = (product as any).store_id || product.store?.id || 1
+    setIsRequestingAffiliation(true)
+    try {
+      const storeRes = await storeService.getDetail(token, storeId)
+      const parentId = storeRes.data?.user_id
+
+      if (!parentId) {
+        toast.error("Data vendor tidak ditemukan")
+        return
+      }
+
+      await affiliationService.create(token, {
+        parent_id: parentId,
+        type: 'reseller_koperasi' // Note: Reseller usually affiliates with Koperasi
+      })
+      toast.success("Permintaan afiliasi berhasil dikirim. Silakan tunggu persetujuan.")
+      setShowAffiliateDialog(false)
+    } catch (error: any) {
+      toast.error(error.message || "Gagal mengajukan afiliasi")
+    } finally {
+      setIsRequestingAffiliation(false)
+    }
+  }
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -71,37 +111,37 @@ function ProductCardComponent({ product }: { product: Product }) {
 
     setIsValidating(true)
     try {
-      const token = await getAccessToken()
-      if (!token) return
+      const currentToken = token || await getAccessToken()
+      if (!currentToken) return
 
-      const storeId = (product as any).store_id || (product as any).store?.id || 1
+      const storeId = (product as any).store_id || product.store?.id || 1
 
       // 1. Get vendor's user_id from store detail
-      const storeRes = await storeService.getDetail(token, storeId)
+      const storeRes = await storeService.getDetail(currentToken, storeId)
       const parentId = storeRes.data?.user_id
 
-      // 2. Check Affiliation
-      let affiliated = false
+      // 2. Check Affiliation (Re-verify)
+      let affiliated = isAffiliated
       if (parentId && currentUser?.id) {
-        const userRes = await userService.getUserDetail(token, currentUser.id)
-        const affiliations = userRes.data?.parent_affiliations || []
-        affiliated = affiliations.some((a: any) => a.user?.id === parentId)
+        const affRes = await userService.checkAffiliation(currentToken, parentId, currentUser.id)
+        affiliated = affRes.data?.is_affiliated === true
+        setIsAffiliated(affiliated)
       }
 
       if (!affiliated) {
-        toast.error("Anda belum terafiliasi dengan vendor ini atau afiliasi belum disetujui.")
+        setShowAffiliateDialog(true)
         return
       }
 
       // 3. Check unpaid POs / Debts for this specific product
-      const debtRes = await debtService.getDebts({ buyer_id: currentUser?.id ? Number(currentUser.id) : undefined, user_id: parentId ? Number(parentId) : undefined, status: 'unpaid' }, token)
+      const debtRes = await debtService.getDebts({ buyer_id: currentUser?.id ? Number(currentUser.id) : undefined, user_id: parentId ? Number(parentId) : undefined, status: 'unpaid' }, currentToken)
       const debts = Array.isArray(debtRes.data?.debts) ? debtRes.data.debts : (Array.isArray(debtRes.data) ? debtRes.data : [])
 
       let isProductInUnpaidPO = false;
       for (const debt of debts) {
         if (debt.type === 'po' && debt.order_id) {
           try {
-            const orderRes = await orderService.getOrderDetail(debt.order_id, token)
+            const orderRes = await orderService.getOrderDetail(debt.order_id, currentToken)
             const orderItems = orderRes.data?.items || []
             if (orderItems.some((item: any) => item.product_id === Number(product.id))) {
               isProductInUnpaidPO = true;
@@ -189,9 +229,26 @@ function ProductCardComponent({ product }: { product: Product }) {
               <><ShoppingCart size={14} /> Tambah</>
             )}
           </button>
-          {/* Share button removed as per user request */}
         </div>
       </div>
+      
+      <Dialog open={showAffiliateDialog} onOpenChange={setShowAffiliateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ajukan Afiliasi ke Vendor</DialogTitle>
+            <DialogDescription>
+              Anda harus terafiliasi dengan vendor ini sebelum dapat membeli produk mereka. Apakah Anda ingin mengirimkan permintaan afiliasi?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-3 mt-4">
+            <Button variant="outline" onClick={() => setShowAffiliateDialog(false)}>Batal</Button>
+            <Button onClick={handleRequestAffiliation} disabled={isRequestingAffiliation} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+              {isRequestingAffiliation ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Ajukan Afiliasi
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -210,13 +267,12 @@ export default function MarketplaceResellerPage() {
   const [isFetchingMore, setIsFetchingMore] = useState(false)
   const limit = 12
 
-  const cartItems = useCartStore((s) => s.items)
+  const cartItems = useCartStore((s: any) => s.items)
 
   const fetchVendors = useCallback(async () => {
     try {
-      const token = await getAccessToken()
-      if (!token) return
-      const res = await storeService.getStores(token, { limit: 100 })
+      const { token } = useAuthStore.getState()
+      const res = await storeService.getStores(token as string, { limit: 100 })
       if (res.data) {
         if (Array.isArray(res.data)) {
           setVendors(res.data)
@@ -260,7 +316,7 @@ export default function MarketplaceResellerPage() {
       const res = hasFilters 
         ? await productService.searchProducts(params, token || undefined)
         : await productService.getProducts(params, token || undefined)
-
+      
       if (res.data) {
         const fetchedProducts = res.data.data || (Array.isArray(res.data) ? res.data : [])
         setProducts(prev => currentPage === 1 ? fetchedProducts : [...prev, ...fetchedProducts])
@@ -296,20 +352,9 @@ export default function MarketplaceResellerPage() {
       <div className="space-y-2 mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold">Marketplace Reseller</h1>
-            <p className="text-sm text-gray-500 mt-1">Belanja produk kualitas terbaik dengan harga reseller</p>
+            <h1 className="text-2xl font-semibold">Marketplace Pembelian</h1>
+            <p className="text-sm text-gray-500 mt-1">Dashboard Reseller - Belanja Produk dari Koperasi</p>
           </div>
-          <Link href="/dashboard/reseller/marketplace/cart">
-            <Button variant="outline" className="relative">
-              <ShoppingCart size={18} />
-              <span className="ml-2">Keranjang</span>
-              {cartItems.length > 0 && (
-                <Badge className="absolute -top-2 -right-2 bg-red-500">
-                  {cartItems.length}
-                </Badge>
-              )}
-            </Button>
-          </Link>
         </div>
       </div>
 
@@ -381,9 +426,14 @@ export default function MarketplaceResellerPage() {
           ) : products.length > 0 ? (
             <div className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                {products.map((product) => (
-                  <ProductCardComponent key={product.id} product={product} />
-                ))}
+                {products.map((p) => {
+                  return (
+                    <ProductCardComponent 
+                      key={p.id} 
+                      product={p} 
+                    />
+                  )
+                })}
               </div>
 
               <InfiniteScrollTrigger

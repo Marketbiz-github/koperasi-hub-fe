@@ -31,6 +31,7 @@ interface ProductDetail {
   rating?: number;
   reviews_count?: number;
   sold_count?: number;
+  total_sold?: number;
   images?: { image_url: string; is_primary: boolean }[];
   product_category?: { name: string };
   store?: {
@@ -340,7 +341,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                       {product.rating || 4.5} ({(product.reviews_count || 0).toLocaleString('id-ID')} ulasan)
                     </span>
                     <span className="text-gray-400 ml-auto text-sm">
-                      {(product.sold_count || 0).toLocaleString('id-ID')} terjual
+                      {(product.total_sold || 0).toLocaleString('id-ID')} terjual
                     </span>
                   </div>
 

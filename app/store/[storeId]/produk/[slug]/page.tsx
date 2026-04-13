@@ -263,7 +263,7 @@ export default function StoreProductDetailPage({ params }: PageProps) {
                                         <span className="text-sm font-bold text-slate-900">{product.rating || 0}</span>
                                     </div>
                                     <div className="h-4 w-px bg-slate-200" />
-                                    <span className="text-sm font-bold text-slate-400">{(product.sold_count || 0).toLocaleString('id-ID')} Terjual</span>
+                                    <span className="text-sm font-bold text-slate-400">{(product.total_sold || 0).toLocaleString('id-ID')} Terjual</span>
                                 </div>
 
                                 <div className="text-4xl font-black text-[var(--store-primary)] tracking-tight mb-6">

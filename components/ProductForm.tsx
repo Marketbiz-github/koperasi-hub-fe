@@ -37,7 +37,8 @@ import {
     Tags,
     Check,
     X as XIcon,
-    Info
+    Info,
+    Search
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -127,6 +128,9 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
         is_cashback: false,
         cashback_unit: 'fixed',
         cashback_value: '',
+        seo_title: '',
+        seo_description: '',
+        seo_keywords: '',
     });
 
     const [images, setImages] = useState<ImageItem[]>([]);
@@ -212,6 +216,9 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                         is_cashback: !!prod.is_cashback,
                         cashback_unit: prod.cashback_unit || 'fixed',
                         cashback_value: prod.cashback_value?.toString() || '',
+                        seo_title: prod.seo_title || '',
+                        seo_description: prod.seo_description || '',
+                        seo_keywords: prod.seo_keywords || '',
                     });
 
                     if (prod.images) {
@@ -588,6 +595,9 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                 is_cashback: formData.is_cashback,
                 cashback_unit: formData.cashback_unit,
                 cashback_value: String(formData.cashback_value),
+                seo_title: formData.seo_title || null,
+                seo_description: formData.seo_description || null,
+                seo_keywords: formData.seo_keywords || null,
             };
 
             if (imagesChanged) {
@@ -1370,6 +1380,47 @@ export default function ProductForm({ rolePath, productId, isDuplicate = false }
                                 </div>
                             )}
 
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Search className="h-5 w-5 text-emerald-600" /> SEO & Meta Tags
+                            </CardTitle>
+                            <CardDescription>Optimasi mesin pencari untuk halaman produk ini</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="seo_title">SEO Title</Label>
+                                <Input
+                                    id="seo_title"
+                                    placeholder="Judul untuk mesin pencari..."
+                                    value={formData.seo_title}
+                                    onChange={e => setFormData({ ...formData, seo_title: e.target.value })}
+                                />
+                                <p className="text-[10px] text-muted-foreground">Saran: maksimal 60 karakter</p>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="seo_description">SEO Description</Label>
+                                <Textarea
+                                    id="seo_description"
+                                    placeholder="Deskripsi untuk mesin pencari..."
+                                    value={formData.seo_description}
+                                    onChange={e => setFormData({ ...formData, seo_description: e.target.value })}
+                                />
+                                <p className="text-[10px] text-muted-foreground">Saran: maksimal 160 karakter</p>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="seo_keywords">SEO Keywords</Label>
+                                <Input
+                                    id="seo_keywords"
+                                    placeholder="Kata kunci, pisahkan dengan koma..."
+                                    value={formData.seo_keywords}
+                                    onChange={e => setFormData({ ...formData, seo_keywords: e.target.value })}
+                                />
+                                <p className="text-[10px] text-muted-foreground">Contoh: gadget, iphone, murah</p>
+                            </div>
                         </CardContent>
                     </Card>
                 </div >

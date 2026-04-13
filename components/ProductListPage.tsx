@@ -37,6 +37,7 @@ interface Product {
     images?: { image_url: string; is_primary: boolean }[];
     product_category?: { name: string };
     total_stock?: number;
+    total_sold?: number;
 }
 
 interface ProductListPageProps {
@@ -279,6 +280,7 @@ export default function ProductListPage({ title, description, rolePath, storeId:
                                         <TableHead>Produk</TableHead>
                                         <TableHead>Kategori</TableHead>
                                         <TableHead>Stok</TableHead>
+                                        <TableHead>Terjual</TableHead>
                                         <TableHead>Harga</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead className="text-right">Aksi</TableHead>
@@ -320,6 +322,11 @@ export default function ProductListPage({ title, description, rolePath, storeId:
                                                     <TableCell>
                                                         <span className={`font-medium ${Number(product.total_stock) < 5 ? 'text-red-500' : ''}`}>
                                                             {product.total_stock ?? 0}
+                                                        </span>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <span className="font-medium text-blue-600">
+                                                            {product.total_sold ?? 0}
                                                         </span>
                                                     </TableCell>
                                                     <TableCell className="font-semibold text-emerald-700">

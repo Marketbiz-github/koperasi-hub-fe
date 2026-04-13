@@ -11,13 +11,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { User, Settings, LogOut, StoreIcon } from "lucide-react"
+import { User, Settings, LogOut, StoreIcon, ShoppingCart } from "lucide-react"
 import { IconUser } from "@tabler/icons-react"
 import { useAuthStore } from "@/store/authStore"
+import { useCartStore } from "@/store/cartStore"
+import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 
 export function SiteHeader() {
   const { user, store, logout } = useAuthStore()
+  const cartItems = useCartStore((s: any) => s.items)
 
   const handleLogout = async () => {
     await logout()
@@ -51,6 +54,16 @@ export function SiteHeader() {
         )}
 
         <div className="ml-auto flex items-center gap-2">
+          <Link href="/dashboard/koperasi/marketplace/cart">
+            <Button variant="outline" size="sm" className="relative rounded-full px-2 h-8 w-8 sm:h-9 sm:w-9">
+              <ShoppingCart className="size-4" />
+              {cartItems.length > 0 && (
+                <Badge className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center p-0 bg-red-500 text-[10px] text-white border-none">
+                  {cartItems.length}
+                </Badge>
+              )}
+            </Button>
+          </Link>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

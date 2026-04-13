@@ -50,6 +50,8 @@ interface ProductDetail {
     long_description?: string | null
     status: string
     stock?: number
+    total_sold?: number
+    store_id?: number
     images: ProductImage[]
     product_category?: { name: string } | null
     product_variants?: any[] | null
@@ -74,6 +76,7 @@ export default function ResellerProductDetailPage() {
     const router = useRouter()
     const currentUser = useAuthStore((s) => s.user)
     const [product, setProduct] = useState<ProductDetail | null>(null)
+    const [storeName, setStoreName] = useState("")
     const [isLoading, setIsLoading] = useState(true)
     const [totalStock, setTotalStock] = useState<number | null>(null)
     const [variants, setVariants] = useState<any[]>([])
@@ -145,35 +148,21 @@ export default function ResellerProductDetailPage() {
             // 1. Get vendor's user_id from store detail
             const storeRes = await storeService.getDetail(token, storeId)
             const parentId = storeRes.data?.user_id
+            setStoreName(storeRes.data?.name || "KoperasiHub Vendor")
 
             // 2. Check Affiliation
             let affiliated = false
             if (parentId && currentUser?.id) {
                 const affRes = await userService.checkAffiliation(token, parentId, currentUser.id)
-                affiliated = affRes.data?.is_affiliated === true;
+                affiliated = affRes.data?.is_affiliated === true
             }
             setIsAffiliated(affiliated)
 
             if (!affiliated) {
-                // Check if request already sent
-                if (parentId) {
-                   const childReqs = await affiliationService.getChild(token, { parent_id: parentId });
-                   const reqList = childReqs.data || [];
-                   const pendingReq = reqList.find((r:any) => r.status === 'pending');
-                   const rejectedReq = reqList.find((r:any) => r.status === 'rejected');
-                   if (pendingReq) {
-                       setValidationMessage("Status afiliasi Anda dengan vendor ini masih menunggu persetujuan.");
-                       setAffiliationStatus('pending');
-                   } else if (rejectedReq) {
-                       setValidationMessage("Pengajuan afiliasi Anda ke vendor ini telah ditolak.");
-                       setAffiliationStatus('rejected');
-                   } else {
-                       setValidationMessage("Anda belum terafiliasi dengan vendor ini. Silakan ajukan terlebih dahulu.");
-                       setAffiliationStatus('unaffiliated');
-                   }
-                }
+                setValidationMessage("Anda belum terafiliasi dengan vendor ini. Silakan ajukan terlebih dahulu.")
+                setAffiliationStatus('unaffiliated')
             } else {
-                setAffiliationStatus('affiliated');
+                setAffiliationStatus('affiliated')
                 // 3. Check unpaid POs / Debts for this specific product
                 const debtRes = await debtService.getDebts({ buyer_id: currentUser?.id ? Number(currentUser.id) : undefined, user_id: parentId ? Number(parentId) : undefined, status: 'unpaid' }, token)
                 const debts = Array.isArray(debtRes.data?.debts) ? debtRes.data.debts : (Array.isArray(debtRes.data) ? debtRes.data : [])
@@ -210,25 +199,37 @@ export default function ResellerProductDetailPage() {
     }, [])
 
     useEffect(() => {
-        if (product?.store?.id) {
-            validatePurchase(product.store.id)
+        const storeId = product?.store_id || product?.store?.id
+        if (storeId) {
+            validatePurchase(Number(storeId))
         }
-    }, [product?.store?.id, validatePurchase])
+    }, [product?.store_id, product?.store?.id, validatePurchase])
 
     const handleRequestAffiliation = async () => {
-        if (!product?.store?.id) return;
+        const storeId = product?.store?.id || (product as any)?.store_id;
+        if (!storeId) {
+            toast.error("ID Vendor/Koperasi tidak ditemukan");
+            return;
+        }
+
         setIsRequestingAffiliation(true);
         try {
             const token = await getAccessToken();
-            const storeRes = await storeService.getDetail(token || '', product.store.id);
+            const storeRes = await storeService.getDetail(token || '', storeId);
             const parentId = storeRes.data?.user_id;
 
             if (parentId) {
-                await affiliationService.create(token || '', { parent_id: parentId, type: 'reseller_koperasi' });
-                toast.success('Permintaan afiliasi berhasil dikirim!');
+                await affiliationService.create(token || '', { 
+                    parent_id: parentId, 
+                    type: 'reseller_koperasi' 
+                });
+                toast.success('Permintaan afiliasi berhasil dikirim! Silakan tunggu persetujuan.');
                 setShowAffiliateDialog(false);
                 setAffiliationStatus('pending');
-                setValidationMessage("Status afiliasi Anda dengan vendor ini masih menunggu persetujuan.");
+                setValidationMessage("Status afiliasi Anda dengan Koperasi ini sedang menunggu persetujuan (Pending).");
+                setIsAffiliated(false);
+            } else {
+                toast.error("Gagal mendapatkan ID pemilik Koperasi");
             }
         } catch (error: any) {
             toast.error(error.message || 'Gagal mengajukan afiliasi');
@@ -353,8 +354,8 @@ export default function ResellerProductDetailPage() {
                         </Badge>
                         <h1 className="text-3xl font-bold text-gray-900 leading-tight">{product.name}</h1>
                         <div className="flex items-center gap-4 text-sm text-gray-500">
-                            <span className="flex items-center gap-1.5"><Package size={14} /> SKU: <span className="text-gray-900 font-medium">{product.sku}</span></span>
-                            <span className="flex items-center gap-1.5 border-l pl-4"><Store size={14} /> Vendor: <span className="text-gray-900 font-medium">{product.store?.name || "KoperasiHub Vendor"}</span></span>
+                            <span className="flex items-center gap-1.5"><Store size={14} /> Vendor: <span className="text-gray-900 font-medium">{storeName || "Memuat..." }</span></span>
+                            <span className="flex items-center gap-1.5 border-l pl-4 text-emerald-600 font-bold">{(product.total_sold || 0).toLocaleString('id-ID')} Terjual</span>
                         </div>
                     </div>
 
