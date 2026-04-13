@@ -88,6 +88,9 @@ export default function StoreSettingsForm() {
         cover: '',
         latitude: '',
         longitude: '',
+        seo_title: '',
+        seo_description: '',
+        seo_keywords: '',
     });
 
     const [areaSearchInput, setAreaSearchInput] = useState('');
@@ -143,6 +146,9 @@ export default function StoreSettingsForm() {
                         cover: data.cover || '',
                         latitude: data.latitude || '',
                         longitude: data.longitude || '',
+                        seo_title: data.seo_title || '',
+                        seo_description: data.seo_description || '',
+                        seo_keywords: data.seo_keywords || '',
                     });
 
                     // Set initial area search input
@@ -374,6 +380,9 @@ export default function StoreSettingsForm() {
                 cover: formData.cover,
                 latitude: formData.latitude,
                 longitude: formData.longitude,
+                seo_title: formData.seo_title,
+                seo_description: formData.seo_description,
+                seo_keywords: formData.seo_keywords,
             };
 
             const token = await getAccessToken();
@@ -603,6 +612,50 @@ export default function StoreSettingsForm() {
                             </div>
                         </div>
 
+                    </div>
+                </section>
+
+                {/* SEO & Metadata */}
+                <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <Search className="w-5 h-5 text-emerald-600" /> SEO & Metadata
+                    </h2>
+                    <div className="space-y-6">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">SEO Title</label>
+                            <input
+                                type="text"
+                                value={formData.seo_title}
+                                onChange={(e) => setFormData({ ...formData, seo_title: e.target.value })}
+                                className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                                placeholder="Judul toko untuk mesin pencari (SEO)"
+                            />
+                            <p className="text-[10px] text-slate-500 mt-1 italic">Judul ini akan muncul di tab browser dan hasil pencarian Google.</p>
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">SEO Description</label>
+                            <textarea
+                                value={formData.seo_description}
+                                onChange={(e) => setFormData({ ...formData, seo_description: e.target.value })}
+                                rows={3}
+                                className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                                placeholder="Deskripsi singkat toko untuk SEO..."
+                            />
+                            <p className="text-[10px] text-slate-500 mt-1 italic">Deskripsi yang menarik membantu meningkatkan klik dari hasil pencarian (Maks. 160 karakter disarankan).</p>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">SEO Keywords</label>
+                            <textarea
+                                value={formData.seo_keywords}
+                                onChange={(e) => setFormData({ ...formData, seo_keywords: e.target.value })}
+                                rows={2}
+                                className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                                placeholder="Contoh: koperasiku, toko online, sembako murah, belanja hemat..."
+                            />
+                            <p className="text-[10px] text-slate-500 mt-1 italic">Pisahkan kata kunci dengan tanda koma.</p>
+                        </div>
                     </div>
                 </section>
 
