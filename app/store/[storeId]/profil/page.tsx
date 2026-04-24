@@ -155,7 +155,7 @@ export default function KoperasiPublicProfilePage({
                                         </div>
                                         <div>
                                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Official Website / ID</p>
-                                            <p className="text-sm font-bold text-slate-800 break-all">{window.location.origin}/store/{store.id}</p>
+                                            <p className="text-sm font-bold text-slate-800 break-all">{window.location.origin}/store/{store.subdomain || store.id}</p>
                                         </div>
                                     </div>
 
@@ -192,7 +192,7 @@ export default function KoperasiPublicProfilePage({
 
                                     <div className="pt-6 border-t border-slate-100">
                                         <Link 
-                                            href={`/store/${storeId}`}
+                                            href={`/store/${store.subdomain || store.id}`}
                                             className="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-2xl font-bold transition-all group"
                                         >
                                             <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
@@ -300,7 +300,7 @@ export default function KoperasiPublicProfilePage({
                                 <h3 className="text-2xl font-bold text-slate-800 mb-2">Mari Tumbuh Bersama</h3>
                                 <p className="text-slate-500 font-medium mb-8">Dukung ekonomi mandiri dengan bertransaksi di toko resmi kami.</p>
                                 <Link 
-                                    href={`/store/${storeId}`}
+                                    href={`/store/${store.subdomain || store.id}`}
                                     className="inline-flex items-center gap-3 bg-[var(--store-primary)] hover:opacity-90 text-white px-10 py-4 rounded-2xl font-black text-lg transition-all shadow-xl shadow-emerald-600/30"
                                 >
                                     Lihat Semua Produk

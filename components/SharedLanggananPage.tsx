@@ -46,7 +46,9 @@ export function SharedLanggananPage() {
                 const currentRole = roleMatch ? roleMatch[1] : user?.role;
                 
                 // Fetch Plans with role filter
-                const plansUrl = currentRole ? `/api/plans?role=${currentRole}` : '/api/plans';
+                const plansUrl = currentRole 
+                    ? `/api/plans?role=${currentRole}&order_by=order&order_dir=ASC` 
+                    : '/api/plans?order_by=order&order_dir=ASC';
                 
                 const resPlans = await fetch(plansUrl);
                 const dataPlans = await resPlans.json();

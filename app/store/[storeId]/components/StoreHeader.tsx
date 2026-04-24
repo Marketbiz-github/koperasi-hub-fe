@@ -21,7 +21,7 @@ export default function StoreHeader({ store }: StoreHeaderProps) {
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.push(`/produk?search=${encodeURIComponent(searchQuery)}`);
+        router.push(`/store/${store.subdomain || store.id}/produk?search=${encodeURIComponent(searchQuery)}`);
     };
 
     return (
@@ -30,7 +30,7 @@ export default function StoreHeader({ store }: StoreHeaderProps) {
                 <div className="flex items-center justify-between h-16 md:h-20">
                     {/* Logo & Name */}
                     <div className="flex items-center gap-3">
-                        <Link href="/" className="relative w-10 h-10 md:w-12 md:h-12 rounded-xl overflow-hidden bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 shadow-sm hover:shadow-md transition-shadow">
+                        <Link href={`/store/${store.subdomain || store.id}`} className="relative w-10 h-10 md:w-12 md:h-12 rounded-xl overflow-hidden bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 shadow-sm hover:shadow-md transition-shadow">
                             {store.logo ? (
                                 <Image
                                     src={store.logo}
@@ -43,14 +43,14 @@ export default function StoreHeader({ store }: StoreHeaderProps) {
                             )}
                         </Link>
                         <div className="hidden sm:block">
-                            <Link href="/">
+                            <Link href={`/store/${store.subdomain || store.id}`}>
                                 <span className="block text-sm font-extrabold text-slate-900 leading-none mb-1 hover:text-[var(--store-primary,#10b981)] transition-colors">{store.name}</span>
                             </Link>
                             <div className="flex items-center gap-2">
                                 <span className="block text-[10px] font-bold text-[var(--store-primary,#10b981)] uppercase tracking-[0.15em]">Official Store</span>
                                 <span className="text-slate-200 text-xs mt-0.5">•</span>
                                 <Link 
-                                    href={`/store/${store.id}/profil`} 
+                                    href={`/store/${store.subdomain || store.id}/profil`} 
                                     className="text-[10px] font-bold text-slate-400 hover:text-[var(--store-primary,#10b981)] uppercase tracking-widest transition-all flex items-center gap-1 group/profile"
                                 >
                                     <span className="group-hover/profile:translate-x-0.5 transition-transform">Profil Koperasi</span>

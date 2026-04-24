@@ -32,6 +32,7 @@ type Product = {
     verified: boolean;
     address?: string;
     phone?: string;
+    subdomain?: string;
   };
 };
 
@@ -225,7 +226,7 @@ export default function ProductDetail({
 
                   <div className="flex gap-2 pt-3">
                     <Link
-                      href={`/store/${product.owner.id}`}
+                      href={`/store/${product.owner.subdomain || product.owner.id}`}
                       className="flex-1 bg-[#2F5755] hover:bg-[#244746] text-white py-2 rounded-lg text-center text-sm font-medium transition"
                     >
                       Kunjungi Toko

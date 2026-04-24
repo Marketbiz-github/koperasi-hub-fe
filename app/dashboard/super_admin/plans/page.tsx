@@ -40,6 +40,7 @@ interface Plan {
     price: string;
     duration_days: number;
     role?: string;
+    order?: number;
     created_at: string;
     features?: Feature[];
 }
@@ -80,13 +81,14 @@ export default function PlansPage() {
         price: '',
         duration_days: '',
         role: '',
+        order: '',
     });
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
             const [planRes, featureRes] = await Promise.all([
-                fetch('/api/plans'),
+                fetch('/api/plans?order_by=order&order_dir=ASC'),
                 fetch('/api/features')
             ]);
             
@@ -120,6 +122,7 @@ export default function PlansPage() {
             price: '',
             duration_days: '',
             role: '',
+            order: '',
         });
         setIsDialogOpen(true);
     };
@@ -131,6 +134,7 @@ export default function PlansPage() {
             price: plan.price.toString(),
             duration_days: plan.duration_days.toString(),
             role: plan.role || '',
+            order: plan.order?.toString() || '',
         });
         setIsDialogOpen(true);
     };
@@ -154,6 +158,7 @@ export default function PlansPage() {
             price: formData.price,
             duration_days: Number(formData.duration_days),
             ...(formData.role ? { role: formData.role } : {}),
+            ...(formData.order ? { order: Number(formData.order) } : {}),
         }
 
         try {
@@ -300,6 +305,7 @@ export default function PlansPage() {
                                         <TableHead className="w-16">ID</TableHead>
                                         <TableHead>Nama Paket</TableHead>
                                         <TableHead>Role</TableHead>
+                                        <TableHead className="text-center">Urutan</TableHead>
                                         <TableHead>Harga</TableHead>
                                         <TableHead>Durasi (Hari)</TableHead>
                                         <TableHead className="text-right">Aksi</TableHead>
@@ -308,7 +314,7 @@ export default function PlansPage() {
                                 <TableBody>
                                     {filteredPlans.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={6} className="h-24 text-center">
+                                            <TableCell colSpan={7} className="h-24 text-center">
                                                 Tidak ada paket ditemukan.
                                             </TableCell>
                                         </TableRow>
@@ -326,6 +332,7 @@ export default function PlansPage() {
                                                         <span className="text-xs text-muted-foreground italic">—</span>
                                                     )}
                                                 </TableCell>
+                                                <TableCell className="text-center">{p.order || '-'}</TableCell>
                                                 <TableCell>Rp {Number(p.price).toLocaleString('id-ID')}</TableCell>
                                                 <TableCell>{p.duration_days} Hari</TableCell>
                                                 <TableCell className="text-right">
@@ -431,6 +438,16 @@ export default function PlansPage() {
                                     ))}
                                 </SelectContent>
                             </Select>
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="order">Urutan (Order)</Label>
+                            <Input
+                                id="order"
+                                type="number"
+                                value={formData.order}
+                                onChange={(e) => setFormData({ ...formData, order: e.target.value })}
+                                placeholder="Contoh: 1"
+                            />
                         </div>
                         <DialogFooter className="pt-4">
                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>

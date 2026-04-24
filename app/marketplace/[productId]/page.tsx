@@ -40,6 +40,7 @@ interface ProductDetail {
     image_url: string;
     address: string;
     is_verified: boolean;
+    subdomain?: string;
   };
   is_gratis_ongkir?: boolean;
   is_cashback?: boolean;
@@ -439,7 +440,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                       <p className="text-xs text-gray-500 line-clamp-1">{product.store.address || 'Alamat tidak tersedia'}</p>
                     </div>
                     <Link
-                      href={`/store/${product.store.id}`}
+                      href={`/store/${product.store.subdomain || product.store.id}`}
                       className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-semibold hover:border-emerald-400 hover:text-emerald-600 transition"
                     >
                       Kunjungi Toko

@@ -191,7 +191,7 @@ export default function ProductPageClient({
         return (
             <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4">
                 <h2 className="text-2xl font-bold text-slate-800">Data tidak ditemukan</h2>
-                <Link href="/" className="text-emerald-600 font-bold hover:underline">Kembali ke Toko</Link>
+                <Link href={`/store/${store.subdomain || store.id}`} className="text-emerald-600 font-bold hover:underline">Kembali ke Toko</Link>
             </div>
         );
     }
@@ -209,7 +209,7 @@ export default function ProductPageClient({
             <main className="flex-1">
                 <div className="max-w-7xl mx-auto w-full px-4 py-8 md:py-12">
                     {/* Breadcrumb / Back */}
-                    <Link href="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-[var(--store-primary)] transition-colors mb-8 font-bold text-sm">
+                    <Link href={`/store/${store.subdomain || store.id}`} className="inline-flex items-center gap-2 text-slate-500 hover:text-[var(--store-primary)] transition-colors mb-8 font-bold text-sm">
                         <ArrowLeft size={18} />
                         Kembali ke Beranda Toko
                     </Link>
