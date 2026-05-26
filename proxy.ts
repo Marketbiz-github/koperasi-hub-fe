@@ -62,15 +62,17 @@ export function proxy(request: NextRequest) {
     ];
 
     let subdomain = '';
-    if (hostname.endsWith('.koperasi-hub-fe.vercel.app')) {
-        subdomain = hostname.replace('.koperasi-hub-fe.vercel.app', '');
-    } else if (hostname.endsWith('.appshub.my.id')) {
-        subdomain = hostname.replace('.appshub.my.id', '');
-    } else if (hostname.endsWith('.koperasi-hub-fe.test')) {
-        subdomain = hostname.replace('.koperasi-hub-fe.test', '');
-    } else if (hostname.endsWith('.localhost:3000')) {
-        subdomain = hostname.replace('.localhost:3000', '');
-    } else if (!mainDomains.includes(hostname)) {
+
+    const matchedDomain = mainDomains.find((domain) =>
+        hostname === domain || hostname.endsWith(`.${domain}`)
+    );
+
+    if (matchedDomain) {
+        if (hostname !== matchedDomain) {
+            subdomain = hostname.replace(`.${matchedDomain}`, '');
+        }
+    } else {
+        // custom domain tenant
         subdomain = hostname;
     }
 
