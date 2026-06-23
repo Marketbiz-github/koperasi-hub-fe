@@ -144,7 +144,7 @@ export default function KoperasiHubPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-              Mengapa Memilih <span className="text-green-600">KoperasiHub</span>?
+              Mengapa Memilih <span className="text-green-600">kopa.network</span>?
             </h2>
             <p className="text-gray-600">
               Platform terpercaya untuk ekosistem bisnis Indonesia
@@ -412,7 +412,7 @@ export default function KoperasiHubPage() {
               {
                 question: 'Apa syarat untuk koperasi bisa bergabung di platform ini?',
                 answer:
-                  'Daftar sebagai koperasi di KoperasiHub dengan melengkapi data yang diperlukan.',
+                  'Daftar sebagai koperasi di kopa.network dengan melengkapi data yang diperlukan.',
               },
               {
                 question: 'Bagaimana cara vendor mendaftarkan produk?',

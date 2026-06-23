@@ -182,8 +182,8 @@ export default function RegisterVendorPage() {
           <Link href="/" className="transition-transform hover:scale-105">
             <div className="relative w-48 h-16">
               <Image
-                src="/images/koperasihub2.png"
-                alt="KoperasiHub Logo"
+                src="/images/kopa.network.png"
+                alt="kopa.network Logo"
                 fill
                 className="object-contain"
                 priority
@@ -325,7 +325,7 @@ export default function RegisterVendorPage() {
                       required
                     />
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">
-                      .koperasihub.com
+                      .kopa.network
                     </div>
                   </div>
                   {errors.subdomain && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.subdomain}</p>}
@@ -406,7 +406,7 @@ export default function RegisterVendorPage() {
                   className="mt-1 w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                 />
                 <label htmlFor="agreeTerms" className="text-sm text-slate-600">
-                  Saya menyetujui <Link href="/syarat-ketentuan" target="_blank" className="font-bold text-emerald-600 hover:underline">Syarat & Ketentuan</Link> serta <Link href="/kebijakan-privasi" target="_blank" className="font-bold text-emerald-600 hover:underline">Kebijakan Privasi</Link> KoperasiHub.
+                  Saya menyetujui <Link href="/syarat-ketentuan" target="_blank" className="font-bold text-emerald-600 hover:underline">Syarat & Ketentuan</Link> serta <Link href="/kebijakan-privasi" target="_blank" className="font-bold text-emerald-600 hover:underline">Kebijakan Privasi</Link> kopa.network.
                 </label>
               </div>
               {errors.agreeTerms && <p className="mt-2 text-xs font-medium text-red-500">{errors.agreeTerms}</p>}
@@ -437,7 +437,7 @@ export default function RegisterVendorPage() {
         {/* Footer info */}
         <div className="text-center mt-10">
           <p className="text-sm text-slate-400">
-            &copy; {new Date().getFullYear()} KoperasiHub Platform. Seluruh Hak Cipta Dilindungi.
+            &copy; {new Date().getFullYear()} kopa.network Platform. Seluruh Hak Cipta Dilindungi.
           </p>
         </div>
       </div >

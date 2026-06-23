@@ -19,7 +19,7 @@ export default function SyaratKetentuan() {
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-4">1. Pendahuluan</h2>
               <p>
-                Selamat datang di KoperasiHub. Dengan mengakses dan menggunakan platform kami, Anda setuju untuk terikat oleh Syarat dan Ketentuan berikut. Harap baca dengan seksama sebelum menggunakan layanan kami.
+                Selamat datang di kopa.network. Dengan mengakses dan menggunakan platform kami, Anda setuju untuk terikat oleh Syarat dan Ketentuan berikut. Harap baca dengan seksama sebelum menggunakan layanan kami.
               </p>
             </section>
 
@@ -33,28 +33,28 @@ export default function SyaratKetentuan() {
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-4">3. Penggunaan Layanan</h2>
               <p>
-                Anda setuju untuk menggunakan layanan KoperasiHub hanya untuk tujuan yang sah dan sesuai dengan Syarat dan Ketentuan ini. Anda dilarang keras menggunakan platform untuk kegiatan yang melanggar hukum, menipu, atau merugikan pihak lain.
+                Anda setuju untuk menggunakan layanan kopa.network hanya untuk tujuan yang sah dan sesuai dengan Syarat dan Ketentuan ini. Anda dilarang keras menggunakan platform untuk kegiatan yang melanggar hukum, menipu, atau merugikan pihak lain.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-4">4. Transaksi dan Pembayaran</h2>
               <p>
-                KoperasiHub memfasilitasi transaksi antara Vendor, Koperasi, dan Anggota. Segala bentuk transaksi pembayaran harus dilakukan melalui metode yang telah disediakan di platform untuk menjamin keamanan dan transparansi.
+                kopa.network memfasilitasi transaksi antara Vendor, Koperasi, dan Anggota. Segala bentuk transaksi pembayaran harus dilakukan melalui metode yang telah disediakan di platform untuk menjamin keamanan dan transparansi.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-4">5. Hak Kekayaan Intelektual</h2>
               <p>
-                Seluruh konten dalam platform KoperasiHub, termasuk namun tidak terbatas pada teks, grafik, logo, dan perangkat lunak, adalah properti KoperasiHub atau pemberi lisensinya dan dilindungi oleh undang-undang hak cipta.
+                Seluruh konten dalam platform kopa.network, termasuk namun tidak terbatas pada teks, grafik, logo, dan perangkat lunak, adalah properti kopa.network atau pemberi lisensinya dan dilindungi oleh undang-undang hak cipta.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-4">6. Pembatalan dan Pengembalian</h2>
               <p>
-                Kebijakan pembatalan pesanan dan pengembalian barang mengikuti kebijakan masing-masing vendor yang terdaftar, namun tetap dimediasi oleh KoperasiHub demi perlindungan konsumen.
+                Kebijakan pembatalan pesanan dan pengembalian barang mengikuti kebijakan masing-masing vendor yang terdaftar, namun tetap dimediasi oleh kopa.network demi perlindungan konsumen.
               </p>
             </section>
 

@@ -14,8 +14,8 @@ export default function Footer() {
               <Link href="/" className="">
                 <div className="relative w-36 md:w-48 h-12 md:h-16">
                   <Image
-                    src="/images/koperasihub-dark2.png"
-                    alt="KoperasiHub Logo"
+                    src="/images/kopa.network-whitee.png"
+                    alt="kopa.network Logo"
                     fill
                     className="object-contain"
                     priority
@@ -49,7 +49,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-700 pt-6 flex flex-col md:flex-row items-center justify-between">
-          <p className="text-gray-400 text-sm mb-4 md:mb-0">© {new Date().getFullYear()} KoperasiHub Platform. Seluruh Hak Cipta Dilindungi.</p>
+          <p className="text-gray-400 text-sm mb-4 md:mb-0">© {new Date().getFullYear()} kopa.network Platform. Seluruh Hak Cipta Dilindungi.</p>
           <div className="flex items-center space-x-4">
             <a href="#" className="text-gray-300 hover:text-[#10b981] transition"><Instagram className="w-6 h-6" /></a>
             <a href="#" className="text-gray-300 hover:text-[#10b981] transition">

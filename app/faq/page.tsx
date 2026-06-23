@@ -6,8 +6,8 @@ import { useState } from 'react';
 
 const faqs = [
   {
-    question: "Apa itu KoperasiHub?",
-    answer: "KoperasiHub adalah platform digital yang menghubungkan vendor, koperasi, dan anggota koperasi dalam satu ekosistem terpadu untuk memudahkan pengadaan barang dan pemasaran produk."
+    question: "Apa itu kopa.network?",
+    answer: "kopa.network adalah platform digital yang menghubungkan vendor, koperasi, dan anggota koperasi dalam satu ekosistem terpadu untuk memudahkan pengadaan barang dan pemasaran produk."
   },
   {
     question: "Bagaimana cara mendaftar sebagai Vendor?",
@@ -15,7 +15,7 @@ const faqs = [
   },
   {
     question: "Apakah koperasi bisa menjual produk anggotanya di sini?",
-    answer: "Ya, sangat bisa! Koperasi dapat mendaftarkan produk anggota dan menjualnya ke pasar yang lebih luas melalui jaringan KoperasiHub."
+    answer: "Ya, sangat bisa! Koperasi dapat mendaftarkan produk anggota dan menjualnya ke pasar yang lebih luas melalui jaringan kopa.network."
   },
   {
     question: "Apa keuntungan bagi Anggota Koperasi?",
@@ -43,7 +43,7 @@ export default function FAQ() {
           <div className="text-center mb-12">
             <h1 className="text-4xl font-extrabold text-gray-900 mb-4">FAQ</h1>
             <p className="text-gray-600 text-lg">
-              Pertanyaan yang sering diajukan seputar KoperasiHub.
+              Pertanyaan yang sering diajukan seputar kopa.network.
             </p>
           </div>
 

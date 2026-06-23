@@ -51,14 +51,14 @@ export default function CartFooter() {
                     <div className="flex items-center gap-4">
                         <div className="relative w-32 h-8 grayscale opacity-50">
                             <Image
-                                src="/images/koperasihub-dark2.png"
-                                alt="KoperasiHub"
+                                src="/images/kopa.network-whitee.png"
+                                alt="kopa.network"
                                 fill
                                 className="object-contain"
                             />
                         </div>
                         <p className="text-xs text-gray-400">
-                            © {new Date().getFullYear()} KoperasiHub. Seluruh Hak Cipta Dilindungi.
+                            © {new Date().getFullYear()} kopa.network. Seluruh Hak Cipta Dilindungi.
                         </p>
                     </div>
 

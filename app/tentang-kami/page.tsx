@@ -13,7 +13,7 @@ export default function TentangKami() {
           <div className="bg-green-600 py-12 px-8 text-white text-center">
             <h1 className="text-4xl font-extrabold mb-4">Tentang Kami</h1>
             <p className="text-green-50 text-lg max-w-2xl mx-auto">
-              Menghubungkan Potensi, Membangun Ekonomi Bersama KoperasiHub.
+              Menghubungkan Potensi, Membangun Ekonomi Bersama kopa.network.
             </p>
           </div>
           
@@ -36,9 +36,9 @@ export default function TentangKami() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-green-700 mb-4">Apa Itu KoperasiHub?</h2>
+              <h2 className="text-2xl font-bold text-green-700 mb-4">Apa Itu kopa.network?</h2>
               <p>
-                KoperasiHub adalah platform Marketplace B2B & B2C yang dirancang khusus untuk memenuhi kebutuhan ekosistem koperasi. Kami memahami bahwa koperasi memiliki peran vital dalam ekonomi Indonesia, namun seringkali menghadapi tantangan dalam digitalisasi dan akses ke vendor berkualitas.
+                kopa.network adalah platform Marketplace B2B & B2C yang dirancang khusus untuk memenuhi kebutuhan ekosistem koperasi. Kami memahami bahwa koperasi memiliki peran vital dalam ekonomi Indonesia, namun seringkali menghadapi tantangan dalam digitalisasi dan akses ke vendor berkualitas.
               </p>
               <p className="mt-4">
                 Melalui platform kami, koperasi dapat dengan mudah mengelola pengadaan barang, menawarkan produk ke anggota, dan menjalin kemitraan strategis dengan vendor-vendor terpercaya di seluruh Indonesia.
@@ -46,7 +46,7 @@ export default function TentangKami() {
             </section>
 
             <div className="bg-green-50 p-6 rounded-2xl border border-green-100 italic text-center">
-              "Kekuatan kita ada pada kebersamaan. KoperasiHub hadir untuk memperkuat kebersamaan itu melalui teknologi."
+              "Kekuatan kita ada pada kebersamaan. kopa.network hadir untuk memperkuat kebersamaan itu melalui teknologi."
             </div>
           </div>
         </div>

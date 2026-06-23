@@ -13,8 +13,8 @@ export default function Footer() {
               <Link href="/" className="">
                 <div className="relative w-36 md:w-48 h-12 md:h-16">
                   <Image
-                    src="/images/koperasihub-dark2.png"
-                    alt="KoperasiHub Logo"
+                    src="/images/kopa.network-whitee.png"
+                    alt="kopa.network Logo"
                     fill
                     className="object-contain"
                     priority
@@ -88,7 +88,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-800 pt-8 text-center">
-          <p className="text-gray-500 text-xs">&copy; {new Date().getFullYear()} KoperasiHub Platform. Seluruh Hak Cipta Dilindungi.</p>
+          <p className="text-gray-500 text-xs">&copy; {new Date().getFullYear()} kopa.network Platform. Seluruh Hak Cipta Dilindungi.</p>
         </div>
       </div>
     </footer>

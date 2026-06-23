@@ -68,7 +68,7 @@ export default function DashboardPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Super Admin Dashboard</h1>
-      <p className="text-muted-foreground mb-6">Ringkasan performa seluruh platform Koperasi Hub</p>
+      <p className="text-muted-foreground mb-6">Ringkasan performa seluruh platform kopa.network</p>
       
       <div className="my-6">
         <SectionCards
