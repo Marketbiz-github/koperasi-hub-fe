@@ -81,7 +81,7 @@ export async function getLatLong(params: GeocodeParams): Promise<{ lat: string; 
 
         const qUrl = `https://nominatim.openstreetmap.org/search?${qParams.toString()}`;
         const dataOsm = await fetchWithRetry(qUrl, {
-            headers: { 'User-Agent': 'KoperasiHub-FE/1.0' }
+            headers: { 'User-Agent': 'kopa.network-FE/1.0' }
         });
 
         if (dataOsm && Array.isArray(dataOsm) && dataOsm.length > 0) {

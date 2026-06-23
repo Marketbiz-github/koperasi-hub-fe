@@ -26,7 +26,7 @@ export function SiteHeader() {
     await logout()
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_DOMAIN || 'koperasihub.com'
+  const appUrl = process.env.NEXT_PUBLIC_APP_DOMAIN || 'kopa.network'
   const storeUrl = store?.domain
     ? `https://${store.domain}`
     : store?.subdomain

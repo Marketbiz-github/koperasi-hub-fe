@@ -37,8 +37,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
         if (!product && !store) return {};
 
-        const title = product?.seo_title || (product ? `${product.name} | ${store?.name || 'KoperasiHub'}` : store?.seo_title || store?.name);
-        const description = product?.seo_description || product?.short_description || store?.seo_description || store?.description || 'Beli produk berkualitas di KoperasiHub.';
+        const title = product?.seo_title || (product ? `${product.name} | ${store?.name || 'kopa.network'}` : store?.seo_title || store?.name);
+        const description = product?.seo_description || product?.short_description || store?.seo_description || store?.description || 'Beli produk berkualitas di kopa.network.';
         const keywords = product?.seo_keywords || store?.seo_keywords || `koperasi, ${product?.name || ''}, marketplace`;
 
         return {

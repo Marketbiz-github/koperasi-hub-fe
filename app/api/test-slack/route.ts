@@ -3,7 +3,7 @@ import { sendSlackMessage } from "@/lib/slack";
 
 export async function GET() {
   const success = await sendSlackMessage(
-    "Hello :wave:! This is a test message from Koperasi Hub environment to confirm Slack integration is working."
+    "Hello :wave:! This is a test message from kopa.network environment to confirm Slack integration is working."
   );
 
   if (success) {

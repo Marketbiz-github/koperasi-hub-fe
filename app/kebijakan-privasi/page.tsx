@@ -19,7 +19,7 @@ export default function KebijakanPrivasi() {
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-4">1. Informasi yang Kami Kumpulkan</h2>
               <p>
-                Kami mengumpulkan informasi yang Anda berikan langsung kepada kami saat mendaftarkan akun, termasuk nama, alamat email, nomor telepon, dan data profil lainnya yang diperlukan untuk layanan KoperasiHub.
+                Kami mengumpulkan informasi yang Anda berikan langsung kepada kami saat mendaftarkan akun, termasuk nama, alamat email, nomor telepon, dan data profil lainnya yang diperlukan untuk layanan kopa.network.
               </p>
             </section>
 

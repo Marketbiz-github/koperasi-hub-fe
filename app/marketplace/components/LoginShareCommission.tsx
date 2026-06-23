@@ -309,8 +309,8 @@ export default function LoginShareCommission({
         <div className="flex items-center justify-between px-6 py-4 border-t">
           <div className="relative w-32 h-8">
             <Image
-              src="/images/koperasihub-dark2.png"
-              alt="KoperasiHub"
+              src="/images/kopa.network-whitee.png"
+              alt="kopa.network"
               fill
               className="object-contain"
             />

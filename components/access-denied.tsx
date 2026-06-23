@@ -71,7 +71,7 @@ export function AccessDenied({ allowedRole }: AccessDeniedProps) {
           {/* Footer */}
           <div className="mt-8 pt-6 border-t border-gray-200">
             <p className="text-sm text-gray-600">
-              © 2025 KoperasiHub. All rights reserved.
+              © 2025 kopa.network. All rights reserved.
             </p>
           </div>
         </div>

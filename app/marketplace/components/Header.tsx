@@ -76,8 +76,8 @@ export default function Header() {
               <Link href="/" className="">
                 <div className="relative w-32 md:w-48 h-10 md:h-14">
                   <Image
-                    src="/images/koperasihub-dark2.png"
-                    alt="KoperasiHub Logo"
+                    src="/images/kopa.network-whitee.png"
+                    alt="kopa.network Logo"
                     fill
                     className="object-contain"
                     priority
@@ -156,7 +156,7 @@ export default function Header() {
           <form onSubmit={handleSearch} className="relative">
             <input
               type="text"
-              placeholder="Cari produk di KoperasiHub..."
+              placeholder="Cari produk di kopa.network..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="bg-white/10 text-white placeholder-white/50 px-4 py-3 pr-10 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-emerald-500 outline-none transition"

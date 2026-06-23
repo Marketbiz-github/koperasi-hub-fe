@@ -15,8 +15,9 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "KoperasiHub - Platform Terpadu untuk Vendor, Koperasi & Promotor",
-  description: "KoperasiHub adalah platform e-commerce terpadu yang menghubungkan vendor, koperasi, dan promotor. Kelola toko, produk, dan penjualan Anda dengan mudah.",
+  metadataBase: new URL("https://kopa.network"),
+  title: "kopa.network - Platform Terpadu untuk Vendor, Koperasi & Promotor",
+  description: "kopa.network adalah platform e-commerce terpadu yang menghubungkan vendor, koperasi, dan promotor. Kelola toko, produk, dan penjualan Anda dengan mudah.",
   keywords: [
     "koperasi",
     "e-commerce",
@@ -27,32 +28,32 @@ export const metadata: Metadata = {
     "toko online",
     "sistem penjualan",
   ],
-  authors: [{ name: "KoperasiHub" }],
-  creator: "KoperasiHub",
-  publisher: "KoperasiHub",
+  authors: [{ name: "kopa.network" }],
+  creator: "kopa.network",
+  publisher: "kopa.network",
   openGraph: {
     type: "website",
     locale: "id_ID",
-    url: "https://koperasi.hub",
-    siteName: "KoperasiHub",
-    title: "KoperasiHub - Platform Terpadu untuk Vendor, Koperasi & Promotor",
+    url: "https://kopa.network",
+    siteName: "kopa.network",
+    title: "kopa.network - Platform Terpadu untuk Vendor, Koperasi & Promotor",
     description: "Platform e-commerce terpadu yang menghubungkan vendor, koperasi, dan promotor Indonesia.",
     images: [
       {
-        url: "https://koperasi.hub/og-image.jpg",
+        url: "https://kopa.network/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "KoperasiHub",
+        alt: "kopa.network",
         type: "image/jpeg",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "KoperasiHub - Platform Terpadu untuk Vendor, Koperasi & Promotor",
+    title: "kopa.network - Platform Terpadu untuk Vendor, Koperasi & Promotor",
     description: "Platform e-commerce terpadu yang menghubungkan vendor, koperasi, dan promotor Indonesia.",
-    images: ["https://koperasi.hub/og-image.jpg"],
-    creator: "@koperasihub",
+    images: ["https://kopa.network/og-image.jpg"],
+    creator: "@kopa.network",
   },
   robots: {
     index: true,
@@ -62,7 +63,7 @@ export const metadata: Metadata = {
     "max-video-preview": -1,
   },
   alternates: {
-    canonical: "https://koperasi.hub",
+    canonical: "https://kopa.network",
   },
   icons: {
     icon: "/images/favicon.png",

@@ -148,7 +148,7 @@ export default function ResellerProductDetailPage() {
             // 1. Get vendor's user_id from store detail
             const storeRes = await storeService.getDetail(token, storeId)
             const parentId = storeRes.data?.user_id
-            setStoreName(storeRes.data?.name || "KoperasiHub Vendor")
+            setStoreName(storeRes.data?.name || "kopa.network Vendor")
 
             // 2. Check Affiliation
             let affiliated = false

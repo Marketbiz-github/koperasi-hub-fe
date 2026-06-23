@@ -17,8 +17,8 @@ export default function ActivationSuccessPage() {
             >
                 <div className="relative w-48 h-12">
                     <Image
-                        src="/images/koperasihub2.png"
-                        alt="KoperasiHub Logo"
+                        src="/images/kopa.network.png"
+                        alt="kopa.network Logo"
                         fill
                         className="object-contain"
                         priority
@@ -101,7 +101,7 @@ export default function ActivationSuccessPage() {
                 transition={{ delay: 0.8 }}
                 className="mt-12 text-sm text-slate-400 font-medium"
             >
-                &copy; {new Date().getFullYear()} KoperasiHub Platform. Seluruh Hak Cipta Dilindungi.
+                &copy; {new Date().getFullYear()} kopa.network Platform. Seluruh Hak Cipta Dilindungi.
             </motion.p>
         </div>
     );

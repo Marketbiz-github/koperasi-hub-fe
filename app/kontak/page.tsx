@@ -48,7 +48,7 @@ export default function Kontak() {
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-800">Email</h3>
-                    <p className="text-gray-600">support@koperasihub.com</p>
+                    <p className="text-gray-600">support@kopa.network</p>
                   </div>
                 </div>
               </div>

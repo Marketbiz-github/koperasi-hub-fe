@@ -127,7 +127,7 @@ export default function LoginForm({
           {/* Footer Info */}
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-500">
-              © 2025 KoperasiHub. All rights reserved.
+              © 2025 kopa.network. All rights reserved.
             </p>
           </div>
         </div>

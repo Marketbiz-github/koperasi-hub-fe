@@ -82,8 +82,8 @@ export default function LoginPage() {
           <Link href="/" className="transition-transform hover:scale-105">
             <div className="relative w-48 h-16">
               <Image
-                src="/images/koperasihub2.png"
-                alt="KoperasiHub Logo"
+                src="/images/kopa.network.png"
+                alt="kopa.network Logo"
                 fill
                 className="object-contain"
                 priority
@@ -211,7 +211,7 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="text-center mt-10">
           <p className="text-sm text-slate-400">
-            &copy; {new Date().getFullYear()} KoperasiHub Platform. Seluruh Hak Cipta Dilindungi.
+            &copy; {new Date().getFullYear()} kopa.network Platform. Seluruh Hak Cipta Dilindungi.
           </p>
         </div>
       </div>

@@ -97,7 +97,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
   const productSlug = product.slug || product.id.toString();
 
-  const baseAppDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || (typeof window !== 'undefined' ? window.location.host.split('.').slice(-2).join('.') : 'koperasihub.com');
+  const baseAppDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || (typeof window !== 'undefined' ? window.location.host.split('.').slice(-2).join('.') : 'kopa.network');
   
   const currentSubdomain = subdomain || product.store?.subdomain || (product as any).store_subdomain;
   const currentCustomDomain = customDomain || product.store?.domain || (product as any).store_domain;
