@@ -15,6 +15,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://kopa.network"),
   title: "kopa.network - Platform Terpadu untuk Vendor, Koperasi & Promotor",
   description: "kopa.network adalah platform e-commerce terpadu yang menghubungkan vendor, koperasi, dan promotor. Kelola toko, produk, dan penjualan Anda dengan mudah.",
   keywords: [
